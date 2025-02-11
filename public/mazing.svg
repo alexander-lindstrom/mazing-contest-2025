@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <rect width="32" height="32" fill="#1e293b" rx="4"/>
+  
+  <!-- Simplified Maze Pattern -->
+  <path d="M8 8 L24 8 L24 16 L16 16 L16 24 L24 24" 
+        stroke="#94a3b8" 
+        stroke-width="3" 
+        fill="none" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  
+  <!-- Tower -->
+  <rect x="20" y="12" width="4" height="4" fill="#60a5fa"/>
+  
+  <!-- Runner/Ball -->
+  <circle cx="12" cy="12" r="2" fill="#f472b6"/>
+</svg>

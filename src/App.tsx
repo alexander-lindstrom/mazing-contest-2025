@@ -11,6 +11,7 @@ function App() {
   const handleCellClick = (x: number, y: number) => {
     const newGrid = grid.map(row => [...row]);
 
+    // Solve incorrect selling by keeping and using the tower list
     if (canSellTower(grid, x, y)) {
       for (let dy = 0; dy < 2; dy++) {
         for (let dx = 0; dx < 2; dx++) {

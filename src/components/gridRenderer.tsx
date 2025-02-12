@@ -1,5 +1,5 @@
-import { Stage, Layer, Rect, Text, Group } from 'react-konva';
-import { canPlaceTower, getCellColor, getTowerSymbol, getTowerSymbolColor, GridCell, GridProperties, Position, TowerType } from '../types/grid';
+import { Stage, Layer, Rect, Group } from 'react-konva';
+import { canPlaceTower, getCellColor, GridProperties, Position } from '../types/grid';
 import { useCallback, useState } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 
@@ -69,41 +69,6 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, o
               cursor="pointer"
             />
           ))
-        )}
-
-        {/* Tower symbols */}
-        {grid.map((row, y) =>
-          row.map((cell, x) => {
-            if (
-              cell === GridCell.BLOCK_TOWER ||
-              cell === GridCell.CLAP_TOWER ||
-              cell === GridCell.BLOCK_TOWER_NOSELL ||
-              cell === GridCell.CLAP_TOWER_NOSELL
-            ) {
-              // Only render symbol on top-left cell of 2x2 tower
-              if (x % 2 === 0 && y % 2 === 0) {
-                const towerType = cell === GridCell.BLOCK_TOWER || cell === GridCell.BLOCK_TOWER_NOSELL
-                  ? TowerType.BLOCK_TOWER
-                  : TowerType.CLAP_TOWER;
-                
-                return (
-                  <Text
-                    key={`tower-${x}-${y}`}
-                    x={x * CELL_SIZE}
-                    y={y * CELL_SIZE}
-                    width={CELL_SIZE * 2}
-                    height={CELL_SIZE * 2}
-                    text={getTowerSymbol(towerType)}
-                    fontSize={40}
-                    fill={getTowerSymbolColor(cell)}
-                    align="center"
-                    verticalAlign="middle"
-                  />
-                );
-              }
-            }
-            return null;
-          })
         )}
 
         {/* Hover highlight for 2x2 area */}

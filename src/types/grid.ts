@@ -77,32 +77,6 @@ export const getCellColor = (cell: GridCell): string => {
   }
 };
 
-export const getTowerSymbol = (type: TowerType): string => {
-  switch (type) {
-    case TowerType.BLOCK_TOWER:
-    case TowerType.BLOCK_TOWER_NOSELL:
-      return '▣';
-    case TowerType.CLAP_TOWER:
-    case TowerType.CLAP_TOWER_NOSELL:
-      return '◈';
-    default:
-      return '?';
-  }
-};
-
-export const getTowerSymbolColor = (cell: GridCell): string => {
-  switch (cell) {
-    case GridCell.BLOCK_TOWER:
-    case GridCell.CLAP_TOWER:
-      return '#FFFFFF'; // White
-    case GridCell.BLOCK_TOWER_NOSELL:
-    case GridCell.CLAP_TOWER_NOSELL:
-      return '#A0A0A0'; // Gray
-    default:
-      return '#000000';
-  }
-};
-
 export interface Position {
   x: number;
   y: number;

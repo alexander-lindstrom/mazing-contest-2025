@@ -49,7 +49,7 @@ const emptyGrid = Array(defaultHeight).fill(null).map((_, rowIndex) => {
   return row;
 });
 
-export const defaultGridState = {
+export const defaultGridParams = {
     height: defaultHeight,
     width: defaultWidth,
     grid: emptyGrid,
@@ -128,11 +128,4 @@ export const canPlaceTower = (grid: GridCell[][], x: number, y: number): boolean
 export const canSellTower = (grid: GridCell[][], x: number, y: number): boolean => {
   const cell = grid[y][x];
   return cell === GridCell.BLOCK_TOWER || cell === GridCell.CLAP_TOWER;
-};
-
-export const getTowerPlacementPosition = (x: number, y: number): Position => {
-  return {
-    x: Math.floor(x / 2) * 2,
-    y: Math.floor(y / 2) * 2
-  };
 };

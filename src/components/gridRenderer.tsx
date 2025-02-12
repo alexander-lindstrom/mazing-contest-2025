@@ -1,5 +1,5 @@
 import { Stage, Layer, Rect, Text, Group } from 'react-konva';
-import { canPlaceTower, getCellColor, getTowerPlacementPosition, getTowerSymbol, getTowerSymbolColor, GridCell, GridProperties, Position, TowerType } from '../types/grid';
+import { canPlaceTower, getCellColor, getTowerSymbol, getTowerSymbolColor, GridCell, GridProperties, Position, TowerType } from '../types/grid';
 import { useCallback, useState } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 
@@ -32,10 +32,16 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, o
     setHoverPosition(null);
   }, []);
 
-  const handleCellClick = useCallback((x: number, y: number) => {
-    const towerPos = getTowerPlacementPosition(x, y);
-    console.log(x,y)
-    onCellClick(towerPos.x, towerPos.y);
+  const handleStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    const stage = e.target.getStage();
+    if (!stage) return;
+    
+    const pos = stage.getPointerPosition();
+    if (!pos) return;
+    const x = Math.floor(pos.x / CELL_SIZE);
+    const y = Math.floor(pos.y / CELL_SIZE);
+    
+    onCellClick(x, y);
   }, [onCellClick]);
 
   return (
@@ -44,6 +50,7 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, o
       height={height * CELL_SIZE}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={handleStageClick}
     >
       <Layer>
         {/* Base grid */}
@@ -59,7 +66,6 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, o
               strokeWidth={1}
               stroke="#000"
               cornerRadius={2}
-              onClick={() => handleCellClick(x, y)}
               cursor="pointer"
             />
           ))

@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { canPlaceTower, canSellTower, defaultGridState, GridCell } from './types/grid';
+import { canPlaceTower, canSellTower, defaultGridParams, GridCell } from './types/grid';
 import GridRenderer from './components/gridRenderer';
 
 function App() {
-  const gridState = defaultGridState;
+  const gridParams = defaultGridParams;
   const [grid, setGrid] = useState(() => {
-    return gridState.grid;
+    return gridParams.grid;
   });
   
   const handleCellClick = (x: number, y: number) => {
     const newGrid = grid.map(row => [...row]);
-    
+
     if (canSellTower(grid, x, y)) {
       for (let dy = 0; dy < 2; dy++) {
         for (let dx = 0; dx < 2; dx++) {
@@ -37,7 +37,10 @@ function App() {
     <div className="App">
       <h1>Tower Defense Grid</h1>
       <GridRenderer
-        {...gridState}
+        width={gridParams.width}
+        height={gridParams.height}
+        towers={gridParams.towers}
+        grid={grid}
         onCellClick={handleCellClick}
       />
     </div>

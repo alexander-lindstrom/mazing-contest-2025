@@ -24,14 +24,14 @@ export type GridProperties = {
 }
 
 //towers 2x2
-const defaultHeight = 40;
-const defaultWidth = 40;
+const defaultHeight = 20;
+const defaultWidth = 20;
 
 const centerMid = Math.floor(defaultWidth / 2);
 const centerLeft = centerMid - 1;
 const centerRight = centerMid + 1;
 
-export const emptyGrid = Array(defaultHeight).fill(null).map((_, rowIndex) => {
+const emptyGrid = Array(defaultHeight).fill(null).map((_, rowIndex) => {
   const row = Array(defaultWidth).fill(GridCell.GRASS);
   
   if (rowIndex === 0 || rowIndex === defaultHeight - 1) {
@@ -49,7 +49,7 @@ export const emptyGrid = Array(defaultHeight).fill(null).map((_, rowIndex) => {
   return row;
 });
 
-export const defaultGrid = {
+export const defaultGridState = {
     height: defaultHeight,
     width: defaultWidth,
     grid: emptyGrid,
@@ -81,10 +81,10 @@ export const getTowerSymbol = (type: TowerType): string => {
   switch (type) {
     case TowerType.BLOCK_TOWER:
     case TowerType.BLOCK_TOWER_NOSELL:
-      return '▣'; // Block symbol
+      return '▣';
     case TowerType.CLAP_TOWER:
     case TowerType.CLAP_TOWER_NOSELL:
-      return '◈'; // Diamond symbol
+      return '◈';
     default:
       return '?';
   }

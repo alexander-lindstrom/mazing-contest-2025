@@ -34,6 +34,7 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, o
 
   const handleCellClick = useCallback((x: number, y: number) => {
     const towerPos = getTowerPlacementPosition(x, y);
+    console.log(x,y)
     onCellClick(towerPos.x, towerPos.y);
   }, [onCellClick]);
 
@@ -115,7 +116,7 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, o
                     width={CELL_SIZE}
                     height={CELL_SIZE}
                     fill="rgba(255, 255, 255, 0.2)"
-                    stroke={canPlaceTower(grid, hoverPosition.x, hoverPosition.y) ? "#00FFFF" : "red"}
+                    stroke={canPlaceTower(grid, hoverPosition.x, hoverPosition.y) ? "blue" : "red"}
                     strokeWidth={2}
                   />
                 );

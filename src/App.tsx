@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { canPlaceTower, canSellTower, emptyGrid, GridCell } from './types/grid';
+import { canPlaceTower, canSellTower, defaultGridState, GridCell } from './types/grid';
 import GridRenderer from './components/gridRenderer';
 
 function App() {
+  const gridState = defaultGridState;
   const [grid, setGrid] = useState(() => {
-    return emptyGrid;
+    return gridState.grid;
   });
   
   const handleCellClick = (x: number, y: number) => {
@@ -36,10 +37,7 @@ function App() {
     <div className="App">
       <h1>Tower Defense Grid</h1>
       <GridRenderer
-        height={40}
-        width={40}
-        grid={grid}
-        towers={[]}
+        {...gridState}
         onCellClick={handleCellClick}
       />
     </div>

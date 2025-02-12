@@ -1,53 +1,51 @@
-// src/components/GridRenderer.tsx
-import { Stage, Layer, Rect, Text } from 'react-konva';
-import { GridCell, GridProperties, TowerType } from '../types/grid';
-
+import { Stage, Layer, Rect, Text, Group } from 'react-konva';
+import { canPlaceTower, getCellColor, getTowerPlacementPosition, getTowerSymbol, getTowerSymbolColor, GridCell, GridProperties, Position, TowerType } from '../types/grid';
+import { useCallback, useState } from 'react';
+import { KonvaEventObject } from 'konva/lib/Node';
 
 const CELL_SIZE = 50;
 const CELL_PADDING = 1;
 
-const getCellColor = (cell: GridCell): string => {
-    switch (cell) {
-      case GridCell.GRASS:
-        return '#90EE90'; // Light green
-      case GridCell.GRASS_NOBUILD:
-        return '#698269'; // Darker green
-      case GridCell.SAND:
-        return '#F4D03F'; // Sand yellow
-      case GridCell.BLOCK_TOWER:
-        return '#E74C3C'; // Bright red for sellable block tower
-      case GridCell.BLOCK_TOWER_NOSELL:
-        return '#922B21'; // Darker red for non-sellable block tower
-      case GridCell.CLAP_TOWER:
-        return '#3498DB'; // Bright blue for sellable clap tower
-      case GridCell.CLAP_TOWER_NOSELL:
-        return '#1F618D'; // Darker blue for non-sellable clap tower
-      default:
-        return '#FFFFFF';
-    }
-  };
-
-const getTowerSymbol = (type: TowerType): string => {
-  switch (type) {
-    case TowerType.BLOCK_TOWER:
-    case TowerType.BLOCK_TOWER_NOSELL:
-      return '▣'; // Block symbol
-    case TowerType.CLAP_TOWER:
-    case TowerType.CLAP_TOWER_NOSELL:
-      return '◈'; // Diamond symbol
-    default:
-      return '?';
-  }
-};
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers }) => {
-  const canvasWidth = width * CELL_SIZE;
-  const canvasHeight = height * CELL_SIZE;
+const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, onCellClick }) => {
+  const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
+  
+  const handleMouseMove = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    const stage = e.target.getStage();
+    if (!stage) return;
+    
+    const pos = stage.getPointerPosition();
+    if (!pos) return;
+    
+    const x = Math.floor(pos.x / CELL_SIZE);
+    const y = Math.floor(pos.y / CELL_SIZE);
+    
+    if (x >= 0 && x + 1 < width && y >= 0 && y + 1 < height) {
+      setHoverPosition({ x, y });
+    } else {
+      setHoverPosition(null);
+    }
+  }, [width, height]);
+
+
+  const handleMouseLeave = useCallback(() => {
+    setHoverPosition(null);
+  }, []);
+
+  const handleCellClick = useCallback((x: number, y: number) => {
+    const towerPos = getTowerPlacementPosition(x, y);
+    onCellClick(towerPos.x, towerPos.y);
+  }, [onCellClick]);
 
   return (
-    <Stage width={canvasWidth} height={canvasHeight}>
+    <Stage 
+      width={width * CELL_SIZE} 
+      height={height * CELL_SIZE}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       <Layer>
+        {/* Base grid */}
         {grid.map((row, y) =>
           row.map((cell, x) => (
             <Rect
@@ -60,10 +58,13 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers })
               strokeWidth={1}
               stroke="#000"
               cornerRadius={2}
+              onClick={() => handleCellClick(x, y)}
+              cursor="pointer"
             />
           ))
         )}
 
+        {/* Tower symbols */}
         {grid.map((row, y) =>
           row.map((cell, x) => {
             if (
@@ -72,27 +73,55 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers })
               cell === GridCell.BLOCK_TOWER_NOSELL ||
               cell === GridCell.CLAP_TOWER_NOSELL
             ) {
-              const towerType = cell === GridCell.BLOCK_TOWER || cell === GridCell.BLOCK_TOWER_NOSELL
-                ? TowerType.BLOCK_TOWER
-                : TowerType.CLAP_TOWER;
-              
-              return (
-                <Text
-                  key={`tower-${x}-${y}`}
-                  x={x * CELL_SIZE}
-                  y={y * CELL_SIZE}
-                  width={CELL_SIZE}
-                  height={CELL_SIZE}
-                  text={getTowerSymbol(towerType)}
-                  fontSize={30}
-                  fill="#000"
-                  align="center"
-                  verticalAlign="middle"
-                />
-              );
+              // Only render symbol on top-left cell of 2x2 tower
+              if (x % 2 === 0 && y % 2 === 0) {
+                const towerType = cell === GridCell.BLOCK_TOWER || cell === GridCell.BLOCK_TOWER_NOSELL
+                  ? TowerType.BLOCK_TOWER
+                  : TowerType.CLAP_TOWER;
+                
+                return (
+                  <Text
+                    key={`tower-${x}-${y}`}
+                    x={x * CELL_SIZE}
+                    y={y * CELL_SIZE}
+                    width={CELL_SIZE * 2}
+                    height={CELL_SIZE * 2}
+                    text={getTowerSymbol(towerType)}
+                    fontSize={40}
+                    fill={getTowerSymbolColor(cell)}
+                    align="center"
+                    verticalAlign="middle"
+                  />
+                );
+              }
             }
             return null;
           })
+        )}
+
+        {/* Hover highlight for 2x2 area */}
+        {hoverPosition && (
+          <Group>
+            {[0, 1].map(dy => 
+              [0, 1].map(dx => {
+                const x = hoverPosition.x + dx;
+                const y = hoverPosition.y + dy;
+                
+                return (
+                  <Rect
+                    key={`hover-${x}-${y}`}
+                    x={x * CELL_SIZE}
+                    y={y * CELL_SIZE}
+                    width={CELL_SIZE}
+                    height={CELL_SIZE}
+                    fill="rgba(255, 255, 255, 0.2)"
+                    stroke={canPlaceTower(grid, hoverPosition.x, hoverPosition.y) ? "#00FFFF" : "red"}
+                    strokeWidth={2}
+                  />
+                );
+              })
+            )}
+          </Group>
         )}
       </Layer>
     </Stage>

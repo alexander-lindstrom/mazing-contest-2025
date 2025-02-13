@@ -18,9 +18,18 @@ export enum GridCell {
     CLAP_TOWER_NOSELL,
   }
 
-//towers 2x2
 const defaultHeight = 20;
 const defaultWidth = 21;
+
+export const defaultStart: Position = {
+  x: Math.floor((defaultWidth-1)/2),
+  y: 0,
+}
+
+export const defaultGoal: Position = {
+  x: Math.floor((defaultWidth-1)/2),
+  y: defaultHeight-1,
+}
 
 const centerMid = Math.floor(defaultWidth / 2);
 const centerLeft = centerMid - 1;

@@ -2,8 +2,10 @@ import { useState } from 'react';
 import GridRenderer from '../components/GridRenderer';
 import { generateStartingState } from '../util/RandomGeneration';
 
+const startingState = generateStartingState();
+
 export function GamePage() {
-  const startingState = generateStartingState();
+
   const [grid, setGrid] = useState(() => {
     return startingState.grid;
   });

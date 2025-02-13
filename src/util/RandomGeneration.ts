@@ -1,4 +1,5 @@
-import { canPlaceTower, defaultGridParams, GridCell, GridParams, Position, Tower } from './Grid';
+import { canPlaceTower, defaultGoal, defaultGridParams, defaultStart, GridCell, GridParams, Position, Tower } from './Grid';
+import { findShortestPath } from './Pathfinding';
 
 const maxClap = 3
 const minClap = 0
@@ -40,16 +41,24 @@ function placeTowers(grid: GridCell[][], towers: Tower[], count: number, type: G
     }
   }
 
-export function generateStartingState(){
-
-    const {height, width, grid, towers} = defaultGridParams;
-    const gold = getRandomInRange(minGold, maxGold);
-    const lumber = getRandomInRange(minLumber, maxLumber);
-    const clap = getRandomInRange(minClap, maxClap);
-    const block = getRandomInRange(minBlock, maxBlock);
-
-    placeTowers(grid, towers, clap, GridCell.CLAP_TOWER);
-    placeTowers(grid, towers, block, GridCell.BLOCK_TOWER);
-
-    return {height, width, grid, towers, gold, lumber};
-}
+  export function generateStartingState() {
+    let path: number[][] | null = null;
+    let height: number, width: number, grid: GridCell[][], towers: Tower[];
+    let gold: number, lumber: number, clap: number, block: number;
+  
+    do {
+      ({ height, width, grid, towers } = defaultGridParams);
+      gold = getRandomInRange(minGold, maxGold);
+      lumber = getRandomInRange(minLumber, maxLumber);
+      clap = getRandomInRange(minClap, maxClap);
+      block = getRandomInRange(minBlock, maxBlock);
+  
+      placeTowers(grid, towers, clap, GridCell.CLAP_TOWER);
+      placeTowers(grid, towers, block, GridCell.BLOCK_TOWER);
+  
+      path = findShortestPath(grid, defaultStart, defaultGoal);
+    } while (path === null);
+  
+    return { height, width, grid, towers, gold, lumber };
+  }
+  

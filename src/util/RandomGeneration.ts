@@ -53,8 +53,8 @@ function placeTowers(grid: GridCell[][], towers: Tower[], count: number, type: G
       clap = getRandomInRange(minClap, maxClap);
       block = getRandomInRange(minBlock, maxBlock);
   
-      placeTowers(grid, towers, clap, GridCell.CLAP_TOWER);
-      placeTowers(grid, towers, block, GridCell.BLOCK_TOWER);
+      placeTowers(grid, towers, clap, GridCell.CLAP_TOWER_NOSELL);
+      placeTowers(grid, towers, block, GridCell.BLOCK_TOWER_NOSELL);
   
       path = findShortestPath(grid, defaultStart, defaultGoal);
     } while (path === null);

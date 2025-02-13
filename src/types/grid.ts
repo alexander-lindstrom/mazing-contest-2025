@@ -1,3 +1,13 @@
+export interface Position {
+  x: number;
+  y: number;
+}
+
+export interface Tower {
+  type: TowerType;
+  positions: [Position, Position, Position, Position];
+}
+
 export enum GridCell {
     GRASS,
     GRASS_NOBUILD,
@@ -13,14 +23,6 @@ export enum TowerType {
     CLAP_TOWER,
     BLOCK_TOWER_NOSELL,
     CLAP_TOWER_NOSELL,
-}
-  
-export type GridProperties = {
-    height: number;
-    width: number;
-    grid: GridCell[][];
-    towers: TowerType[];
-    onCellClick: (x: number, y: number) => void;
 }
 
 //towers 2x2
@@ -49,11 +51,18 @@ const emptyGrid = Array(defaultHeight).fill(null).map((_, rowIndex) => {
   return row;
 });
 
-export const defaultGridParams = {
-    height: defaultHeight,
-    width: defaultWidth,
-    grid: emptyGrid,
-    towers: []
+export interface GridParams {
+  height: number;
+  width: number;
+  grid: GridCell[][];
+  towers: Tower[];
+}
+
+export const defaultGridParams: GridParams = {
+  height: defaultHeight,
+  width: defaultWidth,
+  grid: emptyGrid,
+  towers: []
 };
 
 export const getCellColor = (cell: GridCell): string => {
@@ -76,11 +85,6 @@ export const getCellColor = (cell: GridCell): string => {
       return '#FFFFFF';
   }
 };
-
-export interface Position {
-  x: number;
-  y: number;
-}
 
 export const canPlaceTower = (grid: GridCell[][], x: number, y: number): boolean => {
   if (x < 0 || y < 0 || x + 1 >= grid[0].length || y + 1 >= grid.length) {

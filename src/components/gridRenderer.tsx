@@ -1,13 +1,17 @@
 import { Stage, Layer, Rect, Group } from 'react-konva';
-import { canPlaceTower, getCellColor, GridProperties, Position } from '../types/grid';
+import { canPlaceTower, canSellTower, getCellColor, GridCell, GridParams, Position, Tower, TowerType } from '../types/grid';
 import { useCallback, useState } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 
 const CELL_SIZE = 50;
 const CELL_PADDING = 1;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, onCellClick }) => {
+export type GridRendererParams = GridParams & {
+  setGrid: React.Dispatch<React.SetStateAction<GridCell[][]>>;
+  setTowers: React.Dispatch<React.SetStateAction<Tower[]>>;
+}
+
+const GridRenderer: React.FC<GridRendererParams> = ({ height, width, towers, setTowers, grid, setGrid }) => {
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
   
   const handleMouseMove = useCallback((e: KonvaEventObject<MouseEvent>) => {
@@ -27,12 +31,62 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, o
     }
   }, [width, height]);
 
-
+  
   const handleMouseLeave = useCallback(() => {
     setHoverPosition(null);
   }, []);
 
   const handleStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
+
+    const handleCellClick = (x: number, y: number) => {
+      const newGrid = grid.map(row => [...row]);
+  
+      if (canSellTower(grid, x, y)) {
+        const towerIndex = towers.findIndex(tower => 
+            tower.positions.some(pos => pos.x === x && pos.y === y)
+        );
+        
+        if (towerIndex !== -1) {
+            const tower = towers[towerIndex];
+            
+            tower.positions.forEach(pos => {
+                newGrid[pos.y][pos.x] = GridCell.GRASS;
+            });
+            
+            const newTowers = [...towers];
+            newTowers.splice(towerIndex, 1);
+            
+            setGrid(newGrid);
+            setTowers(newTowers);
+            return;
+        }
+      }
+      
+      if (canPlaceTower(grid, x, y)) {
+        const selectedTower = GridCell.BLOCK_TOWER;
+        const positions: [Position, Position, Position, Position] = [
+            { x: x, y: y },
+            { x: x + 1, y: y },
+            { x: x, y: y + 1 },
+            { x: x + 1, y: y + 1 }
+        ];
+        
+        positions.forEach(pos => {
+            newGrid[pos.y][pos.x] = selectedTower;
+        });
+        
+        const newTower: Tower = {
+            type: TowerType.BLOCK_TOWER,
+            positions: positions
+        };
+        
+        const newTowers = [...towers, newTower];
+        
+        setGrid(newGrid);
+        setTowers(newTowers);
+      }
+    };
+
     const stage = e.target.getStage();
     if (!stage) return;
     
@@ -41,8 +95,8 @@ const GridRenderer: React.FC<GridProperties> = ({ height, width, grid, towers, o
     const x = Math.floor(pos.x / CELL_SIZE);
     const y = Math.floor(pos.y / CELL_SIZE);
     
-    onCellClick(x, y);
-  }, [onCellClick]);
+    handleCellClick(x, y);
+  }, [grid, setGrid, setTowers, towers]);
 
   return (
     <Stage 

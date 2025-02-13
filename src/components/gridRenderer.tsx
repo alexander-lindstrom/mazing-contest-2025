@@ -1,5 +1,5 @@
 import { Stage, Layer, Rect, Group } from 'react-konva';
-import { canPlaceTower, canSellTower, getCellColor, GridCell, GridParams, Position, Tower, TowerType } from '../types/grid';
+import { canPlaceTower, canSellTower, getCellColor, GridCell, GridParams, Position, Tower} from '../util/Grid';
 import { useCallback, useState } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 
@@ -76,7 +76,7 @@ const GridRenderer: React.FC<GridRendererParams> = ({ height, width, towers, set
         });
         
         const newTower: Tower = {
-            type: TowerType.BLOCK_TOWER,
+            type: GridCell.BLOCK_TOWER,
             positions: positions
         };
         

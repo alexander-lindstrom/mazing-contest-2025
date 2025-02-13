@@ -4,7 +4,7 @@ export interface Position {
 }
 
 export interface Tower {
-  type: TowerType;
+  type: GridCell;
   positions: [Position, Position, Position, Position];
 }
 
@@ -17,23 +17,16 @@ export enum GridCell {
     BLOCK_TOWER_NOSELL,
     CLAP_TOWER_NOSELL,
   }
-  
-export enum TowerType {
-    BLOCK_TOWER,
-    CLAP_TOWER,
-    BLOCK_TOWER_NOSELL,
-    CLAP_TOWER_NOSELL,
-}
 
 //towers 2x2
 const defaultHeight = 20;
-const defaultWidth = 20;
+const defaultWidth = 21;
 
 const centerMid = Math.floor(defaultWidth / 2);
 const centerLeft = centerMid - 1;
 const centerRight = centerMid + 1;
 
-const emptyGrid = Array(defaultHeight).fill(null).map((_, rowIndex) => {
+export const emptyGrid = Array(defaultHeight).fill(null).map((_, rowIndex) => {
   const row = Array(defaultWidth).fill(GridCell.GRASS);
   
   if (rowIndex === 0 || rowIndex === defaultHeight - 1) {

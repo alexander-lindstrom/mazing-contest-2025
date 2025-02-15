@@ -74,8 +74,6 @@ export function GamePage() {
     console.log(runnerPosition)
   };
 
-
-
   return (
     <div className="game-page">
       <h1>Tower Defense Grid</h1>

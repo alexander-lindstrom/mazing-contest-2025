@@ -1,0 +1,10 @@
+Pure single player: 
+
+-Sort out simulation
+- Make game page nice using css library
+- Start using gold/lumber
+- Add timer
+
+Single player against server:
+
+Multi player:

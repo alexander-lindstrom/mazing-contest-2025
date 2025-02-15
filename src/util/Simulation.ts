@@ -1,8 +1,8 @@
-import { GridCell, GridParams, Tower } from "./Grid";
+import { GridCell, Position, Tower } from "./Grid";
 
 export function simulateRunnerMovement(
-    gridParams: GridParams,
-    shortestPath: { x: number; y: number }[],
+    towers: Tower[],
+    shortestPath: Position[],
     dt: number = 0.1,
     baseSpeed: number = 1,
     slowMultiplier: number = 0.5,
@@ -17,7 +17,7 @@ export function simulateRunnerMovement(
     let speed = baseSpeed;
     let slowTimeRemaining = 0;
     const lastClapTimes = new Map<Tower, number>();
-    const runnerPositions: { x: number; y: number }[] = [];
+    const runnerPositions: Position[] = [];
   
     while (pathIndex < shortestPath.length - 1) {
       const nextNode = shortestPath[pathIndex + 1];
@@ -42,11 +42,21 @@ export function simulateRunnerMovement(
       runnerX += dx * moveRatio;
       runnerY += dy * moveRatio;
       
-      for (const tower of gridParams.towers) {
+      for (const tower of towers) {
         if (tower.type === GridCell.CLAP_TOWER || tower.type === GridCell.CLAP_TOWER_NOSELL) {
+
+          const getCenterPoint = (positions: [Position, Position, Position, Position]): Position => {
+            const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
+            const sumY = positions.reduce((sum, pos) => sum + pos.y, 0);
+            return {
+              x: sumX / positions.length,
+              y: sumY / positions.length
+            };
+          };
+          
+          const centerPoint = getCenterPoint(tower.positions);
           const towerDistance = Math.sqrt(
-            // Need to have a central position available to use here
-            (tower.x - runnerX) ** 2 + (tower.y - runnerY) ** 2
+            (centerPoint.x - runnerX) ** 2 + (centerPoint.y - runnerY) ** 2
           );
           if (towerDistance <= clapRange) {
             const lastClap = lastClapTimes.get(tower) ?? -Infinity;

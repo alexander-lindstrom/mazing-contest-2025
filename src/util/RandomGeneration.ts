@@ -42,7 +42,7 @@ function placeTowers(grid: GridCell[][], towers: Tower[], count: number, type: G
   }
 
   export function generateStartingState() {
-    let path: number[][] | null = null;
+    let path: Position[] | null = null;
     let height: number, width: number, grid: GridCell[][], towers: Tower[];
     let gold: number, lumber: number, clap: number, block: number;
   

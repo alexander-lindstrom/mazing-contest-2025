@@ -2,6 +2,23 @@ import { GridCell, Position, Tower } from "./Grid";
 
 export const defaultTimeStep = 0.01;
 
+interface TimeStep {
+  position: Position;
+  claps: Array<{
+    position: Position;  // Center position
+    tower: Tower;
+  }>;
+}
+
+const getCenterPoint = (positions: Position[]): Position => {
+  const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
+  const sumY = positions.reduce((sum, pos) => sum + pos.y, 0);
+  return {
+    x: sumX / positions.length,
+    y: sumY / positions.length
+  };
+};
+
 export function simulateRunnerMovement(
     towers: Tower[],
     shortestPath: Position[],
@@ -11,7 +28,7 @@ export function simulateRunnerMovement(
     slowDuration: number = 4,
     clapRange: number = 3,
     clapCooldown: number = 5
-  ) {
+  ): TimeStep[] {
     let time = 0;
     let pathIndex = 0;
     let runnerX = shortestPath[0].x;
@@ -19,8 +36,8 @@ export function simulateRunnerMovement(
     let speed = baseSpeed;
     let slowTimeRemaining = 0;
     const lastClapTimes = new Map<Tower, number>();
-    const runnerPositions: Position[] = [];
-  
+    const timeSteps: TimeStep[] = [];
+
     while (pathIndex < shortestPath.length - 1) {
       const nextNode = shortestPath[pathIndex + 1];
       const dx = nextNode.x - runnerX;
@@ -44,36 +61,36 @@ export function simulateRunnerMovement(
       runnerX += dx * moveRatio;
       runnerY += dy * moveRatio;
       
+      const clapsThisStep: Array<{ position: Position; tower: Tower }> = [];
+
       for (const tower of towers) {
         if (tower.type === GridCell.CLAP_TOWER || tower.type === GridCell.CLAP_TOWER_NOSELL) {
-
-          const getCenterPoint = (positions: [Position, Position, Position, Position]): Position => {
-            const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
-            const sumY = positions.reduce((sum, pos) => sum + pos.y, 0);
-            return {
-              x: sumX / positions.length,
-              y: sumY / positions.length
-            };
-          };
-          
           const centerPoint = getCenterPoint(tower.positions);
           const towerDistance = Math.sqrt(
             (centerPoint.x - runnerX) ** 2 + (centerPoint.y - runnerY) ** 2
           );
+          
           if (towerDistance <= clapRange) {
             const lastClap = lastClapTimes.get(tower) ?? -Infinity;
             if (time - lastClap >= clapCooldown) {
               slowTimeRemaining = slowDuration;
               lastClapTimes.set(tower, time);
+              clapsThisStep.push({
+                position: centerPoint,
+                tower: tower
+              });
             }
           }
         }
       }
       
-      runnerPositions.push({ x: runnerX, y: runnerY });
+      timeSteps.push({
+        position: { x: runnerX, y: runnerY },
+        claps: clapsThisStep
+      });
+      
       time += dt;
     }
   
-    return runnerPositions;
+    return timeSteps;
   }
-  

@@ -72,8 +72,9 @@ export function GamePage() {
       return;
     }
 
-    const runnerPosition = simulateRunnerMovement(towers, path);
-    setRunnerPath(runnerPosition);
+    const timeSteps = simulateRunnerMovement(towers, path);
+    const positions = timeSteps.map(step => step.position);
+    setRunnerPath(positions);
     setIsRunning(true);
   };
 

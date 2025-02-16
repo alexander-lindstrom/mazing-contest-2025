@@ -11,8 +11,8 @@ export function findShortestPath(
     row.map((cell) => (cell === GridCell.GRASS || cell === GridCell.GRASS_NOBUILD ? 0 : 1))
   );
 
-  const finder = new PF.AStarFinder({
-    diagonalMovement: 3, // If at most one obstacle
+  const finder = PF.JumpPointFinder({
+    diagonalMovement: PF.DiagonalMovement.IfAtMostOneObstacle,
   });
 
   const pfGrid = new PF.Grid(matrix);

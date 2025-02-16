@@ -1,9 +1,11 @@
 import { GridCell, Position, Tower } from "./Grid";
 
+export const defaultTimeStep = 0.01;
+
 export function simulateRunnerMovement(
     towers: Tower[],
     shortestPath: Position[],
-    dt: number = 0.1,
+    dt: number = defaultTimeStep,
     baseSpeed: number = 1,
     slowMultiplier: number = 0.5,
     slowDuration: number = 2,

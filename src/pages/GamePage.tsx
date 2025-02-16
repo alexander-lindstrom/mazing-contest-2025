@@ -8,13 +8,15 @@ import { simulateRunnerMovement } from '../util/Simulation';
 const startingState = generateStartingState();
 
 export function GamePage() {
-
   const [grid, setGrid] = useState(() => {
     return startingState.grid;
   });
   const [towers, setTowers] = useState(() => {
     return startingState.towers;
   });
+
+  const [runnerPath, setRunnerPath] = useState<Position[]>([]);
+  const [isRunning, setIsRunning] = useState(false);
 
   const handleCellClick = (x: number, y: number) => {
     const newGrid = grid.map(row => [...row]);
@@ -67,11 +69,13 @@ export function GamePage() {
 
   const handleButtonClick = () => {
     const path = findShortestPath(grid, defaultStart, defaultGoal);
-    if(!path){
+    if (!path) {
       return;
     }
+
     const runnerPosition = simulateRunnerMovement(towers, path);
-    console.log(runnerPosition)
+    setRunnerPath(runnerPosition);
+    setIsRunning(true);
   };
 
   return (
@@ -83,6 +87,8 @@ export function GamePage() {
         towers={towers}
         grid={grid}
         handleClick={handleCellClick}
+        runnerPath={runnerPath}
+        showRunner={isRunning}
       />
 
       <button 

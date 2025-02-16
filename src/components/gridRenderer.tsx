@@ -1,28 +1,34 @@
 import { Stage, Layer, Rect, Group } from 'react-konva';
 import { canPlaceTower, getCellColor, GridParams, Position } from '../util/Grid';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
+import Runner from './Runner';
+import Konva from 'konva';
+import { defaultTimeStep } from '../util/Simulation';
 
 const CELL_SIZE = 50;
 const CELL_PADDING = 1;
 
 export type GridRendererParams = GridParams & {
   handleClick: (x: number, y: number) => void;
-}
+  runnerPath: Position[];
+  showRunner: boolean;
+};
 
-const GridRenderer: React.FC<GridRendererParams> = ({ height, width, grid, handleClick }) => {
+const GridRenderer: React.FC<GridRendererParams> = ({ height, width, grid, handleClick, runnerPath, showRunner }) => {
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
-  
+  const layerRef = useRef<Konva.Layer>(null);
+
   const handleMouseMove = useCallback((e: KonvaEventObject<MouseEvent>) => {
     const stage = e.target.getStage();
     if (!stage) return;
-    
+
     const pos = stage.getPointerPosition();
     if (!pos) return;
-    
+
     const x = Math.floor(pos.x / CELL_SIZE);
     const y = Math.floor(pos.y / CELL_SIZE);
-    
+
     if (x >= 0 && x + 1 < width && y >= 0 && y + 1 < height) {
       setHoverPosition({ x, y });
     } else {
@@ -30,33 +36,31 @@ const GridRenderer: React.FC<GridRendererParams> = ({ height, width, grid, handl
     }
   }, [width, height]);
 
-  
   const handleMouseLeave = useCallback(() => {
     setHoverPosition(null);
   }, []);
 
   const handleStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
-
     const stage = e.target.getStage();
     if (!stage) return;
-    
+
     const pos = stage.getPointerPosition();
     if (!pos) return;
     const x = Math.floor(pos.x / CELL_SIZE);
     const y = Math.floor(pos.y / CELL_SIZE);
-    
+
     handleClick(x, y);
   }, [handleClick]);
 
   return (
-    <Stage 
-      width={width * CELL_SIZE} 
+    <Stage
+      width={width * CELL_SIZE}
       height={height * CELL_SIZE}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={handleStageClick}
     >
-      <Layer>
+      <Layer ref={layerRef}>
         {/* Base grid */}
         {grid.map((row, y) =>
           row.map((cell, x) => (
@@ -78,11 +82,11 @@ const GridRenderer: React.FC<GridRendererParams> = ({ height, width, grid, handl
         {/* Hover highlight for 2x2 area */}
         {hoverPosition && (
           <Group>
-            {[0, 1].map(dy => 
+            {[0, 1].map(dy =>
               [0, 1].map(dx => {
                 const x = hoverPosition.x + dx;
                 const y = hoverPosition.y + dy;
-                
+
                 return (
                   <Rect
                     key={`hover-${x}-${y}`}
@@ -100,6 +104,12 @@ const GridRenderer: React.FC<GridRendererParams> = ({ height, width, grid, handl
           </Group>
         )}
       </Layer>
+
+      {runnerPath && showRunner && (
+        <Layer>
+          <Runner runnerPath={runnerPath} cellSize={50} timestep={defaultTimeStep} />
+        </Layer>
+      )}
     </Stage>
   );
 };

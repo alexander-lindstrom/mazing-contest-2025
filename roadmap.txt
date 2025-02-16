@@ -1,8 +1,6 @@
 Pure single player: 
 
-- Start using gold/lumber
 - Add timer
-- Allow building clap towers
 - Add clap animation
     Different runner color when slowed.
 

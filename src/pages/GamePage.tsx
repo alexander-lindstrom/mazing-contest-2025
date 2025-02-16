@@ -11,12 +11,8 @@ import { Switch } from '../components/ui/switch';
 const startingState = generateStartingState();
 
 export function GamePage() {
-  const [grid, setGrid] = useState(() => {
-    return startingState.grid;
-  });
-  const [towers, setTowers] = useState(() => {
-    return startingState.towers;
-  });
+  const [grid, setGrid] = useState(startingState.grid);
+  const [towers, setTowers] = useState(startingState.towers);
   const [resources, setResources] = useState({ gold: startingState.gold, lumber: startingState.lumber });
   const [runnerPath, setRunnerPath] = useState<Position[]>([]);
   const [isRunning, setIsRunning] = useState(false);
@@ -24,8 +20,10 @@ export function GamePage() {
 
   const handleCellClick = (x: number, y: number) => {
     
+    if(isRunning){
+      return;
+    }
     const newGrid = grid.map(row => [...row]);
-
 
     if (canSellTower(grid, x, y)) {
       const towerIndex = towers.findIndex(tower =>
@@ -79,6 +77,21 @@ export function GamePage() {
     setIsRunning(true);
   };
 
+  const handleReset = () => {
+
+    const newState = generateStartingState();
+    setGrid(newState.grid);
+    setTowers(newState.towers);
+    setResources({ 
+      gold: newState.gold, 
+      lumber: newState.lumber 
+    });
+    setRunnerPath([]);
+    setIsRunning(false);
+    setPlaceTowerMode(GridCell.BLOCK_TOWER);
+  };
+  
+
   return (
     <div className="flex justify-center items-start p-6 bg-gray-900 min-h-screen">
       <div className="flex flex-col items-center w-full max-w-6xl">
@@ -112,10 +125,10 @@ export function GamePage() {
                 Start
               </Button>
               <Button
-                onClick={() => console.log('Resetting game...')}
+                onClick={handleReset}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               >
-                Reset
+                Regenerate
               </Button>
               <div className="flex items-center gap-2">
                 <span>Block</span>

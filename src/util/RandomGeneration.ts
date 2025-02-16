@@ -47,7 +47,7 @@ function placeTowers(grid: GridCell[][], towers: Tower[], count: number, type: G
     let gold: number, lumber: number, clap: number, block: number;
   
     do {
-      ({ height, width, grid, towers } = defaultGridParams);
+      ({ height, width, grid, towers } = structuredClone(defaultGridParams));
       gold = getRandomInRange(minGold, maxGold);
       lumber = getRandomInRange(minLumber, maxLumber);
       clap = getRandomInRange(minClap, maxClap);

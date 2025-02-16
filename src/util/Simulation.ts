@@ -6,10 +6,10 @@ export function simulateRunnerMovement(
     towers: Tower[],
     shortestPath: Position[],
     dt: number = defaultTimeStep,
-    baseSpeed: number = 1,
+    baseSpeed: number = 2,
     slowMultiplier: number = 0.5,
-    slowDuration: number = 2,
-    clapRange: number = 1.5,
+    slowDuration: number = 4,
+    clapRange: number = 3,
     clapCooldown: number = 5
   ) {
     let time = 0;

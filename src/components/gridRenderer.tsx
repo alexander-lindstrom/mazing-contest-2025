@@ -1,10 +1,11 @@
-import { Stage, Layer, Rect, Group } from 'react-konva';
-import { canPlaceTower, getCellColor, GridParams, Position } from '../util/Grid';
-import { useCallback, useRef, useState } from 'react';
-import { KonvaEventObject } from 'konva/lib/Node';
-import Runner from './Runner';
-import Konva from 'konva';
-import { defaultTimeStep } from '../util/Simulation';
+import { Stage, Layer, Rect, Group } from "react-konva";
+import { canPlaceTower, getCellColor, GridParams, Position } from "../util/Grid";
+import { useCallback, useRef, useState } from "react";
+import { KonvaEventObject } from "konva/lib/Node";
+import Runner from "./Runner";
+import ClapAnimation, { ClapEvent } from "./ClapAnimation";
+import Konva from "konva";
+import { defaultTimeStep } from "../util/Simulation";
 
 const CELL_SIZE = 50;
 const CELL_PADDING = 1;
@@ -13,44 +14,59 @@ export type GridRendererParams = GridParams & {
   handleClick: (x: number, y: number) => void;
   runnerPath: Position[];
   showRunner: boolean;
+  clapEvents: ClapEvent[];
 };
 
-const GridRenderer: React.FC<GridRendererParams> = ({ height, width, grid, handleClick, runnerPath, showRunner }) => {
+const GridRenderer: React.FC<GridRendererParams> = ({
+  height,
+  width,
+  grid,
+  handleClick,
+  runnerPath,
+  showRunner,
+  clapEvents,
+}) => {
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
   const layerRef = useRef<Konva.Layer>(null);
 
-  const handleMouseMove = useCallback((e: KonvaEventObject<MouseEvent>) => {
-    const stage = e.target.getStage();
-    if (!stage) return;
+  const handleMouseMove = useCallback(
+    (e: KonvaEventObject<MouseEvent>) => {
+      const stage = e.target.getStage();
+      if (!stage) return;
 
-    const pos = stage.getPointerPosition();
-    if (!pos) return;
+      const pos = stage.getPointerPosition();
+      if (!pos) return;
 
-    const x = Math.floor(pos.x / CELL_SIZE);
-    const y = Math.floor(pos.y / CELL_SIZE);
+      const x = Math.floor(pos.x / CELL_SIZE);
+      const y = Math.floor(pos.y / CELL_SIZE);
 
-    if (x >= 0 && x + 1 < width && y >= 0 && y + 1 < height) {
-      setHoverPosition({ x, y });
-    } else {
-      setHoverPosition(null);
-    }
-  }, [width, height]);
+      if (x >= 0 && x + 1 < width && y >= 0 && y + 1 < height) {
+        setHoverPosition({ x, y });
+      } else {
+        setHoverPosition(null);
+      }
+    },
+    [width, height]
+  );
 
   const handleMouseLeave = useCallback(() => {
     setHoverPosition(null);
   }, []);
 
-  const handleStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
-    const stage = e.target.getStage();
-    if (!stage) return;
+  const handleStageClick = useCallback(
+    (e: KonvaEventObject<MouseEvent>) => {
+      const stage = e.target.getStage();
+      if (!stage) return;
 
-    const pos = stage.getPointerPosition();
-    if (!pos) return;
-    const x = Math.floor(pos.x / CELL_SIZE);
-    const y = Math.floor(pos.y / CELL_SIZE);
+      const pos = stage.getPointerPosition();
+      if (!pos) return;
+      const x = Math.floor(pos.x / CELL_SIZE);
+      const y = Math.floor(pos.y / CELL_SIZE);
 
-    handleClick(x, y);
-  }, [handleClick]);
+      handleClick(x, y);
+    },
+    [handleClick]
+  );
 
   return (
     <Stage
@@ -82,8 +98,8 @@ const GridRenderer: React.FC<GridRendererParams> = ({ height, width, grid, handl
         {/* Hover highlight for 2x2 area */}
         {hoverPosition && (
           <Group>
-            {[0, 1].map(dy =>
-              [0, 1].map(dx => {
+            {[0, 1].map((dy) =>
+              [0, 1].map((dx) => {
                 const x = hoverPosition.x + dx;
                 const y = hoverPosition.y + dy;
 
@@ -105,9 +121,16 @@ const GridRenderer: React.FC<GridRendererParams> = ({ height, width, grid, handl
         )}
       </Layer>
 
+      {/* Runner animation */}
       {runnerPath && showRunner && (
         <Layer>
           <Runner runnerPath={runnerPath} cellSize={50} timestep={defaultTimeStep} />
+        </Layer>
+      )}
+
+      {clapEvents.length > 0 && showRunner && (
+        <Layer>
+          <ClapAnimation clapEvents={clapEvents} cellSize={CELL_SIZE} />
         </Layer>
       )}
     </Stage>

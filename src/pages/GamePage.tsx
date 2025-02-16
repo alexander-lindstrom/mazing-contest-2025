@@ -7,6 +7,7 @@ import { simulateRunnerMovement } from '../util/Simulation';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Switch } from '../components/ui/switch';
+import { ClapEvent } from '../components/ClapAnimation';
 
 const startingState = generateStartingState();
 
@@ -17,6 +18,7 @@ export function GamePage() {
   const [runnerPath, setRunnerPath] = useState<Position[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [placeTowerMode, setPlaceTowerMode] = useState(GridCell.BLOCK_TOWER);
+  const [clapEvents, setClapEvents] = useState<ClapEvent[]>([]);
 
   const handleCellClick = (x: number, y: number) => {
     
@@ -66,7 +68,7 @@ export function GamePage() {
     }
   };
 
-  const handleButtonClick = () => {
+  const handleStartButton = () => {
     const path = findShortestPath(grid, defaultStart, defaultGoal);
     if (!path) {
       return;
@@ -74,7 +76,9 @@ export function GamePage() {
 
     const timeSteps = simulateRunnerMovement(towers, path);
     const positions = timeSteps.map(step => step.position);
+    const claps = timeSteps.flatMap(step => step.claps || [])
     setRunnerPath(positions);
+    setClapEvents(claps);
     setIsRunning(true);
   };
 
@@ -107,6 +111,7 @@ export function GamePage() {
               handleClick={handleCellClick}
               runnerPath={runnerPath}
               showRunner={isRunning}
+              clapEvents={clapEvents}
             />
           </div>
 
@@ -120,7 +125,7 @@ export function GamePage() {
 
             <div className="flex space-x-4">
               <Button
-                onClick={handleButtonClick}
+                onClick={handleStartButton}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
                 Start

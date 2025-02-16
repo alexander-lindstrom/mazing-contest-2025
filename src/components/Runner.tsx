@@ -16,15 +16,15 @@ const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep }) => {
   useEffect(() => {
     if (runnerPath.length < 2) return;
 
-    const totalDuration = runnerPath.length * timestep; // Dynamic duration
+    const totalDuration = runnerPath.length * timestep;
 
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
       }
-      const elapsed = (timestamp - startTimeRef.current) / 1000; // Convert to seconds
+      const elapsed = (timestamp - startTimeRef.current) / 1000;
 
-      const progress = elapsed / totalDuration; // 0 to 1
+      const progress = elapsed / totalDuration;
       const index = Math.min(Math.floor(progress * runnerPath.length), runnerPath.length - 1);
 
       setCurrentPosition(runnerPath[index]);

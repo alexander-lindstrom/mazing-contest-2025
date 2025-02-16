@@ -1,28 +1,40 @@
 import { useState } from 'react';
 import GridRenderer from '../components/GridRenderer';
 import { generateStartingState } from '../util/RandomGeneration';
-import { canPlaceTower, canSellTower, defaultGoal, defaultStart, GridCell, Position, Tower } from '../util/Grid';
+import { canPlaceTower, canSellTower, defaultGoal, defaultStart, get2x2Positions, GridCell, Position, Tower } from '../util/Grid';
 import { findShortestPath } from '../util/Pathfinding';
 import { simulateRunnerMovement } from '../util/Simulation';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Switch } from '../components/ui/switch';
 
 const startingState = generateStartingState();
 
 export function GamePage() {
-  const [grid, setGrid] = useState(() => startingState.grid);
-  const [towers, setTowers] = useState(() => startingState.towers);
+  const [grid, setGrid] = useState(() => {
+    return startingState.grid;
+  });
+  const [towers, setTowers] = useState(() => {
+    return startingState.towers;
+  });
+  const [resources, setResources] = useState({ gold: startingState.gold, lumber: startingState.lumber });
   const [runnerPath, setRunnerPath] = useState<Position[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [placeTowerMode, setPlaceTowerMode] = useState(GridCell.BLOCK_TOWER);
 
   const handleCellClick = (x: number, y: number) => {
-    const newGrid = grid.map(row => [...row]);
     
-    // Logic for handling tower placement and removal
+    const newGrid = grid.map(row => [...row]);
+
+
     if (canSellTower(grid, x, y)) {
-      const towerIndex = towers.findIndex(tower => tower.positions.some(pos => pos.x === x && pos.y === y));
+      const towerIndex = towers.findIndex(tower =>
+        tower.positions.some(pos => pos.x === x && pos.y === y)
+      );
       if (towerIndex !== -1) {
         const tower = towers[towerIndex];
+        const goldDiff = 1;
+        const lumberDiff = tower.type === GridCell.CLAP_TOWER ? 1 : 0;
         tower.positions.forEach(pos => {
           newGrid[pos.y][pos.x] = GridCell.GRASS;
         });
@@ -30,33 +42,37 @@ export function GamePage() {
         newTowers.splice(towerIndex, 1);
         setGrid(newGrid);
         setTowers(newTowers);
+        setResources({gold: resources.gold + goldDiff, lumber: resources.lumber + lumberDiff});
         return;
       }
     }
 
-    if (canPlaceTower(grid, x, y)) {
-      const selectedTower = GridCell.BLOCK_TOWER;
-      const positions: [Position, Position, Position, Position] = [
-        { x: x, y: y },
-        { x: x + 1, y: y },
-        { x: x, y: y + 1 },
-        { x: x + 1, y: y + 1 }
-      ];
-
+    else if (canPlaceTower(grid, x, y)) {
+      const positions = get2x2Positions({x, y});
+      const lumberCost = placeTowerMode === GridCell.BLOCK_TOWER ? 0 : 1;
+      if(resources.gold < 1 || resources.lumber < lumberCost){
+        return;
+      }
       positions.forEach(pos => {
-        newGrid[pos.y][pos.x] = selectedTower;
+        newGrid[pos.y][pos.x] = placeTowerMode;
       });
-
-      const newTower: Tower = { type: GridCell.BLOCK_TOWER, positions: positions };
+      const newTower: Tower = {
+        type: placeTowerMode,
+        positions: positions
+    };
       const newTowers = [...towers, newTower];
       setGrid(newGrid);
       setTowers(newTowers);
+      
+      setResources({gold: resources.gold - 1, lumber: resources.lumber - lumberCost});
     }
   };
 
   const handleButtonClick = () => {
     const path = findShortestPath(grid, defaultStart, defaultGoal);
-    if (!path) return;
+    if (!path) {
+      return;
+    }
 
     const runnerPosition = simulateRunnerMovement(towers, path);
     setRunnerPath(runnerPosition);
@@ -64,41 +80,54 @@ export function GamePage() {
   };
 
   return (
-    <div className="game-page flex flex-col gap-8 p-8 bg-gray-900 text-white">
-      <h1 className="text-4xl font-bold">Tower Defense Grid</h1>
-
-      <div className="grid-section flex justify-center">
-        <Card className="bg-gray-800 p-6">
-          <GridRenderer
-            width={startingState.width}
-            height={startingState.height}
-            towers={towers}
-            grid={grid}
-            handleClick={handleCellClick}
-            runnerPath={runnerPath}
-            showRunner={isRunning}
-          />
-        </Card>
-      </div>
-
-      <div className="game-info-section flex flex-col items-center gap-4">
-        <Card className="bg-gray-800 p-6">
-          <div className="text-lg font-semibold">Game Info</div>
-          <div className="text-sm">
-            <p>Gold: 500</p>
-            <p>Lumber: 200</p>
-            <p>Time Left: 2:30</p>
+    <div className="flex justify-center items-start p-6 bg-gray-900 min-h-screen">
+      <div className="flex flex-col items-center w-full max-w-6xl">
+        
+        <div className="flex w-full space-x-6">
+          <div className="flex-grow">
+            <GridRenderer
+              width={startingState.width}
+              height={startingState.height}
+              towers={towers}
+              grid={grid}
+              handleClick={handleCellClick}
+              runnerPath={runnerPath}
+              showRunner={isRunning}
+            />
           </div>
-        </Card>
-      </div>
 
-      <div className="buttons-section flex justify-center gap-4">
-        <Button className="bg-blue-500 px-6 py-3 rounded hover:bg-blue-600" onClick={handleButtonClick}>
-          Start
-        </Button>
-        <Button className="bg-red-500 px-6 py-3 rounded hover:bg-red-600" onClick={() => {}}>
-          Reset
-        </Button>
+          <div className="flex flex-col space-y-6 w-80">
+            <Card className="bg-gray-800 text-white p-4">
+              <h2 className="text-lg font-semibold">Game Info</h2>
+              <p>Gold: {resources.gold}</p>
+              <p>Lumber: {resources.lumber}</p>
+              <p>Time Left: 5:00</p>
+            </Card>
+
+            <div className="flex space-x-4">
+              <Button
+                onClick={handleButtonClick}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                Start
+              </Button>
+              <Button
+                onClick={() => console.log('Resetting game...')}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                Reset
+              </Button>
+              <div className="flex items-center gap-2">
+                <span>Block</span>
+                <Switch
+                  checked={placeTowerMode === GridCell.CLAP_TOWER}
+                  onCheckedChange={(checked) => setPlaceTowerMode(checked ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER)}
+                />
+                <span>Clap</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

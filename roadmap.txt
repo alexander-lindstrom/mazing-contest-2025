@@ -1,9 +1,10 @@
 Pure single player: 
 
-- Sort out simulation
-- Make game page nice using css library
 - Start using gold/lumber
 - Add timer
+- Allow building clap towers
+- Add clap animation
+    Different runner color when slowed.
 
 Single player against server:
 

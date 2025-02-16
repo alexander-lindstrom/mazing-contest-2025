@@ -88,17 +88,26 @@ export const getCellColor = (cell: GridCell): string => {
   }
 };
 
+export function get2x2Positions(pos: Position): [Position, Position, Position, Position] {
+  return [
+    { x: pos.x, y: pos.y },
+    { x: pos.x + 1, y: pos.y },
+    { x: pos.x, y: pos.y + 1 },
+    { x: pos.x + 1, y: pos.y + 1 }
+  ];
+}
+
 export const canPlaceTower = (grid: GridCell[][], x: number, y: number): boolean => {
   if (x < 0 || y < 0 || x + 1 >= grid[0].length || y + 1 >= grid.length) {
     return false;
   }
 
-  for (let dy = 0; dy < 2; dy++) {
-    for (let dx = 0; dx < 2; dx++) {
-      const cell = grid[y + dy][x + dx];
-      if (cell !== GridCell.GRASS) {
-        return false;
-      }
+  const positions = get2x2Positions({ x, y });
+  for (let i = 0; i < positions.length; i++) {
+    const { x: posX, y: posY } = positions[i];
+    const cell = grid[posY][posX];
+    if (cell !== GridCell.GRASS) {
+      return false;
     }
   }
   
@@ -109,3 +118,4 @@ export const canSellTower = (grid: GridCell[][], x: number, y: number): boolean 
   const cell = grid[y][x];
   return cell === GridCell.BLOCK_TOWER || cell === GridCell.CLAP_TOWER;
 };
+

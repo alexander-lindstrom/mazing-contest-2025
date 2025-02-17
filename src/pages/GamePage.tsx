@@ -152,9 +152,12 @@ export function GamePage() {
               <Button onClick={handleStartButton} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Start</Button>
               <Button onClick={handleReset} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Regenerate</Button>
               <div className="flex items-center gap-2">
-                <span>Block</span>
-                <Switch checked={placeTowerMode === GridCell.CLAP_TOWER} onCheckedChange={checked => setPlaceTowerMode(checked ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER)} />
-                <span>Clap</span>
+              <span style={{ color: 'white' }}>Block</span>
+                <Switch 
+                  checked={placeTowerMode === GridCell.CLAP_TOWER} 
+                  onCheckedChange={checked => setPlaceTowerMode(checked ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER)} 
+                />
+              <span style={{ color: 'white' }}>Clap</span>
               </div>
             </div>
           </div>

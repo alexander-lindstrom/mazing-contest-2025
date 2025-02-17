@@ -13,16 +13,15 @@ interface ClapAnimationProps {
   cellSize: number;
 }
 
-const duration = 1;
+const duration = 0.5
+const persistenceDuration = 1;
 const radius = defaultClapRange;
 
 const ClapAnimation: React.FC<ClapAnimationProps> = ({
   events,
   cellSize,
 }) => {
-  const [activeClaps, setActiveClaps] = useState<{ id: number; x: number; y: number; progress: number }[]>(
-    []
-  );
+  const [activeClaps, setActiveClaps] = useState<{ id: number; x: number; y: number; progress: number }[]>([]);
 
   useEffect(() => {
     let animationFrame: number;
@@ -31,13 +30,25 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
     const update = () => {
       const currentTime = (performance.now() - startTime) / 1000;
       const newClaps = events
-        .filter((event) => currentTime >= event.time && currentTime <= event.time + duration)
-        .map((event, index) => ({
-          id: index,
-          x: event.x * cellSize + cellSize / 2,
-          y: event.y * cellSize + cellSize / 2,
-          progress: (currentTime - event.time) / duration,
-      }));
+        .filter((event) => currentTime >= event.time && currentTime <= event.time + duration + persistenceDuration)
+        .map((event, index) => {
+          const timeInEvent = currentTime - event.time;
+          let progress = 0;
+
+          if (timeInEvent <= duration) {
+            progress = timeInEvent / duration;
+          }
+          else if (timeInEvent <= duration + persistenceDuration) {
+            progress = 1;
+          }
+
+          return {
+            id: index,
+            x: event.x * cellSize + cellSize / 2,
+            y: event.y * cellSize + cellSize / 2,
+            progress,
+          };
+        });
 
       setActiveClaps(newClaps);
       animationFrame = requestAnimationFrame(update);

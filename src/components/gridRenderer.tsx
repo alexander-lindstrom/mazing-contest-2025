@@ -127,7 +127,9 @@ const GridRenderer: React.FC<GridRendererParams> = ({
 
       {clapEvents.length > 0 && showRunner && (
         <Layer>
-          <ClapAnimation clapEvents={clapEvents} cellSize={CELL_SIZE} />
+          <ClapAnimation 
+          events={clapEvents} 
+          cellSize={CELL_SIZE} />
         </Layer>
       )}
     </Stage>

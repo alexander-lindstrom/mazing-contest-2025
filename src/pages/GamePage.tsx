@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GridRenderer from '../components/GridRenderer';
 import { generateStartingState } from '../util/RandomGeneration';
 import { canPlaceTower, canSellTower, defaultGoal, defaultStart, get2x2Positions, GridCell, Position, Tower } from '../util/Grid';
@@ -19,12 +19,32 @@ export function GamePage() {
   const [isRunning, setIsRunning] = useState(false);
   const [placeTowerMode, setPlaceTowerMode] = useState(GridCell.BLOCK_TOWER);
   const [clapEvents, setClapEvents] = useState<ClapEvent[]>([]);
+  const [timeLeft, setTimeLeft] = useState(45);
+  const [countdownActive, setCountdownActive] = useState(true);
 
-  const handleCellClick = (x: number, y: number) => {
-    
-    if(isRunning){
+  useEffect(() => {
+    if (!countdownActive || timeLeft <= 0) {
       return;
     }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleStartButton();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdownActive, timeLeft]);
+
+  const handleCellClick = (x: number, y: number) => {
+    if (isRunning) return;
+
     const newGrid = grid.map(row => [...row]);
 
     if (canSellTower(grid, x, y)) {
@@ -42,65 +62,56 @@ export function GamePage() {
         newTowers.splice(towerIndex, 1);
         setGrid(newGrid);
         setTowers(newTowers);
-        setResources({gold: resources.gold + goldDiff, lumber: resources.lumber + lumberDiff});
-        return;
+        setResources({ gold: resources.gold + goldDiff, lumber: resources.lumber + lumberDiff });
       }
-    }
-
-    else if (canPlaceTower(grid, x, y)) {
-      const positions = get2x2Positions({x, y});
+    } else if (canPlaceTower(grid, x, y)) {
+      const positions = get2x2Positions({ x, y });
       const lumberCost = placeTowerMode === GridCell.BLOCK_TOWER ? 0 : 1;
-      if(resources.gold < 1 || resources.lumber < lumberCost){
-        return;
-      }
+      if (resources.gold < 1 || resources.lumber < lumberCost) return;
+
       positions.forEach(pos => {
         newGrid[pos.y][pos.x] = placeTowerMode;
       });
+
       const newTower: Tower = {
         type: placeTowerMode,
         positions: positions
-    };
-      const newTowers = [...towers, newTower];
+      };
+
       setGrid(newGrid);
-      setTowers(newTowers);
-      
-      setResources({gold: resources.gold - 1, lumber: resources.lumber - lumberCost});
+      setTowers([...towers, newTower]);
+      setResources({ gold: resources.gold - 1, lumber: resources.lumber - lumberCost });
     }
   };
 
   const handleStartButton = () => {
+    if (isRunning) return;
+
+    setCountdownActive(false);
     const path = findShortestPath(grid, defaultStart, defaultGoal);
-    if (!path) {
-      return;
-    }
+    if (!path) return;
 
     const timeSteps = simulateRunnerMovement(towers, path);
-    const positions = timeSteps.map(step => step.position);
-    const claps = timeSteps.flatMap(step => step.claps || [])
-    setRunnerPath(positions);
-    setClapEvents(claps);
+    setRunnerPath(timeSteps.map(step => step.position));
+    setClapEvents(timeSteps.flatMap(step => step.claps || []));
     setIsRunning(true);
   };
 
   const handleReset = () => {
-
     const newState = generateStartingState();
     setGrid(newState.grid);
     setTowers(newState.towers);
-    setResources({ 
-      gold: newState.gold, 
-      lumber: newState.lumber 
-    });
+    setResources({ gold: newState.gold, lumber: newState.lumber });
     setRunnerPath([]);
     setIsRunning(false);
     setPlaceTowerMode(GridCell.BLOCK_TOWER);
+    setTimeLeft(45);
+    setCountdownActive(true);
   };
-  
 
   return (
     <div className="flex justify-center items-start p-6 bg-gray-900 min-h-screen">
       <div className="flex flex-col items-center w-full max-w-6xl">
-        
         <div className="flex w-full space-x-6">
           <div className="flex-grow">
             <GridRenderer
@@ -120,7 +131,7 @@ export function GamePage() {
               <h2 className="text-lg font-semibold">Game Info</h2>
               <p>Gold: {resources.gold}</p>
               <p>Lumber: {resources.lumber}</p>
-              <p>Time Left: 5:00</p>
+              <p>Time Left: {timeLeft}s</p>
             </Card>
 
             <div className="flex space-x-4">

@@ -1,8 +1,10 @@
 import { ClapEvent } from "../components/ClapAnimation";
 import { GridCell, Position, Tower } from "./Grid";
 
-export const defaultTimeStep = 0.01;
+export const defaultTimeStep = 0.001;
 export const defaultClapRange = 3;
+export const defaultBaseSpeed = 2;
+const defaultSlowMultiplier = 0.5;
 
 const getCenterPoint = (positions: Position[]): Position => {
   const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
@@ -14,20 +16,20 @@ const getCenterPoint = (positions: Position[]): Position => {
 };
 
 interface TimeStep {
-  position: Position;  // Runner position at this timestep
-  claps: ClapEvent[];  // Clap events triggered at this timestep
+  position: Position;
+  claps: ClapEvent[];
 }
 
 export function simulateRunnerMovement(
   towers: Tower[],
   shortestPath: Position[],
   dt: number = defaultTimeStep,
-  baseSpeed: number = 2,
-  slowMultiplier: number = 0.5,
+  baseSpeed: number = defaultBaseSpeed,
+  slowMultiplier: number = defaultSlowMultiplier,
   slowDuration: number = 4,
   clapRange: number = defaultClapRange,
   clapCooldown: number = 5
-): TimeStep[] {  // Return TimeStep[] containing both position and clap events
+): TimeStep[] {
   let time = 0;
   let pathIndex = 0;
   let runnerX = shortestPath[0].x;
@@ -35,7 +37,7 @@ export function simulateRunnerMovement(
   let speed = baseSpeed;
   let slowTimeRemaining = 0;
   const lastClapTimes = new Map<Tower, number>();
-  const timeSteps: TimeStep[] = [];  // Store timeSteps that include both position and clap events
+  const timeSteps: TimeStep[] = [];
 
   while (pathIndex < shortestPath.length - 1) {
     const nextNode = shortestPath[pathIndex + 1];
@@ -60,7 +62,7 @@ export function simulateRunnerMovement(
     runnerX += dx * moveRatio;
     runnerY += dy * moveRatio;
     
-    const clapsThisStep: ClapEvent[] = [];  // Store clap events for the current step
+    const clapsThisStep: ClapEvent[] = [];
 
     // Check each tower for clap events
     for (const tower of towers) {
@@ -76,7 +78,6 @@ export function simulateRunnerMovement(
             slowTimeRemaining = slowDuration;
             lastClapTimes.set(tower, time);
 
-            // Create ClapEvent for this tower at the current time
             clapsThisStep.push({
               x: centerPoint.x,
               y: centerPoint.y,
@@ -87,7 +88,6 @@ export function simulateRunnerMovement(
       }
     }
     
-    // Push the timeStep (position + claps) to the array
     timeSteps.push({
       position: { x: runnerX, y: runnerY },
       claps: clapsThisStep
@@ -96,5 +96,5 @@ export function simulateRunnerMovement(
     time += dt;
   }
 
-  return timeSteps;  // Return timeSteps that include both runner position and claps
+  return timeSteps;
 }

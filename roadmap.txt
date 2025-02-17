@@ -1,5 +1,10 @@
 Pure single player: 
-- Different runner color when slowed.
+
+- Runner improvments:
+    Different color when slowed.
+    Sprite?
+- Improvements:
+    Remove corners?
 - Improve appearance.
 
 Single player against server:

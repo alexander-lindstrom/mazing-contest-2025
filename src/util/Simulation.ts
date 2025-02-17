@@ -2,6 +2,7 @@ import { ClapEvent } from "../components/ClapAnimation";
 import { GridCell, Position, Tower } from "./Grid";
 
 export const defaultTimeStep = 0.01;
+export const defaultClapRange = 3;
 
 const getCenterPoint = (positions: Position[]): Position => {
   const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
@@ -24,7 +25,7 @@ export function simulateRunnerMovement(
   baseSpeed: number = 2,
   slowMultiplier: number = 0.5,
   slowDuration: number = 4,
-  clapRange: number = 3,
+  clapRange: number = defaultClapRange,
   clapCooldown: number = 5
 ): TimeStep[] {  // Return TimeStep[] containing both position and clap events
   let time = 0;

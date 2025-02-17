@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Circle } from "react-konva";
+import Konva from "konva";
+import { defaultClapRange } from "../util/Simulation";
 
 export interface ClapEvent {
   x: number;
@@ -11,39 +13,58 @@ interface ClapAnimationProps {
   clapEvents: ClapEvent[];
   cellSize: number;
   duration?: number;
+  currentSimulationTime?: number;
 }
 
 const ClapAnimation: React.FC<ClapAnimationProps> = ({
   clapEvents,
   cellSize,
-  duration = 500,
+  duration = 2000,
+  currentSimulationTime = 0,
 }) => {
   const [activeClaps, setActiveClaps] = useState<{ x: number; y: number; id: number }[]>([]);
-  const [nextId, setNextId] = useState(0); // Unique ID for animations
-
-  console.log(nextId)
-
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const prevClapEventsRef = useRef<ClapEvent[]>([]);
+  
   useEffect(() => {
-    const timeouts: ReturnType<typeof setTimeout>[] = [];
-
-    clapEvents.forEach(({ x, y, time }) => {
+    // Find only new clap events (simple comparison approach)
+    const newClapEvents = clapEvents.filter(
+      event => !prevClapEventsRef.current.some(
+        prev => prev.x === event.x && prev.y === event.y && prev.time === event.time
+      )
+    );
+    
+    // Update our tracked clap events
+    prevClapEventsRef.current = [...prevClapEventsRef.current, ...newClapEvents];
+    
+    // Clear previous timeouts
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+    
+    newClapEvents.forEach(({ x, y, time }) => {
+      // Calculate delay - use 0 if the clap time is in the past
+      const delay = Math.max(0, time - currentSimulationTime);
+      console.log(delay)
+      const clapId = Date.now() + Math.random();
+      
       const timeout = setTimeout(() => {
-        setActiveClaps((prev) => [...prev, { x, y, id: nextId }]);
-        setNextId((id) => id + 1);
-
+        setActiveClaps((prev) => [...prev, { x, y, id: clapId }]);
+        
         // Remove the animation after `duration`
-        setTimeout(() => {
-          setActiveClaps((prev) => prev.filter((clap) => clap.id !== nextId));
+        const cleanupTimeout = setTimeout(() => {
+          setActiveClaps((prev) => prev.filter((clap) => clap.id !== clapId));
         }, duration);
-      }, time);
-
-      timeouts.push(timeout);
+        
+        timeoutsRef.current.push(cleanupTimeout);
+      }, delay);
+      
+      timeoutsRef.current.push(timeout);
     });
-
+    
     return () => {
-      timeouts.forEach(clearTimeout);
+      timeoutsRef.current.forEach(clearTimeout);
     };
-  }, [clapEvents, duration, nextId]);
+  }, [clapEvents, duration, currentSimulationTime]);
 
   return (
     <>
@@ -52,15 +73,19 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
           key={id}
           x={x * cellSize + cellSize / 2}
           y={y * cellSize + cellSize / 2}
-          radius={0}
-          fill="blue"
-          opacity={0.5}
+          radius={cellSize / 10}
+          fill="rgba(0, 0, 255, 0.3)"
           listening={false}
-          scale={{ x: 1, y: 1 }}
-          animation="ease-out"
-          duration={duration}
-          stroke="blue"
-          strokeWidth={2}
+          ref={(node) => {
+            if (node) {
+              node.to({
+                radius: cellSize * defaultClapRange,
+                opacity: 1,
+                duration: duration / 1000,
+                easing: Konva.Easings.EaseOut
+              });
+            }
+          }}
         />
       ))}
     </>

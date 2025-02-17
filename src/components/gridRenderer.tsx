@@ -77,7 +77,6 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       onClick={handleStageClick}
     >
       <Layer ref={layerRef}>
-        {/* Base grid */}
         {grid.map((row, y) =>
           row.map((cell, x) => (
             <Rect
@@ -95,7 +94,6 @@ const GridRenderer: React.FC<GridRendererParams> = ({
           ))
         )}
 
-        {/* Hover highlight for 2x2 area */}
         {hoverPosition && (
           <Group>
             {[0, 1].map((dy) =>
@@ -121,7 +119,6 @@ const GridRenderer: React.FC<GridRendererParams> = ({
         )}
       </Layer>
 
-      {/* Runner animation */}
       {runnerPath && showRunner && (
         <Layer>
           <Runner runnerPath={runnerPath} cellSize={50} timestep={defaultTimeStep} />

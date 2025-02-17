@@ -88,6 +88,19 @@ export const getCellColor = (cell: GridCell): string => {
   }
 };
 
+export const getBaseCellColor = (cell: GridCell): string => {
+  switch (cell) {
+    case GridCell.GRASS:
+      return '#90EE90'; // Light green
+    case GridCell.GRASS_NOBUILD:
+      return '#698269'; // Darker green
+    case GridCell.SAND:
+      return '#FFBF00'; // Sand yellow
+    default:
+      return '#674422';
+  }
+};
+
 export function get2x2Positions(pos: Position): [Position, Position, Position, Position] {
   return [
     { x: pos.x, y: pos.y },
@@ -123,4 +136,9 @@ export function distance2D(pos1: Position, pos2: Position): number {
   const dx = pos2.x - pos1.x;
   const dy = pos2.y - pos1.y;
   return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function isTower(g: GridCell){
+  return g === GridCell.BLOCK_TOWER || g === GridCell.BLOCK_TOWER_NOSELL ||
+    g === GridCell.CLAP_TOWER || g === GridCell.CLAP_TOWER_NOSELL;
 }

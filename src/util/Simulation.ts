@@ -6,7 +6,7 @@ export const defaultClapRange = 3;
 export const defaultBaseSpeed = 2;
 const defaultSlowMultiplier = 0.5;
 
-const getCenterPoint = (positions: Position[]): Position => {
+export const getCenterPoint = (positions: Position[]): Position => {
   const sumX = positions.reduce((sum, pos) => sum + pos.x, 0);
   const sumY = positions.reduce((sum, pos) => sum + pos.y, 0);
   return {

@@ -1,11 +1,10 @@
 import { Stage, Layer, Rect, Group } from "react-konva";
-import { canPlaceTower, getCellColor, GridParams, Position } from "../util/Grid";
-import { useCallback, useRef, useState } from "react";
+import { canPlaceTower, getBaseCellColor, getCellColor, GridParams, Position, Tower } from "../util/Grid";
+import { useCallback, useState } from "react";
 import { KonvaEventObject } from "konva/lib/Node";
 import Runner from "./Runner";
 import ClapAnimation, { ClapEvent } from "./ClapAnimation";
-import Konva from "konva";
-import { defaultTimeStep } from "../util/Simulation";
+import { defaultTimeStep, getCenterPoint } from "../util/Simulation";
 
 const CELL_SIZE = 50;
 const CELL_PADDING = 1;
@@ -15,6 +14,7 @@ export type GridRendererParams = GridParams & {
   runnerPath: Position[];
   showRunner: boolean;
   clapEvents: ClapEvent[];
+  towers: Tower[];
 };
 
 const GridRenderer: React.FC<GridRendererParams> = ({
@@ -25,9 +25,9 @@ const GridRenderer: React.FC<GridRendererParams> = ({
   runnerPath,
   showRunner,
   clapEvents,
+  towers,
 }) => {
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
-  const layerRef = useRef<Konva.Layer>(null);
 
   const handleMouseMove = useCallback(
     (e: KonvaEventObject<MouseEvent>) => {
@@ -68,6 +68,48 @@ const GridRenderer: React.FC<GridRendererParams> = ({
     [handleClick]
   );
 
+  const renderBaseGrid = () => (
+    grid.map((row, y) =>
+      row.map((cell, x) => (
+        <Rect
+          key={`${x}-${y}`}
+          x={x * CELL_SIZE + CELL_PADDING}
+          y={y * CELL_SIZE + CELL_PADDING}
+          width={CELL_SIZE - 2 * CELL_PADDING}
+          height={CELL_SIZE - 2 * CELL_PADDING}
+          fill={getBaseCellColor(cell)}
+          strokeWidth={1}
+          stroke="#000"
+          cornerRadius={2}
+          cursor="pointer"
+        />
+      ))
+    )
+  );
+
+  const renderTowers = () => (
+    towers.map((tower, index) => {
+      const { positions, type } = tower;
+      const center = getCenterPoint(positions);
+      return (
+        <Rect
+          key={`tower-${index}`}
+          x={(center.x + 0.5) * CELL_SIZE}
+          y={(center.y + 0.5) * CELL_SIZE}
+          width={Math.SQRT2 * CELL_SIZE}
+          height={Math.SQRT2 * CELL_SIZE}
+          fill={getCellColor(type)}
+          strokeWidth={1}
+          stroke="#000"
+          rotation={45}
+          offsetX={(Math.SQRT2 * CELL_SIZE) / 2}
+          offsetY={(Math.SQRT2 * CELL_SIZE) / 2}
+          cornerRadius={4}
+        />
+      );
+    })
+  );
+
   return (
     <Stage
       width={width * CELL_SIZE}
@@ -76,23 +118,11 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       onMouseLeave={handleMouseLeave}
       onClick={handleStageClick}
     >
-      <Layer ref={layerRef}>
-        {grid.map((row, y) =>
-          row.map((cell, x) => (
-            <Rect
-              key={`${x}-${y}`}
-              x={x * CELL_SIZE + CELL_PADDING}
-              y={y * CELL_SIZE + CELL_PADDING}
-              width={CELL_SIZE - 2 * CELL_PADDING}
-              height={CELL_SIZE - 2 * CELL_PADDING}
-              fill={getCellColor(cell)}
-              strokeWidth={1}
-              stroke="#000"
-              cornerRadius={2}
-              cursor="pointer"
-            />
-          ))
-        )}
+      <Layer>
+        {renderBaseGrid()}
+        {renderTowers()}
+    
+
 
         {hoverPosition && (
           <Group>

@@ -25,8 +25,6 @@ export function GamePage() {
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
 
-  console.log(totalSimulationTime)
-
   useEffect(() => {
     if (countdown <= 0) {
       handleStartButton();
@@ -142,7 +140,6 @@ export function GamePage() {
 
           <div className="flex flex-col space-y-6 w-80">
             <Card className="bg-gray-800 text-white p-4">
-              <h2 className="text-lg font-semibold">Game Info</h2>
               <p>Gold: {resources.gold}</p>
               <p>Lumber: {resources.lumber}</p>
               <p>Time: {isRunning ? stopwatch : countdown}</p>

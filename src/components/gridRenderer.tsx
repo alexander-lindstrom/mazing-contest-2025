@@ -121,16 +121,12 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       <Layer>
         {renderBaseGrid()}
         {renderTowers()}
-    
-
-
-        {hoverPosition && (
+        {!showRunner && hoverPosition && (
           <Group>
             {[0, 1].map((dy) =>
               [0, 1].map((dx) => {
                 const x = hoverPosition.x + dx;
                 const y = hoverPosition.y + dy;
-
                 return (
                   <Rect
                     key={`hover-${x}-${y}`}
@@ -148,13 +144,11 @@ const GridRenderer: React.FC<GridRendererParams> = ({
           </Group>
         )}
       </Layer>
-
       {runnerPath && showRunner && (
         <Layer>
           <Runner runnerPath={runnerPath} cellSize={50} timestep={defaultTimeStep} />
         </Layer>
       )}
-
       {clapEvents.length > 0 && showRunner && (
         <Layer>
           <ClapAnimation 

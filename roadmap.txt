@@ -1,10 +1,6 @@
 Pure single player: 
-
-- Add countdown (before start)
-- Add timer (after start)
-- Add clap animation
-    Keep track of clapEvents
-    Different runner color when slowed.
+- Different runner color when slowed.
+- Improve appearance.
 
 Single player against server:
 

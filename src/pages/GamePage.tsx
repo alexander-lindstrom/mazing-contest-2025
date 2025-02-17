@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import GridRenderer from '../components/GridRenderer';
 import { generateStartingState } from '../util/RandomGeneration';
-import { canPlaceTower, canSellTower, defaultGoal, defaultStart, get2x2Positions, GridCell, Position, Tower } from '../util/Grid';
+import { canPlaceTower, canSellTower, defaultGoal, defaultStart, get2x2Positions, GridCell, Position } from '../util/Grid';
 import { findShortestPath } from '../util/Pathfinding';
-import { simulateRunnerMovement } from '../util/Simulation';
+import { defaultTimeStep, simulateRunnerMovement } from '../util/Simulation';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Switch } from '../components/ui/switch';
 import { ClapEvent } from '../components/ClapAnimation';
 
 const startingState = generateStartingState();
+const INITIAL_COUNTDOWN = 45;
 
 export function GamePage() {
   const [grid, setGrid] = useState(startingState.grid);
@@ -19,32 +20,41 @@ export function GamePage() {
   const [isRunning, setIsRunning] = useState(false);
   const [placeTowerMode, setPlaceTowerMode] = useState(GridCell.BLOCK_TOWER);
   const [clapEvents, setClapEvents] = useState<ClapEvent[]>([]);
-  const [timeLeft, setTimeLeft] = useState(45);
-  const [countdownActive, setCountdownActive] = useState(true);
+  const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN);
+  const [stopwatch, setStopwatch] = useState(0);
+  const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
+  const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
+
+  console.log(totalSimulationTime)
 
   useEffect(() => {
-    if (!countdownActive || timeLeft <= 0) {
+    if (countdown <= 0) {
+      handleStartButton();
       return;
     }
-
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          handleStartButton();
-          return 0;
-        }
-        return prev - 1;
-      });
+    
+    const interval = setInterval(() => {
+      setCountdown(prev => Math.max(prev - 1, 0));
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countdownActive, timeLeft]);
+  }, [countdown]);
+
+  useEffect(() => {
+    if (!isStopwatchRunning || (totalSimulationTime !== null && stopwatch >= totalSimulationTime)) {
+      return;
+    }
+    
+    const interval = setInterval(() => {
+      setStopwatch(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isStopwatchRunning, stopwatch, totalSimulationTime]);
 
   const handleCellClick = (x: number, y: number) => {
     if (isRunning) return;
-
     const newGrid = grid.map(row => [...row]);
 
     if (canSellTower(grid, x, y)) {
@@ -63,38 +73,40 @@ export function GamePage() {
         setGrid(newGrid);
         setTowers(newTowers);
         setResources({ gold: resources.gold + goldDiff, lumber: resources.lumber + lumberDiff });
+        return;
       }
     } else if (canPlaceTower(grid, x, y)) {
       const positions = get2x2Positions({ x, y });
       const lumberCost = placeTowerMode === GridCell.BLOCK_TOWER ? 0 : 1;
       if (resources.gold < 1 || resources.lumber < lumberCost) return;
-
       positions.forEach(pos => {
         newGrid[pos.y][pos.x] = placeTowerMode;
       });
-
-      const newTower: Tower = {
-        type: placeTowerMode,
-        positions: positions
-      };
-
       setGrid(newGrid);
-      setTowers([...towers, newTower]);
+      setTowers([...towers, { type: placeTowerMode, positions }]);
       setResources({ gold: resources.gold - 1, lumber: resources.lumber - lumberCost });
     }
   };
 
   const handleStartButton = () => {
     if (isRunning) return;
-
-    setCountdownActive(false);
+    
     const path = findShortestPath(grid, defaultStart, defaultGoal);
     if (!path) return;
-
+    
     const timeSteps = simulateRunnerMovement(towers, path);
-    setRunnerPath(timeSteps.map(step => step.position));
-    setClapEvents(timeSteps.flatMap(step => step.claps || []));
+    const positions = timeSteps.map(step => step.position);
+    const claps = timeSteps.flatMap(step => step.claps || []);
+    
+    setRunnerPath(positions);
+    setClapEvents(claps);
     setIsRunning(true);
+    setCountdown(0);
+    setStopwatch(0);
+    setIsStopwatchRunning(true);
+    
+    const totalSimTime = timeSteps.length * defaultTimeStep;
+    setTotalSimulationTime(totalSimTime);
   };
 
   const handleReset = () => {
@@ -105,10 +117,12 @@ export function GamePage() {
     setRunnerPath([]);
     setIsRunning(false);
     setPlaceTowerMode(GridCell.BLOCK_TOWER);
-    setTimeLeft(45);
-    setCountdownActive(true);
+    setCountdown(INITIAL_COUNTDOWN);
+    setStopwatch(0);
+    setIsStopwatchRunning(false);
+    setTotalSimulationTime(null);
   };
-
+  
   return (
     <div className="flex justify-center items-start p-6 bg-gray-900 min-h-screen">
       <div className="flex flex-col items-center w-full max-w-6xl">
@@ -131,28 +145,15 @@ export function GamePage() {
               <h2 className="text-lg font-semibold">Game Info</h2>
               <p>Gold: {resources.gold}</p>
               <p>Lumber: {resources.lumber}</p>
-              <p>Time Left: {timeLeft}s</p>
+              <p>Time: {isRunning ? stopwatch : countdown}</p>
             </Card>
 
             <div className="flex space-x-4">
-              <Button
-                onClick={handleStartButton}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Start
-              </Button>
-              <Button
-                onClick={handleReset}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-              >
-                Regenerate
-              </Button>
+              <Button onClick={handleStartButton} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Start</Button>
+              <Button onClick={handleReset} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Regenerate</Button>
               <div className="flex items-center gap-2">
                 <span>Block</span>
-                <Switch
-                  checked={placeTowerMode === GridCell.CLAP_TOWER}
-                  onCheckedChange={(checked) => setPlaceTowerMode(checked ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER)}
-                />
+                <Switch checked={placeTowerMode === GridCell.CLAP_TOWER} onCheckedChange={checked => setPlaceTowerMode(checked ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER)} />
                 <span>Clap</span>
               </div>
             </div>

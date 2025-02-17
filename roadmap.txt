@@ -1,12 +1,13 @@
 Pure single player: 
 
-- Runner improvments:
-    Different color when slowed.
-    Sprite?
-- Improvements:
-    Remove corners?
 - Improve appearance.
 
 Single player against server:
 
+- Dedicated single player page
+- Setup server
+- Socket communication
+
 Multi player:
+
+- Dedicated multi player page

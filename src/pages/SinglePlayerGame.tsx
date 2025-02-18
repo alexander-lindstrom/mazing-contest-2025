@@ -12,7 +12,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 const startingState = generateStartingState();
 const INITIAL_COUNTDOWN = 45;
 
-export function GamePage() {
+export function SinglePlayerGame() {
   const [grid, setGrid] = useState(startingState.grid);
   const [towers, setTowers] = useState(startingState.towers);
   const [resources, setResources] = useState({ gold: startingState.gold, lumber: startingState.lumber });

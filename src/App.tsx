@@ -1,9 +1,9 @@
-import { GamePage } from './pages/GamePage';
+import { SinglePlayerGame } from './pages/SinglePlayerGame';
 
 function App() {
   return (
     <div className="App">
-      <GamePage />
+      <SinglePlayerGame />
     </div>
   );
 }

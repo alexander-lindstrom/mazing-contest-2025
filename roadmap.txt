@@ -1,16 +1,10 @@
 Pure single player: 
 
 - Improve appearance.
-- Sound? Start, claps, building?, selling?
-    Howler.js
-    Need sound files for this. Not sure how to generate.
+- Can load config
 
-Single player against server:
-
-- Dedicated single player page
-- Setup server
-- Socket communication
 
 Multi player:
 
 - Dedicated multi player page
+- Endpoinds

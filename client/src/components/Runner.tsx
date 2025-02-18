@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Circle } from 'react-konva';
-import { distance2D, Position } from '../util/Grid';
-import { defaultBaseSpeed } from '../util/Simulation';
+import { distance2D, Position } from '../../../util/Grid';
+import { defaultBaseSpeed } from '../../../util/Simulation';
 
 type RunnerProps = {
   runnerPath: Position[];

@@ -11,6 +11,11 @@ app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
+// Endpoints:
+// GET configuration (random grid, resources)
+// GET shortest path
+// POST final grid
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Circle, Group } from "react-konva";
-import { defaultClapRange } from "../util/Simulation";
+import { defaultClapRange } from "../../../util/Simulation";
 
 export interface ClapEvent {
   x: number;

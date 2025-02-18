@@ -1,10 +1,10 @@
 import { Stage, Layer, Rect, Group } from "react-konva";
-import { canPlaceTower, getBaseCellColor, getCellColor, GridParams, Position, Tower } from "../util/Grid";
+import { canPlaceTower, getBaseCellColor, getCellColor, GridParams, Position, Tower } from "../../../util/Grid";
 import { useCallback, useState } from "react";
 import { KonvaEventObject } from "konva/lib/Node";
 import Runner from "./Runner";
 import ClapAnimation, { ClapEvent } from "./ClapAnimation";
-import { defaultTimeStep, getCenterPoint } from "../util/Simulation";
+import { defaultTimeStep, getCenterPoint } from "../../../util/Simulation";
 
 const CELL_SIZE = 50;
 const CELL_PADDING = 1;

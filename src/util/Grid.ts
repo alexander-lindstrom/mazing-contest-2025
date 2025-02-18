@@ -93,7 +93,7 @@ export const getBaseCellColor = (cell: GridCell): string => {
     case GridCell.GRASS:
       return '#2fd753'; // Light green
     case GridCell.GRASS_NOBUILD:
-      return '#698269'; // Darker green
+      return '#006400'; // Darker green
     case GridCell.SAND:
       return '#FFBF00'; // Sand yellow
     default:

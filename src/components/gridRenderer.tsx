@@ -10,7 +10,7 @@ const CELL_SIZE = 50;
 const CELL_PADDING = 1;
 
 export type GridRendererParams = GridParams & {
-  handleClick: (x: number, y: number) => void;
+  handleClick: (x: number, y: number, e: KonvaEventObject<MouseEvent>) => void;
   runnerPath: Position[];
   showRunner: boolean;
   clapEvents: ClapEvent[];
@@ -57,16 +57,18 @@ const GridRenderer: React.FC<GridRendererParams> = ({
     (e: KonvaEventObject<MouseEvent>) => {
       const stage = e.target.getStage();
       if (!stage) return;
-
+  
       const pos = stage.getPointerPosition();
       if (!pos) return;
+      
       const x = Math.floor(pos.x / CELL_SIZE);
       const y = Math.floor(pos.y / CELL_SIZE);
-
-      handleClick(x, y);
+  
+      handleClick(x, y, e);
     },
     [handleClick]
   );
+  
 
   const renderBaseGrid = () => (
     grid.map((row, y) =>

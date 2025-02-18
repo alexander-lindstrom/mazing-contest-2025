@@ -6,8 +6,8 @@ import { findShortestPath } from '../util/Pathfinding';
 import { defaultTimeStep, simulateRunnerMovement } from '../util/Simulation';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Switch } from '../components/ui/switch';
 import { ClapEvent } from '../components/ClapAnimation';
+import { KonvaEventObject } from 'konva/lib/Node';
 
 const startingState = generateStartingState();
 const INITIAL_COUNTDOWN = 45;
@@ -18,7 +18,6 @@ export function GamePage() {
   const [resources, setResources] = useState({ gold: startingState.gold, lumber: startingState.lumber });
   const [runnerPath, setRunnerPath] = useState<Position[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [placeTowerMode, setPlaceTowerMode] = useState(GridCell.BLOCK_TOWER);
   const [clapEvents, setClapEvents] = useState<ClapEvent[]>([]);
   const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN);
   const [stopwatch, setStopwatch] = useState(0);
@@ -51,9 +50,10 @@ export function GamePage() {
     return () => clearInterval(interval);
   }, [isStopwatchRunning, stopwatch, totalSimulationTime]);
 
-  const handleCellClick = (x: number, y: number) => {
+  const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
     if (isRunning) return;
     const newGrid = grid.map(row => [...row]);
+    const shiftPress = e.evt.shiftKey;
 
     if (canSellTower(grid, x, y)) {
       const towerIndex = towers.findIndex(tower =>
@@ -75,13 +75,13 @@ export function GamePage() {
       }
     } else if (canPlaceTower(grid, x, y)) {
       const positions = get2x2Positions({ x, y });
-      const lumberCost = placeTowerMode === GridCell.BLOCK_TOWER ? 0 : 1;
+      const lumberCost = shiftPress ? 1 : 0;
       if (resources.gold < 1 || resources.lumber < lumberCost) return;
       positions.forEach(pos => {
-        newGrid[pos.y][pos.x] = placeTowerMode;
+        newGrid[pos.y][pos.x] = shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER;
       });
       setGrid(newGrid);
-      setTowers([...towers, { type: placeTowerMode, positions }]);
+      setTowers([...towers, { type: shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER, positions }]);
       setResources({ gold: resources.gold - 1, lumber: resources.lumber - lumberCost });
     }
   };
@@ -114,7 +114,6 @@ export function GamePage() {
     setResources({ gold: newState.gold, lumber: newState.lumber });
     setRunnerPath([]);
     setIsRunning(false);
-    setPlaceTowerMode(GridCell.BLOCK_TOWER);
     setCountdown(INITIAL_COUNTDOWN);
     setStopwatch(0);
     setIsStopwatchRunning(false);
@@ -122,7 +121,7 @@ export function GamePage() {
   };
   
   return (
-    <div className="flex justify-center items-start p-6 bg-gray-900 min-h-screen">
+    <div className="flex justify-center items-start p-6 bg-gray-800 min-h-screen">
       <div className="flex flex-col items-center w-full max-w-6xl">
         <div className="flex w-full space-x-6">
           <div className="flex-grow">
@@ -137,25 +136,27 @@ export function GamePage() {
               clapEvents={clapEvents}
             />
           </div>
-
+  
           <div className="flex flex-col space-y-6 w-80">
-            <Card className="bg-gray-800 text-white p-4">
-              <p>Gold: {resources.gold}</p>
-              <p>Lumber: {resources.lumber}</p>
-              <p>Time: {isRunning ? stopwatch : countdown}</p>
+            <Card className="bg-blue-600 text-white p-6 border-[3px] border-black shadow-brutalism px-4 py-2">
+              <p className="font-bold">Gold: {resources.gold}</p>
+              <p className="font-bold">Lumber: {resources.lumber}</p>
+              <p className="font-bold">Time: {isRunning ? stopwatch : countdown}</p>
             </Card>
-
+  
             <div className="flex space-x-4">
-              <Button onClick={handleStartButton} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Start</Button>
-              <Button onClick={handleReset} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Regenerate</Button>
-              <div className="flex items-center gap-2">
-              <span style={{ color: 'white' }}>Block</span>
-                <Switch 
-                  checked={placeTowerMode === GridCell.CLAP_TOWER} 
-                  onCheckedChange={checked => setPlaceTowerMode(checked ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER)} 
-                />
-              <span style={{ color: 'white' }}>Clap</span>
-              </div>
+              <Button
+                className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black shadow-brutalism px-4 py-2"
+                onClick={handleStartButton}
+              >
+                Start
+              </Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black shadow-brutalism px-4 py-2"
+                onClick={handleReset}
+              >
+                Regenerate
+              </Button>
             </div>
           </div>
         </div>

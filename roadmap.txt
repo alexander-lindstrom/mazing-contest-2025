@@ -1,6 +1,9 @@
 Pure single player: 
 
 - Improve appearance.
+- Sound? Start, claps, building?, selling?
+    Howler.js
+    Need sound files for this. Not sure how to generate.
 
 Single player against server:
 

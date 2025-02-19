@@ -121,43 +121,41 @@ export function SinglePlayerGame() {
   };
   
   return (
-    <div className="flex justify-center items-start p-6 bg-gray-800 min-h-screen">
-      <div className="flex flex-col items-center w-full max-w-6xl">
-        <div className="flex w-full space-x-6">
-          <div className="flex-grow">
-            <GridRenderer
-              width={startingState.width}
-              height={startingState.height}
-              towers={towers}
-              grid={grid}
-              handleClick={handleCellClick}
-              runnerPath={runnerPath}
-              showRunner={isRunning}
-              clapEvents={clapEvents}
-            />
-          </div>
-  
-          <div className="flex flex-col space-y-6 w-80">
-            <Card className="bg-blue-600 text-white p-6 border-[3px] border-black px-4 py-2">
-              <p className="font-bold">Gold: {resources.gold}</p>
-              <p className="font-bold">Lumber: {resources.lumber}</p>
-              <p className="font-bold">Time: {isRunning ? stopwatch : countdown}</p>
-            </Card>
-  
-            <div className="flex space-x-4">
-              <Button
-                className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
-                onClick={handleStartButton}
-              >
-                Start
-              </Button>
-              <Button
-                className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
-                onClick={handleReset}
-              >
-                Regenerate
-              </Button>
-            </div>
+    <div className="flex flex-col items-center w-full max-w-6xl">
+      <div className="flex w-full space-x-6">
+        <div className="flex-grow">
+          <GridRenderer
+            width={startingState.width}
+            height={startingState.height}
+            towers={towers}
+            grid={grid}
+            handleClick={handleCellClick}
+            runnerPath={runnerPath}
+            showRunner={isRunning}
+            clapEvents={clapEvents}
+          />
+        </div>
+
+        <div className="flex flex-col space-y-6 w-80">
+          <Card className="bg-blue-600 text-white p-6 border-[3px] border-black px-4 py-2">
+            <p className="font-bold">Gold: {resources.gold}</p>
+            <p className="font-bold">Lumber: {resources.lumber}</p>
+            <p className="font-bold">Time: {isRunning ? stopwatch : countdown}</p>
+          </Card>
+
+          <div className="flex space-x-4">
+            <Button
+              className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
+              onClick={handleStartButton}
+            >
+              Start
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
+              onClick={handleReset}
+            >
+              Regenerate
+            </Button>
           </div>
         </div>
       </div>

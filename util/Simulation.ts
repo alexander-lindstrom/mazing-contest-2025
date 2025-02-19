@@ -1,4 +1,4 @@
-import { ClapEvent } from "../components/ClapAnimation";
+import { ClapEvent } from "../client/src/components/ClapAnimation";
 import { GridCell, Position, Tower } from "./Grid";
 
 export const defaultTimeStep = 0.001;

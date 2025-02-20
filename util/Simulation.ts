@@ -1,4 +1,3 @@
-import { ClapEvent } from "../client/src/components/ClapAnimation";
 import { GridCell, Position, Tower } from "./Grid";
 
 export const defaultTimeStep = 0.001;
@@ -18,6 +17,12 @@ export const getCenterPoint = (positions: Position[]): Position => {
 interface TimeStep {
   position: Position;
   claps: ClapEvent[];
+}
+
+export interface ClapEvent {
+  x: number;
+  y: number;
+  time: number;
 }
 
 export function simulateRunnerMovement(

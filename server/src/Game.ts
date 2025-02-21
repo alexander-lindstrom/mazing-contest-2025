@@ -1,4 +1,4 @@
-import { GridCell } from "@mazing/util";
+import { GridCell, StartingState } from "@mazing/util";
 
 export interface PlayerData {
   name: string;
@@ -14,7 +14,9 @@ interface GameState {
   startTime: number | null;
   lastUpdateTime: number | null;
   rounds: number;
+  currentRound: number;
   results: Map<string, Result>;
+  startingConfigs: StartingState[];
 }
 
 export class Game {
@@ -32,7 +34,9 @@ export class Game {
       startTime: null,
       lastUpdateTime: null,
       rounds: rounds,
-      results: new Map()
+      currentRound: 1,
+      results: new Map(),
+      startingConfigs: []
     };
   }
 
@@ -49,6 +53,7 @@ export class Game {
     return this.players.size;
   }
 
+  // State updates
   updateGameState(newState: Partial<GameState>): void {
     this.state = {
       ...this.state,

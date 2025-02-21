@@ -7,6 +7,7 @@ export function setupGameServer(io: Server): void {
     const gameManager = new GameManager(io);
   
     io.on('connection', (socket: Socket) => {
+
       socket.on('create-game', () => {
         const game = gameManager.createGame();
         socket.emit('game-created', game.serialize());
@@ -23,11 +24,7 @@ export function setupGameServer(io: Server): void {
       });
   
       socket.on('game-action', (action: GameAction) => {
-        const game = gameManager.getGameByPlayer(socket.id);
-        if (!game) {
-          return;
-        }
-        gameManager.handleGameAction(socket, action);
+        gameManager.handleGameAction(io, socket, action);
       });
   
       socket.on('disconnect', () => {
@@ -37,5 +34,6 @@ export function setupGameServer(io: Server): void {
           io.to(game.id).emit('player-left', game.serialize());
         }
       });
+
     });
   }

@@ -1,14 +1,15 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
 import { Game, PlayerData } from './Game';
+import { generateStartingState } from '@mazing/util';
 
 enum GameActionEnum {
-  CLIENT_START,
-  CLIENT_SUBMIT_RESULT,
+  CLIENT_START = 'CLIENT_START',
+  CLIENT_SUBMIT_RESULT = 'CLIENT_SUBMIT_RESULT',
 
-  SERVER_START_GAME,
-  SERVER_SEND_ROUND_CONFIG,
-  SERVER_SEND_ROUND_RESULT,
+  SERVER_START_GAME = 'SERVER_START_GAME',
+  SERVER_SEND_ROUND_CONFIG = 'SERVER_SEND_ROUND_CONFIG',
+  SERVER_SEND_ROUND_RESULT = 'SERVER_SEND_ROUND_RESULT',
 }
 
 export interface GameAction {
@@ -48,13 +49,7 @@ export class GameManager {
     game.addPlayer(socket.id, playerData);
     this.playerToGame.set(socket.id, gameId);
     
-    // Join the Socket.IO room for this game
     socket.join(gameId);
-    
-    // If game can start, notify all players in the room
-    if (game.canStart()) {
-      this.io.to(gameId).emit('game-can-start', game.serialize());
-    }
     
     return game;
   }
@@ -121,11 +116,16 @@ export class GameManager {
     };
   }
 
-  handleGameAction(socket: Socket, action: GameAction) {
+  handleGameAction(io: Server, socket: Socket, action: GameAction) {
+
+    const game = this.getGameByPlayer(socket.id);
+    if (!game){
+      throw new Error("Player not part of a game!")
+    }
 
     switch(action.type) {
         case GameActionEnum.CLIENT_START:
-            this.handleClientStart(socket);
+            this.handleClientStart(io, socket, game);
             break;
         case GameActionEnum.CLIENT_SUBMIT_RESULT:
 
@@ -134,14 +134,21 @@ export class GameManager {
     }
 }
 
-  private handleClientStart(socket: Socket){
-      // Check that the game has not already started
-      // Check that the game has at least two players
-      // Check that player sending the request is the room owner
-      // Generate starting config
-          // Update game state
-      // Broadcast start message
-      // Broadcast initial config
+  private handleClientStart(io: Server, socket: Socket, game: Game){
+
+    // Todo: only game owner should be able to start
+    if (!game.canStart){
+      throw new Error ("Game cannot start!");
+    }
+      
+    const config = generateStartingState();
+    game.updateGameState({
+      status: 'running',
+      startTime: Date.now(),
+      startingConfigs: [...game.getState().startingConfigs, config]
+    });
+    io.to(game.id).emit(GameActionEnum.SERVER_START_GAME);
+    io.to(game.id).emit(GameActionEnum.SERVER_SEND_ROUND_CONFIG, config);
   }
 
   private handleClientSubmitResult(socket: Socket){

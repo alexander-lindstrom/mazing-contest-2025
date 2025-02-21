@@ -1,8 +1,22 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
-import { Game, GameAction, GameActionEnum, PlayerData } from './Game';
+import { Game, PlayerData } from './Game';
 
-class GameManager {
+enum GameActionEnum {
+  CLIENT_START,
+  CLIENT_SUBMIT_RESULT,
+
+  SERVER_START_GAME,
+  SERVER_SEND_ROUND_CONFIG,
+  SERVER_SEND_ROUND_RESULT,
+}
+
+export interface GameAction {
+  type: GameActionEnum;
+  payload: any;
+}
+
+export class GameManager {
   private games: Map<string, Game>;
   private playerToGame: Map<string, string>;
   private io: Server;
@@ -12,8 +26,8 @@ class GameManager {
     this.playerToGame = new Map();
     this.io = io;
     
-    // Auto-cleanup of finished games after 1 hour
-    setInterval(() => this.cleanupFinishedGames(), 60 * 60 * 1000);
+    // Auto-cleanup of finished games after 5 minutes
+    setInterval(() => this.cleanupFinishedGames(), 5 * 60 * 1000);
   }
 
   createGame(gameId: string = randomUUID()): Game {
@@ -140,42 +154,4 @@ class GameManager {
     //  If all players has submitted result -> broadcast results.
 
   }
-}
-
-// Example usage with Socket.IO server setup
-export function setupGameServer(io: Server): void {
-  const gameManager = new GameManager(io);
-
-  io.on('connection', (socket: Socket) => {
-    socket.on('create-game', () => {
-      const game = gameManager.createGame();
-      socket.emit('game-created', game.serialize());
-    });
-
-    socket.on('join-game', ({ gameId, playerData }: { gameId: string, playerData: PlayerData }) => {
-      try {
-        const game = gameManager.joinGame(gameId, socket, playerData);
-        // Broadcast to all players in the room
-        io.to(gameId).emit('player-joined', game.serialize());
-      } catch (error) {
-        socket.emit('error', error instanceof Error ? error.message : 'Unknown error');
-      }
-    });
-
-    socket.on('game-action', (action: GameAction) => {
-      const game = gameManager.getGameByPlayer(socket.id);
-      if (!game) {
-        return;
-      }
-      gameManager.handleGameAction(socket, action);
-    });
-
-    socket.on('disconnect', () => {
-      const game = gameManager.leaveGame(socket);
-      if (game) {
-        // Broadcast to remaining players in the room
-        io.to(game.id).emit('player-left', game.serialize());
-      }
-    });
-  });
 }

@@ -1,26 +1,20 @@
+import { GridCell } from "@mazing/util";
+
 export interface PlayerData {
   name: string;
 }
 
+interface Result {
+  duration: number;
+  finalMaze: GridCell[][];
+}
+
 interface GameState {
   status: 'waiting' | 'running' | 'finished';
-  gameData: Record<string, any>;
   startTime: number | null;
   lastUpdateTime: number | null;
-}
-
-export enum GameActionEnum {
-  CLIENT_START,
-  CLIENT_SUBMIT_RESULT,
-
-  SERVER_START_GAME,
-  SERVER_SEND_ROUND_CONFIG,
-  SERVER_SEND_ROUND_RESULT,
-}
-
-export interface GameAction {
-  type: GameActionEnum;
-  payload: any;
+  rounds: number;
+  results: Map<string, Result>;
 }
 
 export class Game {
@@ -29,15 +23,16 @@ export class Game {
   private players: Map<string, PlayerData>;
   private state: GameState;
 
-  constructor(id: string, maxPlayers: number = 8) {
+  constructor(id: string, maxPlayers: number = 8, rounds: number = 10) {
     this.id = id;
     this.maxPlayers = maxPlayers;
     this.players = new Map();
     this.state = {
       status: 'waiting',
-      gameData: {},
       startTime: null,
-      lastUpdateTime: null
+      lastUpdateTime: null,
+      rounds: rounds,
+      results: new Map()
     };
   }
 

@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
 import { Server } from "socket.io";
-import { setupGameServer } from "./GameManager";
 import { createServer } from "http";
+import { setupGameServer } from "./SocketManager";
 
 const app = express();
 const PORT = 5000;

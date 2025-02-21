@@ -9,14 +9,14 @@ export interface Tower {
 }
 
 export enum GridCell {
-    GRASS,
-    GRASS_NOBUILD,
-    SAND,
-    BLOCK_TOWER,
-    CLAP_TOWER,
-    BLOCK_TOWER_NOSELL,
-    CLAP_TOWER_NOSELL,
-  }
+  GRASS,
+  GRASS_NOBUILD,
+  SAND,
+  BLOCK_TOWER,
+  CLAP_TOWER,
+  BLOCK_TOWER_NOSELL,
+  CLAP_TOWER_NOSELL,
+}
 
 const defaultHeight = 20;
 const defaultWidth = 21;

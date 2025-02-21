@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
-import { generateStartingState } from "@mazing/util";
+import { Server } from "socket.io";
+import { setupGameServer } from "./GameManager";
+import { createServer } from "http";
 
 const app = express();
 const PORT = 5000;
@@ -8,18 +10,16 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Server is running!");
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"]
+  }
 });
 
-const config = generateStartingState();
-console.log(config)
+setupGameServer(io);
 
-// Endpoints:
-// GET configuration (random grid, resources)
-// GET shortest path
-// POST final grid
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

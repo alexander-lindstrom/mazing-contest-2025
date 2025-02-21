@@ -1,6 +1,6 @@
+import { ClapEvent, defaultClapRange } from "@mazing/util";
 import React, { useEffect, useState } from "react";
 import { Circle, Group } from "react-konva";
-import { ClapEvent, defaultClapRange } from "../../../util/Simulation";
 
 interface ClapAnimationProps {
   events: ClapEvent[];

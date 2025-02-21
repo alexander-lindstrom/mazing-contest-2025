@@ -2,10 +2,8 @@
   "name": "mazing-contest",
   "version": "1.0.0",
   "description": "A browser version of the classic Warcraft 3 custom game.",
-  "workspaces": [
-    "client",
-    "server"
-  ],
+  "private": true,
+  "workspaces": ["util", "client", "server"],
   "scripts": {
     "start": "concurrently \"npm run dev --prefix client\" \"npm run dev --prefix server\"",
     "build": "npm run build --prefix client && npm run build --prefix server",

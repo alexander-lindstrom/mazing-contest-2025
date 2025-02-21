@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
 import GridRenderer from '../components/GridRenderer';
-import { generateStartingState } from '../../../util/RandomGeneration';
-import { canPlaceTower, canSellTower, defaultGoal, defaultStart, get2x2Positions, GridCell, Position } from '../../../util/Grid';
-import { findShortestPath } from '../../../util/Pathfinding';
-import { defaultTimeStep, simulateRunnerMovement } from '../../../util/Simulation';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { ClapEvent } from '../components/ClapAnimation';
 import { KonvaEventObject } from 'konva/lib/Node';
+import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, get2x2Positions, GridCell, Position, simulateRunnerMovement } from '@mazing/util';
 
 const startingState = generateStartingState();
 const INITIAL_COUNTDOWN = 45;

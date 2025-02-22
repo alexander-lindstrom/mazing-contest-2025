@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
-import { Game, PlayerData } from './Game';
-import { generateStartingState } from '@mazing/util';
+import { Game, GameStatusEnum, PlayerData } from './Game';
+import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
 
 enum GameActionEnum {
   CLIENT_START = 'CLIENT_START',
@@ -10,6 +10,7 @@ enum GameActionEnum {
   SERVER_START_GAME = 'SERVER_START_GAME',
   SERVER_SEND_ROUND_CONFIG = 'SERVER_SEND_ROUND_CONFIG',
   SERVER_SEND_ROUND_RESULT = 'SERVER_SEND_ROUND_RESULT',
+  SERVER_START_NEXT_ROUND = 'SERVER_START_NEXT_ROUND'
 }
 
 export interface GameAction {
@@ -46,6 +47,7 @@ export class GameManager {
       throw new Error('Game not found');
     }
     
+    // Todo: make sure that player is not already part of a game
     game.addPlayer(socket.id, playerData);
     this.playerToGame.set(socket.id, gameId);
     
@@ -128,6 +130,8 @@ export class GameManager {
             this.handleClientStart(io, socket, game);
             break;
         case GameActionEnum.CLIENT_SUBMIT_RESULT:
+            this.handleClientSubmitResult(io, socket, game, action);
+            break;
 
         default:
             throw new Error("No such game action!");
@@ -143,22 +147,34 @@ export class GameManager {
       
     const config = generateStartingState();
     game.updateGameState({
-      status: 'running',
+      status: GameStatusEnum.RUNNING,
       startTime: Date.now(),
-      startingConfigs: [...game.getState().startingConfigs, config]
+      startingConfigs: [config]
     });
     io.to(game.id).emit(GameActionEnum.SERVER_START_GAME);
     io.to(game.id).emit(GameActionEnum.SERVER_SEND_ROUND_CONFIG, config);
   }
 
-  private handleClientSubmitResult(socket: Socket){
-    //  Validate player
-    //    In a running game
-    //  Validate result
-    //    Was this possible given the starting config?
-    //    Is there a path?
-    //  Add to game state
-    //  If all players has submitted result -> broadcast results.
+  private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
+
+    if (game.getState().status !== GameStatusEnum.RUNNING) {
+      throw new Error("Cannot submit result for game which is not running!");
+    }
+
+    const initialConfig = game.getStartingConfig();
+    const finalResult = action.payload as StartingState;
+
+    const path = findShortestPath(finalResult.grid, defaultStart, defaultGoal);
+    
+    if (!validateRoundResult(initialConfig, finalResult) || !path) {
+      throw new Error("Invalid round result!");
+    }
+
+    const duration = simulateRunnerMovement(false, [], path).length * defaultTimeStep;
+    game.setResult(socket.id, { duration, finalMaze: finalResult.grid });
+    if (game.allResultsReceived()) {
+      io.to(game.id).emit(GameActionEnum.SERVER_SEND_ROUND_RESULT, game.getResultsForCurrentRound);
+    }
 
   }
 }

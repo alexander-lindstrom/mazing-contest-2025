@@ -9,13 +9,19 @@ interface Result {
   finalMaze: GridCell[][];
 }
 
+export enum GameStatusEnum {
+  WAITING = 'waiting',
+  RUNNING = 'running',
+  FINISHED = 'finished'
+}
+
 interface GameState {
-  status: 'waiting' | 'running' | 'finished';
+  status: GameStatusEnum;
   startTime: number | null;
   lastUpdateTime: number | null;
   rounds: number;
-  currentRound: number;
-  results: Map<string, Result>;
+  currentRound: number; // zero-indexed
+  results: Map<string, Result[]>;
   startingConfigs: StartingState[];
 }
 
@@ -30,11 +36,11 @@ export class Game {
     this.maxPlayers = maxPlayers;
     this.players = new Map();
     this.state = {
-      status: 'waiting',
+      status: GameStatusEnum.WAITING,
       startTime: null,
       lastUpdateTime: null,
       rounds: rounds,
-      currentRound: 1,
+      currentRound: 0,
       results: new Map(),
       startingConfigs: []
     };
@@ -53,7 +59,6 @@ export class Game {
     return this.players.size;
   }
 
-  // State updates
   updateGameState(newState: Partial<GameState>): void {
     this.state = {
       ...this.state,
@@ -73,6 +78,26 @@ export class Game {
   canStart(): boolean {
     return this.players.size >= 2 && this.state.status === 'waiting';
   }
+
+  getStartingConfig(): StartingState {
+    return this.state.startingConfigs[this.state.currentRound];
+  }
+
+  setResult(playerId: string, result: Result){
+    this.state.results.get(playerId)?.push(result);
+  }
+
+  allResultsReceived(){
+    return Array.from(this.state.results.values()).every(resultsArray => 
+      resultsArray[this.state.currentRound] !== undefined
+    );
+  }
+
+  getResultsForCurrentRound(): Result[] {
+    return Array.from(this.state.results.values())
+      .map(resultsArray => resultsArray[this.state.currentRound])
+      .filter(result => result !== undefined);
+  }  
 
   serialize() {
     return {

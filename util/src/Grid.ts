@@ -1,3 +1,5 @@
+import { StartingState } from "./RandomGeneration";
+
 export interface Position {
   x: number;
   y: number;
@@ -141,4 +143,49 @@ export function distance2D(pos1: Position, pos2: Position): number {
 export function isTower(g: GridCell){
   return g === GridCell.BLOCK_TOWER || g === GridCell.BLOCK_TOWER_NOSELL ||
     g === GridCell.CLAP_TOWER || g === GridCell.CLAP_TOWER_NOSELL;
+}
+
+function getTotalTowerValue(grid: GridCell[][]): { gold: number; lumber: number } {
+  let gold = 0;
+  let lumber = 0;
+
+  for (const row of grid) {
+    for (const cell of row) {
+      if (cell === GridCell.BLOCK_TOWER || cell === GridCell.BLOCK_TOWER_NOSELL) {
+        gold += 1;
+      } else if (cell === GridCell.CLAP_TOWER || cell === GridCell.CLAP_TOWER_NOSELL) {
+        gold += 1;
+        lumber += 1;
+      }
+    }
+  }
+  return { gold, lumber };
+}
+
+function checkNonSellableTowers(initialGrid: GridCell[][], finalGrid: GridCell[][]): boolean {
+  for (let i = 0; i < initialGrid.length; i++) {
+    for (let j = 0; j < initialGrid[i].length; j++) {
+      if (
+        (initialGrid[i][j] === GridCell.BLOCK_TOWER_NOSELL || initialGrid[i][j] === GridCell.CLAP_TOWER_NOSELL) &&
+        initialGrid[i][j] !== finalGrid[i][j]
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function validateRoundResult(initial: StartingState, final: StartingState): boolean {
+  const initialTotal = getTotalTowerValue(initial.grid);
+  const finalTotal = getTotalTowerValue(final.grid);
+
+  const maxAllowedGold = initialTotal.gold + initial.gold;
+  const maxAllowedLumber = initialTotal.lumber + initial.lumber;
+
+  return (
+    finalTotal.gold <= maxAllowedGold &&
+    finalTotal.lumber <= maxAllowedLumber &&
+    checkNonSellableTowers(initial.grid, final.grid)
+  );
 }

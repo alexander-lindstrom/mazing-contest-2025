@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { SinglePlayerGame } from "./pages/SinglePlayerGame";
 import { Button } from "@/components/ui/button";
+import GameLobby from "./pages/GameLobby";
 
 function App() {
   const [gameMode, setGameMode] = useState<"single" | "multi" | null>(null);
@@ -21,9 +22,7 @@ function App() {
       )}
 
       {gameMode === "single" && <SinglePlayerGame />}
-      {gameMode === "multi" && (
-        <div className="text-2xl">Multiplayer Mode - Coming Soon!</div>
-      )}
+      {gameMode === "multi" && <GameLobby />}
     </div>
   );
 }

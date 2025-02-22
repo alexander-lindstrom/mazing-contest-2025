@@ -8,7 +8,9 @@ export function setupGameServer(io: Server): void {
   
     io.on('connection', (socket: Socket) => {
 
+      console.log('Client connected:', socket.id);
       socket.on('create-game', () => {
+        console.log('Request to create game from :', socket.id);
         const game = gameManager.createGame();
         socket.emit('game-created', game.serialize());
       });
@@ -27,7 +29,8 @@ export function setupGameServer(io: Server): void {
         gameManager.handleGameAction(io, socket, action);
       });
   
-      socket.on('disconnect', () => {
+      socket.on('disconnect', (reason) => {
+        console.log('Client disconnected:', socket.id, reason);
         const game = gameManager.leaveGame(socket);
         if (game) {
           // Broadcast to remaining players in the room

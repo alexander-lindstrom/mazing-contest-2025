@@ -6,6 +6,7 @@ import { setupGameServer } from "./SocketManager";
 
 const app = express();
 const PORT = 5000;
+const VITE_PORT = 5173;
 
 app.use(cors());
 app.use(express.json());
@@ -13,7 +14,7 @@ app.use(express.json());
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: `http://localhost:${VITE_PORT}`,
     methods: ["GET", "POST"]
   }
 });

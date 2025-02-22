@@ -1,0 +1,1 @@
+Break out methods/other stuff out of SinglePlayerGame. Use for multi player.

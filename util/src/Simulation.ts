@@ -27,7 +27,7 @@ export interface ClapEvent {
 
 // Option to not check for clapEvents (server does not care)
 export function simulateRunnerMovement(
-  calculateClaps: boolean = true,
+  calculateClaps: boolean,
   towers: Tower[],
   shortestPath: Position[],
   dt: number = defaultTimeStep,

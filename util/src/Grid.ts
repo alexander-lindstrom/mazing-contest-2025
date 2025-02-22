@@ -20,8 +20,8 @@ export enum GridCell {
   CLAP_TOWER_NOSELL,
 }
 
-const defaultHeight = 20;
-const defaultWidth = 21;
+export const defaultHeight = 20;
+export const defaultWidth = 21;
 
 export const defaultStart: Position = {
   x: Math.floor((defaultWidth-1)/2),

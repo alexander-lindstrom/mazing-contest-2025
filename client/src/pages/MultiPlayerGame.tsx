@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, get2x2Positions, GridCell, Position, simulateRunnerMovement } from '@mazing/util';
+import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultHeight, defaultStart, defaultTimeStep, defaultWidth, findShortestPath, generateStartingState, get2x2Positions, GridCell, Position, simulateRunnerMovement, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 
-const startingState = generateStartingState();
-const INITIAL_COUNTDOWN = 45;
-
-export function SinglePlayerGame() {
-  const [grid, setGrid] = useState(startingState.grid);
-  const [towers, setTowers] = useState(startingState.towers);
-  const [resources, setResources] = useState({ gold: startingState.gold, lumber: startingState.lumber });
+export function MultiPlayerGame() {
+  const [gameRunning, setGameRunning] = useState(false);
+  const [grid, setGrid] = useState<GridCell[][]>([])
+  const [towers, setTowers] = useState<Tower[]>([])
+  const [resources, setResources] = useState({ gold: 0, lumber: 0 });
   const [runnerPath, setRunnerPath] = useState<Position[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [clapEvents, setClapEvents] = useState<ClapEvent[]>([]);
-  const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN);
+  const [countdown, setCountdown] = useState(0);
   const [stopwatch, setStopwatch] = useState(0);
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
@@ -108,15 +106,15 @@ export function SinglePlayerGame() {
     setResources({ gold: newState.gold, lumber: newState.lumber });
     setRunnerPath([]);
     setIsRunning(false);
-    setCountdown(INITIAL_COUNTDOWN);
+    setCountdown(0);
     setStopwatch(0);
     setIsStopwatchRunning(false);
     setTotalSimulationTime(null);
   };
   
-  return (
+  return gameRunning ? (
     <BaseGame
-      startingState={startingState}
+      startingState={{ width: defaultWidth, height: defaultHeight }}
       towers={towers}
       grid={grid}
       handleCellClick={handleCellClick}
@@ -129,5 +127,5 @@ export function SinglePlayerGame() {
       handleStartButton={handleStartButton}
       handleReset={handleReset}
     />
-  );
+  ) : null;
 }

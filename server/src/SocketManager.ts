@@ -23,6 +23,7 @@ export function setupGameServer(io: Server): void {
       });
   
       socket.on('join-game', ({ gameId, playerData }: { gameId: string, playerData: PlayerData }) => {
+        console.log("player wants to join game")
         try {
           const game = gameManager.joinGame(gameId, socket, playerData);
           // Broadcast to all players in the room

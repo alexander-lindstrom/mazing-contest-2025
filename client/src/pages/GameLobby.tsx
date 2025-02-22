@@ -3,15 +3,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { socket } from '@/socket';
+import { getSocket } from '@/socket';
 
 export const GameLobby = () => {
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [availableGames, setAvailableGames] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+
+    const socket = getSocket();
+    socket.connect();
+
     function onConnect() {
       setIsConnected(true);
     }
@@ -53,21 +57,26 @@ export const GameLobby = () => {
       return;
     }
     
+    const socket = getSocket()
     socket?.emit('create-game', {
       name: playerName
     });
   };
 
   const handleJoinGame = (gameId: string) => {
+    console.log("Want to join game")
     if (!playerName.trim()) {
       setError('Please enter your name first');
       return;
     }
 
-    socket?.emit('joinGame', {
+    const socket = getSocket();
+    socket?.emit('join-game', {
       gameId: gameId,
-      playerName: playerName
-    });
+      playerData: {
+        name: playerName
+      }
+    });    
   };
 
   return (

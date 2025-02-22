@@ -1,1 +1,4 @@
-Break out methods/other stuff out of SinglePlayerGame. Use for multi player.
+After creating/joining a game the user needs to be shown the "game room view".
+    Should be updated whenever a user joins/leaves
+    Should have a start button if at least 2 members
+    Should have a leave button

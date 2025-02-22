@@ -8,18 +8,25 @@ export function setupGameServer(io: Server): void {
   
     io.on('connection', (socket: Socket) => {
 
+      //List available games
+      const availableGames = gameManager.getGameIds();
+      console.log(availableGames)
+      socket.emit('list-games', availableGames);
+
       console.log('Client connected:', socket.id);
-      socket.on('create-game', () => {
-        console.log('Request to create game from :', socket.id);
+
+      socket.on('create-game', (playerData: PlayerData) => {
+        console.log('Request to create game from:', playerData.name);
         const game = gameManager.createGame();
-        socket.emit('game-created', game.serialize());
+        gameManager.joinGame(game.id, socket, playerData)
+        socket.emit('game-created', game.id);
       });
   
       socket.on('join-game', ({ gameId, playerData }: { gameId: string, playerData: PlayerData }) => {
         try {
           const game = gameManager.joinGame(gameId, socket, playerData);
           // Broadcast to all players in the room
-          io.to(gameId).emit('player-joined', game.serialize());
+          io.to(gameId).emit('player-joined', playerData.name);
         } catch (error) {
           socket.emit('error', error instanceof Error ? error.message : 'Unknown error');
         }

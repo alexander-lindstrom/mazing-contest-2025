@@ -32,7 +32,8 @@ export class GameManager {
     setInterval(() => this.cleanupFinishedGames(), 5 * 60 * 1000);
   }
 
-  createGame(gameId: string = randomUUID()): Game {
+  createGame(): Game {
+    const gameId = randomUUID();
     if (this.games.has(gameId)) {
       throw new Error('Game ID already exists');
     }
@@ -85,6 +86,10 @@ export class GameManager {
   getGame(gameId: string): Game | null {
     return this.games.get(gameId) || null;
   }
+
+  getGameIds(): string[] {
+    return Array.from(this.games.keys());
+  }  
 
   private cleanupFinishedGames(): void {
     const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);

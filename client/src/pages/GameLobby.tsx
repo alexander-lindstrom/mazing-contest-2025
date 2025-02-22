@@ -8,7 +8,7 @@ import { socket } from '@/socket';
 export const GameLobby = () => {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [playerName, setPlayerName] = useState('');
-  const [availableGames] = useState<string[]>([]);
+  const [availableGames, setAvailableGames] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -20,8 +20,25 @@ export const GameLobby = () => {
       setIsConnected(false);
     }
 
+    function onGamesList(games: string[]) {
+      console.log("Receiving a list of game ids");
+      console.log(games)
+      setAvailableGames(games);
+    }
+  
+    function onGameCreated(gameId: string) {
+      console.log(`Game created with ID: ${gameId}`);
+    }
+  
+    function onGameJoined(gameId: string) {
+      console.log(`Joined game with ID: ${gameId}`);
+    }
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
+    socket.on('list-games', onGamesList);
+    socket.on('game-created', onGameCreated);
+    socket.on('player-joined', onGameJoined);
 
     return () => {
       socket.off('connect', onConnect);
@@ -36,8 +53,8 @@ export const GameLobby = () => {
       return;
     }
     
-    socket?.emit('createGame', {
-      playerName: playerName
+    socket?.emit('create-game', {
+      name: playerName
     });
   };
 

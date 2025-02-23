@@ -33,12 +33,15 @@ export class GameManager {
   }
 
   createGame(host: PlayerData): Game {
+
     const gameId = randomUUID();
     if (this.games.has(gameId)) {
       throw new Error('Game ID already exists');
     }
     const game = new Game(gameId, host);
     this.games.set(gameId, game);
+
+    this.playerToGame.set(host.id, gameId);
     return game;
   }
 
@@ -59,16 +62,18 @@ export class GameManager {
 
   leaveGame(socket: Socket): Game | null {
     const gameId = this.playerToGame.get(socket.id);
-    if (!gameId) return null;
+
+    if (!gameId) {
+      return null;
+    }
 
     const game = this.games.get(gameId);
-    if (!game) return null;
+    if (!game) {
+      return null;
+    }
 
     const remainingPlayers = game.removePlayer(socket.id);
     this.playerToGame.delete(socket.id);
-    
-    // Leave the Socket.IO room
-    socket.leave(gameId);
 
     // Auto-cleanup empty games
     if (remainingPlayers === 0) {

@@ -21,11 +21,10 @@ export function setupGameServer(io: Server): void {
       listGames(io, socket, gameManager, false);
       console.log('Client connected:', socket.id);
 
-      socket.on('req-create-game', (playerData: PlayerData) => {
-        console.log('Request to create game from:', playerData.name);
+      socket.on('req-create-game', (name: string) => {
+        console.log('Request to create game from:', name);
 
-        const game = gameManager.createGame(playerData);
-        gameManager.joinGame(game.id, socket, playerData)
+        const game = gameManager.createGame( {name: name, id: socket.id });
         listGames(io, socket, gameManager, true);
 
         socket.emit('game-joined', game.getLobbyInformation())
@@ -37,7 +36,7 @@ export function setupGameServer(io: Server): void {
         try {
           const game = gameManager.joinGame(gameId, socket, playerData);
 
-          io.to(gameId).emit('player-joined', game.getLobbyInformation());
+          io.to(gameId).emit('player-update', game.getLobbyInformation());
   
           socket.emit('game-joined', game.getLobbyInformation())
           socket.join(game.id);
@@ -46,8 +45,22 @@ export function setupGameServer(io: Server): void {
           socket.emit('error', error instanceof Error ? error.message : 'Unknown error');
         }
       });
+
+      socket.on('req-leave-game', () => {
+        const game = gameManager.leaveGame(socket);
+        if (game) {
+          socket.leave(game?.id);
+          socket.emit('game-left');
+          io.to(game.id).emit('player-update', game.getLobbyInformation());
+          listGames(io, socket, gameManager, true);
+        }
+        else {
+          throw new Error("Could not find game to leave!");
+        }
+      });
   
       socket.on('game-action', (action: GameAction) => {
+        console.log("game action")
         gameManager.handleGameAction(io, socket, action);
       });
   

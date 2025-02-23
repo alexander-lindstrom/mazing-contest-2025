@@ -63,9 +63,8 @@ export const GameLobby = () => {
     }
     
     const socket = getSocket();
-    socket?.emit('req-create-game', {
-      name: playerName
-    });
+
+    socket?.emit('req-create-game', playerName);
   };
 
   const handleRequestJoinGame = (gameId: string) => {

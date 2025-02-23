@@ -22,7 +22,9 @@ export const GameRoomView = ({
   const [chatMessage, setChatMessage] = useState('');
 
   const handleSendMessage = () => {
-    if (!chatMessage.trim()) return;
+    if (!chatMessage.trim()) {
+      return;
+    }
     // Placeholder for chat functionality
     setChatMessage('');
   };

@@ -97,7 +97,15 @@ export class Game {
     return Array.from(this.state.results.values())
       .map(resultsArray => resultsArray[this.state.currentRound])
       .filter(result => result !== undefined);
-  }  
+  }
+  
+  getLobbyInformation(){
+    return {
+      gameId: this.id,
+      numPlayers: this.players.size,
+      playerNames: Array.from(this.players.values()).map(player => player.name),
+    }
+  }
 
   serialize() {
     return {

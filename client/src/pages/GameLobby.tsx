@@ -4,11 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getSocket } from '@/socket';
+import { LobbyInformation } from '@mazing/util';
 
 export const GameLobby = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [playerName, setPlayerName] = useState('');
-  const [availableGames, setAvailableGames] = useState<string[]>([]);
+  const [availableGames, setAvailableGames] = useState<LobbyInformation[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export const GameLobby = () => {
       setIsConnected(false);
     }
 
-    function onGamesList(games: string[]) {
+    function onGamesList(games: LobbyInformation[]) {
       console.log("Receiving a list of game ids");
       console.log(games)
       setAvailableGames(games);
@@ -63,7 +64,7 @@ export const GameLobby = () => {
     });
   };
 
-  const handleJoinGame = (gameId: string) => {
+  const handleRequestJoinGame = (gameId: string) => {
     console.log("Want to join game")
     if (!playerName.trim()) {
       setError('Please enter your name first');
@@ -119,15 +120,15 @@ export const GameLobby = () => {
                 <div>
                   <h3 className="text-lg font-medium my-2">Available Games</h3>
                   <div className="space-y-2">
-                    {availableGames.map((gameId) => (
+                    {availableGames.map((lobbyInfo) => (
                       <Button
-                        key={gameId}
-                        onClick={() => handleJoinGame(gameId)}
+                        key={lobbyInfo.gameId}
+                        onClick={() => handleRequestJoinGame(lobbyInfo.gameId)}
                         variant="outline"
                         className="w-full"
                         disabled={!isConnected}
                       >
-                        Join Game {gameId}
+                        Join Game {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
                       </Button>
                     ))}
                   </div>

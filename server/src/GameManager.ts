@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
 import { Game, GameStatusEnum, PlayerData } from './Game';
-import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
+import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, LobbyInformation, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
 
 enum GameActionEnum {
   CLIENT_START = 'CLIENT_START',
@@ -87,9 +87,9 @@ export class GameManager {
     return this.games.get(gameId) || null;
   }
 
-  getGameIds(): string[] {
-    return Array.from(this.games.keys());
-  }  
+  getAvailableGames(): LobbyInformation[] {
+    return Array.from(this.games.values()).map(game => game.getLobbyInformation());
+  }      
 
   private cleanupFinishedGames(): void {
     const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);

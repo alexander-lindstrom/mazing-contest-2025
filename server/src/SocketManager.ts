@@ -9,8 +9,7 @@ export function setupGameServer(io: Server): void {
     io.on('connection', (socket: Socket) => {
 
       //List available games
-      const availableGames = gameManager.getGameIds();
-      console.log(availableGames)
+      const availableGames = gameManager.getAvailableGames();
       socket.emit('list-games', availableGames);
 
       console.log('Client connected:', socket.id);

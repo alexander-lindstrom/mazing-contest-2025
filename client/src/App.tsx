@@ -16,7 +16,7 @@ function App() {
             Single Player
           </Button>
           <Button className="px-6 py-3 bg-red-500 hover:bg-red-600 text-black text-xl rounded-xl" onClick={() => setGameMode("multi")}>
-            Multiplayer (Coming Soon)
+            Multiplayer
           </Button>
         </div>
       )}

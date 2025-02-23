@@ -1,4 +1,4 @@
-import { PlayerData } from "@mazing/util";
+import { ChatMessage, ChatRequest, PlayerData } from "@mazing/util";
 import { GameAction, GameManager } from "./GameManager";
 import { Server, Socket } from "socket.io";
 
@@ -58,6 +58,11 @@ export function setupGameServer(io: Server): void {
           throw new Error("Could not find game to leave!");
         }
       });
+
+      socket.on('req-chat-message', (req: ChatRequest ) => {
+        const message: ChatMessage = { sender: req.sender, message: req.message, timestamp: Date.now()};
+        io.to(req.gameId).emit('chat-broadcast', (message));
+      })
   
       socket.on('game-action', (action: GameAction) => {
         console.log("game action")

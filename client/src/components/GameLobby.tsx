@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getSocket } from '@/socket';
-import { LobbyInformation } from '@mazing/util';
+import { ChatMessage, LobbyInformation } from '@mazing/util';
 import { GameRoomView } from './GameRoomView';
 import { LobbyView } from './LobbyView';
 
@@ -12,6 +12,7 @@ export const GameLobby = () => {
   const [availableGames, setAvailableGames] = useState<LobbyInformation[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentGame, setCurrentGame] = useState<LobbyInformation | null>(null);
+  const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
 
   useEffect(() => {
     const socket = getSocket();
@@ -41,12 +42,17 @@ export const GameLobby = () => {
       setCurrentGame(game);
     }
 
+    function onChatBroadcast(message: ChatMessage) {
+      setChatLog((prevChatLog) => [...prevChatLog, message]);
+    }
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('list-games', onGamesList);
     socket.on('game-joined', onGameJoined);
     socket.on('game-left', onGameLeft);
     socket.on('player-update', onPlayerUpdate);
+    socket.on('chat-broadcast', onChatBroadcast);
 
     return () => {
       socket.off('connect', onConnect);
@@ -55,6 +61,7 @@ export const GameLobby = () => {
       socket.off('game-joined', onGameJoined);
       socket.off('game-left', onGameLeft);
       socket.off('player-update', onPlayerUpdate);
+      socket.off('chat-broadcast', onChatBroadcast);
     };
   }, []);
 
@@ -63,9 +70,7 @@ export const GameLobby = () => {
       setError('Please enter your name before hosting a game');
       return;
     }
-    
     const socket = getSocket();
-
     socket?.emit('req-create-game', playerName);
   };
 
@@ -105,6 +110,15 @@ export const GameLobby = () => {
     });
   };
 
+  const handleChatMessage = (message: string) => {
+    const socket = getSocket();
+    socket?.emit('req-chat-message', {
+      message: message,
+      sender: playerName,
+      gameId: currentGame?.gameId,
+    });
+  }
+
   if (currentGame) {
     return (
       <GameRoomView
@@ -112,6 +126,8 @@ export const GameLobby = () => {
         playerName={playerName}
         onLeaveGame={handleLeaveGame}
         onStartGame={handleStartGame}
+        onChatMessage={handleChatMessage}
+        chatLog={chatLog}
       />
     );
   }

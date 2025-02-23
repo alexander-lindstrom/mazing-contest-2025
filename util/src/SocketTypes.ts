@@ -9,3 +9,15 @@ export interface LobbyInformation {
   numPlayers: number,
   playerNames: string[],
 }
+
+export interface ChatMessage {
+  sender: string;
+  message: string;
+  timestamp: number;
+}
+
+export interface ChatRequest {
+  gameId: string;
+  message: string;
+  sender: string;
+}

@@ -24,13 +24,15 @@ export const GameRoomView = ({
   chatLog,
 }: GameRoomViewProps) => {
   const [chatMessage, setChatMessage] = useState('');
-  const scrollRef = useRef<HTMLElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      setTimeout(() => {
+        scrollRef.current!.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 10);
     }
-  }, [chatLog])
+  }, [chatLog]);
 
   const handleSendMessage = () => {
     if (!chatMessage.trim()) {
@@ -73,24 +75,26 @@ export const GameRoomView = ({
                 <CardTitle className="text-lg">Chat</CardTitle>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-48 rounded-md border p-4" ref={scrollRef}>
-                  {chatLog.length > 0 ? (
-                    <div className="space-y-1 text-sm">
-                      {chatLog.map(({ sender, timestamp, message }, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <span className="font-semibold">{sender}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(timestamp).toLocaleTimeString()}
-                          </span>
-                          <span className="text-gray-800">{message}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">
-                      Chat messages will appear here...
-                    </div>
-                  )}
+                <ScrollArea className="h-48 rounded-md border p-4">
+                  <div ref={scrollRef}>
+                    {chatLog.length > 0 ? (
+                      <div className="space-y-1 text-sm">
+                        {chatLog.map(({ sender, timestamp, message }, index) => (
+                          <div key={index} className="flex items-center space-x-2">
+                            <span className="font-semibold">{sender}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(timestamp).toLocaleTimeString()}
+                            </span>
+                            <span className="text-gray-800">{message}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-muted-foreground">
+                        Chat messages will appear here...
+                      </div>
+                    )}
+                  </div>
                 </ScrollArea>
                 <div className="flex gap-2 mt-4">
                   <Input
@@ -103,7 +107,6 @@ export const GameRoomView = ({
                 </div>
               </CardContent>
             </Card>
-
           </div>
 
           <Separator className="my-4" />

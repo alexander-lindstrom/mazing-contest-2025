@@ -36,6 +36,7 @@ export const GameLobby = () => {
 
     function onGameLeft() {
       setCurrentGame(null);
+      setChatLog([])
     }
   
     function onPlayerUpdate(game: LobbyInformation) {

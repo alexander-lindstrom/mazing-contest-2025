@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
-import { Game, GameStatusEnum, PlayerData } from './Game';
-import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, LobbyInformation, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
+import { Game, GameStatusEnum } from './Game';
+import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
 
 enum GameActionEnum {
   CLIENT_START = 'CLIENT_START',
@@ -32,12 +32,12 @@ export class GameManager {
     setInterval(() => this.cleanupFinishedGames(), 5 * 60 * 1000);
   }
 
-  createGame(): Game {
+  createGame(host: PlayerData): Game {
     const gameId = randomUUID();
     if (this.games.has(gameId)) {
       throw new Error('Game ID already exists');
     }
-    const game = new Game(gameId);
+    const game = new Game(gameId, host);
     this.games.set(gameId, game);
     return game;
   }

@@ -1,5 +1,10 @@
+Separate event for
+    "You have joined a room"
+    "Someone joined your room"
+    "You have left a room"
+    "Someone left your room"
+
 After creating/joining a game the user needs to be shown the "game room view".
-    Create file with types to be used in socket communication. Use in both client and sever.
     Provide information about room when joining. Provide information about players joining/leaving.
     Should be updated whenever a user joins/leaves
     Should have a start button if at least 2 members

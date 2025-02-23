@@ -1,8 +1,4 @@
-import { GridCell, StartingState } from "@mazing/util";
-
-export interface PlayerData {
-  name: string;
-}
+import { GridCell, LobbyInformation, PlayerData, StartingState } from "@mazing/util";
 
 interface Result {
   duration: number;
@@ -30,11 +26,13 @@ export class Game {
   private readonly maxPlayers: number;
   private players: Map<string, PlayerData>;
   private state: GameState;
+  private host: PlayerData;
 
-  constructor(id: string, maxPlayers: number = 8, rounds: number = 10) {
+  constructor(id: string, host: PlayerData, maxPlayers: number = 8, rounds: number = 10) {
     this.id = id;
     this.maxPlayers = maxPlayers;
-    this.players = new Map();
+    this.players = new Map([[host.id, host]]);
+    this.host = host;
     this.state = {
       status: GameStatusEnum.WAITING,
       startTime: null,
@@ -42,7 +40,7 @@ export class Game {
       rounds: rounds,
       currentRound: 0,
       results: new Map(),
-      startingConfigs: []
+      startingConfigs: [],
     };
   }
 
@@ -99,8 +97,9 @@ export class Game {
       .filter(result => result !== undefined);
   }
   
-  getLobbyInformation(){
+  getLobbyInformation(): LobbyInformation{
     return {
+      host: this.host,
       gameId: this.id,
       numPlayers: this.players.size,
       playerNames: Array.from(this.players.values()).map(player => player.name),

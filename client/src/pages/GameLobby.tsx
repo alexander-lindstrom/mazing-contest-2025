@@ -11,6 +11,7 @@ export const GameLobby = () => {
   const [playerName, setPlayerName] = useState('');
   const [availableGames, setAvailableGames] = useState<LobbyInformation[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [currentGame, setCurrentGame] = useState<LobbyInformation | null>(null);
 
   useEffect(() => {
 
@@ -30,20 +31,28 @@ export const GameLobby = () => {
       console.log(games)
       setAvailableGames(games);
     }
-  
-    function onGameCreated(gameId: string) {
-      console.log(`Game created with ID: ${gameId}`);
+
+    function onGameJoined(game: LobbyInformation) {
+      console.log(`Joined game with ID: ${game.gameId}`);
+      setCurrentGame(game);
+    }
+
+    function onGameLeft() {
+      console.log("Left the game");
+      setCurrentGame(null);
     }
   
-    function onGameJoined(gameId: string) {
-      console.log(`Joined game with ID: ${gameId}`);
+    function onPlayerUpdate(game: LobbyInformation) {
+      console.log(`A player joined game with ID: ${game.gameId}`);
+      setCurrentGame(game);
     }
 
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('list-games', onGamesList);
-    socket.on('game-created', onGameCreated);
-    socket.on('player-joined', onGameJoined);
+    socket.on('game-joined', onGameJoined);
+    socket.on('game-left', onGameLeft);
+    socket.on('player-update', onPlayerUpdate);
 
     return () => {
       socket.off('connect', onConnect);
@@ -59,7 +68,7 @@ export const GameLobby = () => {
     }
     
     const socket = getSocket()
-    socket?.emit('create-game', {
+    socket?.emit('req-create-game', {
       name: playerName
     });
   };
@@ -72,7 +81,7 @@ export const GameLobby = () => {
     }
 
     const socket = getSocket();
-    socket?.emit('join-game', {
+    socket?.emit('req-join-game', {
       gameId: gameId,
       playerData: {
         name: playerName

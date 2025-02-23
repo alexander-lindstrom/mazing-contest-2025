@@ -4,6 +4,8 @@ import { LobbyInformation } from '@mazing/util';
 import { GameRoomView } from './GameRoomView';
 import { LobbyView } from './LobbyView';
 
+
+
 export const GameLobby = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [playerName, setPlayerName] = useState('');
@@ -58,7 +60,7 @@ export const GameLobby = () => {
 
   const handleHostGame = () => {
     if (!playerName.trim()) {
-      setError('Please enter your name first');
+      setError('Please enter your name before hosting a game');
       return;
     }
     
@@ -67,9 +69,16 @@ export const GameLobby = () => {
     socket?.emit('req-create-game', playerName);
   };
 
+  const setPlayerNameAndClearError = (name: string) => {
+    setPlayerName(name);
+    if (error) {
+      setError(null);
+    }
+  };
+
   const handleRequestJoinGame = (gameId: string) => {
     if (!playerName.trim()) {
-      setError('Please enter your name first');
+      setError('Please enter your name before joining a game');
       return;
     }
 
@@ -111,11 +120,11 @@ export const GameLobby = () => {
     <LobbyView
       isConnected={isConnected}
       playerName={playerName}
-      setPlayerName={setPlayerName}
       error={error}
       availableGames={availableGames}
       onHostGame={handleHostGame}
       onJoinGame={handleRequestJoinGame}
+      setPlayerName={setPlayerNameAndClearError}
     />
   );
 };

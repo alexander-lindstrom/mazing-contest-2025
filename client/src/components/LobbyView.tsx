@@ -25,17 +25,16 @@ export const LobbyView = ({
 }: LobbyViewProps) => {
   return (
     <div className="max-w-md mx-auto p-4">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Welcome to the Game</CardTitle>
         </CardHeader>
         <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">

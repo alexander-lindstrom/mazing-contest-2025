@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { SinglePlayerGame } from "./pages/SinglePlayerGame";
 import { Button } from "@/components/ui/button";
-import GameLobby from "./components/GameLobby";
+import GameLobby from "./pages/GameLobby";
 
 function App() {
   const [gameMode, setGameMode] = useState<"single" | "multi" | null>(null);

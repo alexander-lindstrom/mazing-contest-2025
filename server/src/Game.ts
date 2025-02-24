@@ -1,6 +1,7 @@
 import { GridCell, LobbyInformation, PlayerData, StartingState } from "@mazing/util";
 
 interface Result {
+  player: PlayerData;
   duration: number;
   finalMaze: GridCell[][];
 }
@@ -69,15 +70,23 @@ export class Game {
     return this.players.size;
   }
 
+  getPlayerData(id: string){
+    const player = this.players.get(id);
+    if (!player) {
+      throw new Error("Couldn't get player!");
+    }
+    return player;
+  }
+
   getState(): GameState {
     return this.state;
   }
 
-  canStart(): boolean {
-    return this.players.size >= 2 && this.state.status === 'waiting';
+  canStart(playerId: string): boolean {
+    return playerId === this.host.id && this.players.size >= 2 && this.state.status === 'waiting';
   }
 
-  getStartingConfig(): StartingState {
+  getConfig(): StartingState {
     return this.state.startingConfigs[this.state.currentRound];
   }
 

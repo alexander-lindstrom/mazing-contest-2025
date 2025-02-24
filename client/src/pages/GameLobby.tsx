@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getSocket } from '@/socket';
 import { ChatMessage, LobbyInformation } from '@mazing/util';
-import { GameRoomView } from './GameRoomView';
-import { LobbyView } from './LobbyView';
-
-
+import { GameRoomView } from '../components/GameRoomView';
+import { LobbyView } from '../components/LobbyView';
 
 export const GameLobby = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -47,6 +45,10 @@ export const GameLobby = () => {
       setChatLog((prevChatLog) => [...prevChatLog, message]);
     }
 
+    function onGameStart(gameId: string){
+
+    }
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('list-games', onGamesList);
@@ -54,6 +56,7 @@ export const GameLobby = () => {
     socket.on('game-left', onGameLeft);
     socket.on('player-update', onPlayerUpdate);
     socket.on('chat-broadcast', onChatBroadcast);
+    socket.on('game-start', onGameStart);
 
     return () => {
       socket.off('connect', onConnect);
@@ -63,6 +66,7 @@ export const GameLobby = () => {
       socket.off('game-left', onGameLeft);
       socket.off('player-update', onPlayerUpdate);
       socket.off('chat-broadcast', onChatBroadcast);
+      socket.on('game-start', onGameStart);
     };
   }, []);
 

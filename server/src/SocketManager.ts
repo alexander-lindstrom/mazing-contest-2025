@@ -63,6 +63,10 @@ export function setupGameServer(io: Server): void {
         const message: ChatMessage = { sender: req.sender, message: req.message, timestamp: Date.now()};
         io.to(req.gameId).emit('chat-broadcast', (message));
       })
+
+      socket.on('req-game-start', ( gameId: string ) => {
+        gameManager.startGame(io, socket, gameId);
+      })
   
       socket.on('game-action', (action: GameAction) => {
         console.log("game action")

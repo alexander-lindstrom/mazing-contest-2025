@@ -1,3 +1,12 @@
+export enum GameActionEnum {
+
+  CLIENT_ROUND_RESULT = 'client-round-result',
+
+  SERVER_ROUND_CONFIG = 'server-round-config',
+  SERVER_ROUND_RESULT = 'server-round-result',
+  SERVER_FINAL_RESULT = 'server-final-result'
+}
+
 export interface PlayerData {
   name: string;
   id: string;

@@ -1,17 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
 import { Game, GameStatusEnum } from './Game';
-import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
-
-enum GameActionEnum {
-  CLIENT_START = 'CLIENT_START',
-  CLIENT_SUBMIT_RESULT = 'CLIENT_SUBMIT_RESULT',
-
-  SERVER_START_GAME = 'SERVER_START_GAME',
-  SERVER_SEND_ROUND_CONFIG = 'SERVER_SEND_ROUND_CONFIG',
-  SERVER_SEND_ROUND_RESULT = 'SERVER_SEND_ROUND_RESULT',
-  SERVER_START_NEXT_ROUND = 'SERVER_START_NEXT_ROUND'
-}
+import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, GameActionEnum, generateStartingState,
+   LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
 
 export interface GameAction {
   type: GameActionEnum;
@@ -21,15 +12,14 @@ export interface GameAction {
 export class GameManager {
   private games: Map<string, Game>;
   private playerToGame: Map<string, string>;
-  private io: Server;
 
   constructor(io: Server) {
     this.games = new Map();
     this.playerToGame = new Map();
-    this.io = io;
     
+    // Todo:
     // Auto-cleanup of finished games after 5 minutes
-    setInterval(() => this.cleanupFinishedGames(), 5 * 60 * 1000);
+    //setInterval(() => this.cleanupFinishedGames(), 5 * 60 * 1000);
   }
 
   createGame(host: PlayerData): Game {
@@ -50,8 +40,11 @@ export class GameManager {
     if (!game) {
       throw new Error('Game not found');
     }
+
+    if (game.getState().status !== GameStatusEnum.WAITING) {
+      throw new Error("Cannot join started game!");
+    }
     
-    // Todo: make sure that player is not already part of a game
     game.addPlayer(socket.id, playerData);
     this.playerToGame.set(socket.id, gameId);
     
@@ -75,7 +68,6 @@ export class GameManager {
     const remainingPlayers = game.removePlayer(socket.id);
     this.playerToGame.delete(socket.id);
 
-    // Auto-cleanup empty games
     if (remainingPlayers === 0) {
       this.games.delete(gameId);
     }
@@ -99,21 +91,7 @@ export class GameManager {
   private cleanupFinishedGames(): void {
     const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
     
-    for (const [gameId, game] of this.games.entries()) {
-      const gameState = game.getState();
-      if (gameState.status === 'finished' && 
-          gameState.lastUpdateTime && 
-          gameState.lastUpdateTime < fiveMinutesAgo) {
-        // Notify all players in the room before cleanup
-        this.io.to(gameId).emit('game-cleaned-up', { gameId });
-        
-        // Remove all player mappings for this game
-        for (const [socketId] of game.serialize().players) {
-          this.playerToGame.delete(socketId);
-        }
-        this.games.delete(gameId);
-      }
-    }
+    // Todo:
   }
 
   getStats() {
@@ -136,10 +114,7 @@ export class GameManager {
     }
 
     switch(action.type) {
-        case GameActionEnum.CLIENT_START:
-            this.handleClientStart(io, socket, game);
-            break;
-        case GameActionEnum.CLIENT_SUBMIT_RESULT:
+        case GameActionEnum.CLIENT_ROUND_RESULT:
             this.handleClientSubmitResult(io, socket, game, action);
             break;
 
@@ -148,10 +123,10 @@ export class GameManager {
     }
 }
 
-  private handleClientStart(io: Server, socket: Socket, game: Game){
+   startGame(io: Server, socket: Socket, gameId: string){
 
-    // Todo: only game owner should be able to start
-    if (!game.canStart){
+    const game = this.getGame(gameId);
+    if (!game || !game.canStart(socket.id)) {
       throw new Error ("Game cannot start!");
     }
       
@@ -161,30 +136,27 @@ export class GameManager {
       startTime: Date.now(),
       startingConfigs: [config]
     });
-    io.to(game.id).emit(GameActionEnum.SERVER_START_GAME);
-    io.to(game.id).emit(GameActionEnum.SERVER_SEND_ROUND_CONFIG, config);
+    io.to(game.id).emit('game-started', game.id);
+    io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, config);
   }
 
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
 
     if (game.getState().status !== GameStatusEnum.RUNNING) {
-      throw new Error("Cannot submit result for game which is not running!");
+      throw new Error("Cannot send result for game which is not running!");
     }
 
-    const initialConfig = game.getStartingConfig();
     const finalResult = action.payload as StartingState;
-
     const path = findShortestPath(finalResult.grid, defaultStart, defaultGoal);
     
-    if (!validateRoundResult(initialConfig, finalResult) || !path) {
+    if (!validateRoundResult(game.getConfig(), finalResult) || !path) {
       throw new Error("Invalid round result!");
     }
 
     const duration = simulateRunnerMovement(false, [], path).length * defaultTimeStep;
-    game.setResult(socket.id, { duration, finalMaze: finalResult.grid });
+    game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player: game.getPlayerData(socket.id) });
     if (game.allResultsReceived()) {
-      io.to(game.id).emit(GameActionEnum.SERVER_SEND_ROUND_RESULT, game.getResultsForCurrentRound);
+      io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound);
     }
-
   }
 }

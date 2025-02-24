@@ -1,7 +1,18 @@
 import { useState, useEffect } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultHeight, defaultStart, defaultTimeStep, defaultWidth, findShortestPath, generateStartingState, get2x2Positions, GridCell, Position, simulateRunnerMovement, Tower } from '@mazing/util';
+import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultHeight, defaultStart,
+  defaultTimeStep, defaultWidth, findShortestPath, generateStartingState, get2x2Positions, GridCell,
+  Position, simulateRunnerMovement, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
+
+interface MultiPlayerGameProps {
+  //settings (time per round etc) - can use placeholder initially
+  //list of players(id, name) - controlled by parent
+  //sendChatMessage callback
+  //chatLog state - controlled by parent
+}
+
+// Listen for GameActionEnum socket events. Use these to control what happens.
 
 export function MultiPlayerGame() {
   const [gameRunning, setGameRunning] = useState(false);
@@ -124,8 +135,8 @@ export function MultiPlayerGame() {
       resources={resources}
       stopwatch={stopwatch}
       countdown={countdown}
-      handleStartButton={handleStartButton}
-      handleReset={handleReset}
+      handleStartButton={null}
+      handleReset={null}
     />
   ) : null;
 }

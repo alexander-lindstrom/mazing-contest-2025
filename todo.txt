@@ -1,4 +1,3 @@
-Start game:
-    Only visible if allowed to start (min 2 players)
-    start game req
-    start game rsp (contains initial maze)
+Break out chat window from GameRoomView.
+    re-use in MultiPlayerGame
+Complete MultiPlayerGame - see comments.

@@ -3,14 +3,16 @@ import { getSocket } from '@/socket';
 import { ChatMessage, LobbyInformation } from '@mazing/util';
 import { GameRoomView } from '../components/GameRoomView';
 import { LobbyView } from '../components/LobbyView';
+import { MultiPlayerGame } from '../components/MultiPlayerGame';
 
-export const GameLobby = () => {
+export const MultiPlayerGameController = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [availableGames, setAvailableGames] = useState<LobbyInformation[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentGame, setCurrentGame] = useState<LobbyInformation | null>(null);
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
+  const [gameStarted, setGameStarted] = useState(false); // Add this state
 
   useEffect(() => {
     const socket = getSocket();
@@ -34,7 +36,8 @@ export const GameLobby = () => {
 
     function onGameLeft() {
       setCurrentGame(null);
-      setChatLog([])
+      setChatLog([]);
+      setGameStarted(false);
     }
   
     function onPlayerUpdate(game: LobbyInformation) {
@@ -45,8 +48,8 @@ export const GameLobby = () => {
       setChatLog((prevChatLog) => [...prevChatLog, message]);
     }
 
-    function onGameStart(gameId: string){
-
+    function onGameStart() {
+      setGameStarted(true);
     }
 
     socket.on('connect', onConnect);
@@ -66,7 +69,7 @@ export const GameLobby = () => {
       socket.off('game-left', onGameLeft);
       socket.off('player-update', onPlayerUpdate);
       socket.off('chat-broadcast', onChatBroadcast);
-      socket.on('game-start', onGameStart);
+      socket.off('game-start', onGameStart);
     };
   }, []);
 
@@ -124,7 +127,13 @@ export const GameLobby = () => {
     });
   }
 
-  if (currentGame) {
+  if (gameStarted && currentGame) {
+    return (
+      <MultiPlayerGame 
+        // 
+      />
+    );
+  } else if (currentGame) {
     return (
       <GameRoomView
         game={currentGame}
@@ -150,4 +159,4 @@ export const GameLobby = () => {
   );
 };
 
-export default GameLobby;
+export default MultiPlayerGameController;

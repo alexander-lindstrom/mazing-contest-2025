@@ -15,8 +15,8 @@ interface BaseGameProps {
   resources: { gold: number; lumber: number };
   stopwatch: number;
   countdown: number;
-  handleStartButton: () => void;
-  handleReset: () => void;
+  handleStartButton: (() => void) | null;
+  handleReset: (() => void) | null;
 }
 
 const BaseGame: React.FC<BaseGameProps> = ({
@@ -56,20 +56,23 @@ const BaseGame: React.FC<BaseGameProps> = ({
             <p className="font-bold">Time: {isRunning ? stopwatch : countdown}</p>
           </Card>
 
-          <div className="flex space-x-4">
-            <Button
-              className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
-              onClick={handleStartButton}
-            >
-              Start
-            </Button>
-            <Button
-              className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
-              onClick={handleReset}
-            >
-              Regenerate
-            </Button>
-          </div>
+          {handleStartButton && handleReset && (
+            <div className="flex space-x-4">
+              <Button
+                className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
+                onClick={handleStartButton}
+              >
+                Start
+              </Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
+                onClick={handleReset}
+              >
+                Regenerate
+              </Button>
+            </div>
+          )}
+
         </div>
       </div>
     </div>

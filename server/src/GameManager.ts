@@ -80,8 +80,8 @@ export class GameManager {
     return gameId ? this.games.get(gameId) || null : null;
   }
 
-  getGame(gameId: string): Game | null {
-    return this.games.get(gameId) || null;
+  getGame(gameId: string): Game | undefined {
+    return this.games.get(gameId);
   }
 
   getAvailableGames(): LobbyInformation[] {
@@ -138,6 +138,7 @@ export class GameManager {
     });
     io.to(game.id).emit('game-started', game.id);
     io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, config);
+    console.log("sent start msg");
   }
 
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){

@@ -49,6 +49,7 @@ export const MultiPlayerGameController = () => {
     }
 
     function onGameStart() {
+      console.log("Game startd!")
       setGameStarted(true);
     }
 
@@ -59,7 +60,7 @@ export const MultiPlayerGameController = () => {
     socket.on('game-left', onGameLeft);
     socket.on('player-update', onPlayerUpdate);
     socket.on('chat-broadcast', onChatBroadcast);
-    socket.on('game-start', onGameStart);
+    socket.on('game-started', onGameStart);
 
     return () => {
       socket.off('connect', onConnect);
@@ -113,9 +114,7 @@ export const MultiPlayerGameController = () => {
 
   const handleStartGame = () => {
     const socket = getSocket();
-    socket?.emit('req-start-game', {
-      gameId: currentGame?.gameId
-    });
+    socket?.emit('req-start-game', currentGame?.gameId)
   };
 
   const handleChatMessage = (message: string) => {

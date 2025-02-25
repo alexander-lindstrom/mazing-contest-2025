@@ -3,7 +3,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultHeight, defaultStart,
   defaultTimeStep, defaultWidth, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
   LobbyInformation,
-  Position, Result, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
+  Position, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import { getSocket } from '@/socket';
 
@@ -33,33 +33,95 @@ export const MultiPlayerGame = ({
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
 
-  const { rounds, buildingTime } = settings;
+  // add rounds later
+  const { buildingTime } = settings;
 
   useEffect(() => {
 
-      const socket = getSocket();
+    const socket = getSocket();
 
-      function onRoundStart(config: StartingState) {
-        
-      }
+    function onRoundStart(config: StartingState) {
+      setGrid(config.grid);
+      setTowers(config.towers);
+      setResources({ gold: config.gold, lumber: config.lumber });
+      
+      setRunnerPath([]);
+      setClapEvents([]);
+      setIsRunning(false);
+      setTotalSimulationTime(null);
+      
+      setCountdown(buildingTime);
+      setIsStopwatchRunning(false);
+    }
 
-      function onRoundEnd(roundResult: Result[]) {
-        
-      }
+    // function onRoundEnd(roundResult: Result[]) { }
 
-      // Implement later
-      //function onGameEnd() {}
-  
-      socket.on(GameActionEnum.SERVER_ROUND_CONFIG, onRoundStart);
-      socket.on(GameActionEnum.SERVER_ROUND_RESULT, onRoundEnd);
-      //socket.on(GameActionEnum.SERVER_FINAL_RESULT, onGameEnd);
-  
-      return () => {
-        socket.off(GameActionEnum.SERVER_ROUND_CONFIG);
-        socket.off(GameActionEnum.SERVER_ROUND_RESULT);
-        //socket.off(GameActionEnum.SERVER_FINAL_RESULT);
-      };
-    }, []);
+    // function onGameEnd() {}
+
+    socket.on(GameActionEnum.SERVER_ROUND_CONFIG, onRoundStart);
+    //socket.on(GameActionEnum.SERVER_ROUND_RESULT, onRoundEnd);
+    //socket.on(GameActionEnum.SERVER_FINAL_RESULT, onGameEnd);
+
+    return () => {
+      socket.off(GameActionEnum.SERVER_ROUND_CONFIG);
+      socket.off(GameActionEnum.SERVER_ROUND_RESULT);
+      //socket.off(GameActionEnum.SERVER_FINAL_RESULT);
+    };
+  }, [buildingTime]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          const newCountdown = prevCountdown - 1;
+          if (newCountdown <= 0) {
+            handleRunnerStart();
+          }
+          return newCountdown;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdown]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    
+    if (isStopwatchRunning) {
+      timer = setInterval(() => {
+        setStopwatch(prevTime => {
+          if (totalSimulationTime !== null && prevTime >= totalSimulationTime) {
+            setIsStopwatchRunning(false);
+            
+            const socket = getSocket();
+            const finalState: StartingState = {
+              height: grid.length > 0 ? grid.length : defaultHeight,
+              width: grid.length > 0 ? grid[0].length : defaultWidth,
+              grid: grid,
+              towers: towers,
+              gold: resources.gold,
+              lumber: resources.lumber
+            };
+            
+            socket.emit(GameActionEnum.CLIENT_ROUND_RESULT, finalState);
+            
+            return totalSimulationTime;
+          }
+          return prevTime + 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isStopwatchRunning, totalSimulationTime, grid, towers, resources]);
 
   const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
     if (isRunning) return;
@@ -112,6 +174,7 @@ export const MultiPlayerGame = ({
     setRunnerPath(positions);
     setClapEvents(claps);
     setIsRunning(true);
+    
     setCountdown(0);
     setStopwatch(0);
     setIsStopwatchRunning(true);

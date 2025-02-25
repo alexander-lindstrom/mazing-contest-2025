@@ -64,12 +64,11 @@ export function setupGameServer(io: Server): void {
         io.to(req.gameId).emit('chat-broadcast', (message));
       })
 
-      socket.on('req-game-start', ( gameId: string ) => {
+      socket.on('req-start-game', ( gameId: string ) => {
         gameManager.startGame(io, socket, gameId);
       })
   
       socket.on('game-action', (action: GameAction) => {
-        console.log("game action")
         gameManager.handleGameAction(io, socket, action);
       });
   

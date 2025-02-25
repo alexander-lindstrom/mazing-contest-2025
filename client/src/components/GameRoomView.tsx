@@ -57,10 +57,10 @@ export const GameRoomView = ({
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {game.playerNames.map((name, index) => (
+                  {game.players.map((name, index) => (
                     <div key={index} className="flex items-center">
-                      <span className="flex-1">{name}</span>
-                      {name === game.host.name && (
+                      <span className="flex-1">{name.name}</span>
+                      {name.name === game.host.name && (
                         <span className="text-sm text-muted-foreground">(Host)</span>
                       )}
                     </div>

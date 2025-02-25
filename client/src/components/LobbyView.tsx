@@ -70,7 +70,7 @@ export const LobbyView = ({
                         className="w-full"
                         disabled={!isConnected}
                       >
-                        Join Game {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.playerNames.length} players)
+                        Join Game {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
                       </Button>
                     ))}
                   </div>

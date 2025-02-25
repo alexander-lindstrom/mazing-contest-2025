@@ -1,21 +1,27 @@
 import { useState, useEffect } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultHeight, defaultStart,
-  defaultTimeStep, defaultWidth, findShortestPath, generateStartingState, get2x2Positions, GridCell,
-  Position, simulateRunnerMovement, Tower } from '@mazing/util';
+  defaultTimeStep, defaultWidth, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
+  LobbyInformation,
+  Position, Result, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
+import { getSocket } from '@/socket';
 
-interface MultiPlayerGameProps {
-  //settings (time per round etc) - can use placeholder initially
-  //list of players(id, name) - controlled by parent
-  //sendChatMessage callback
-  //chatLog state - controlled by parent
+interface MultiPlayerGameSettings {
+  rounds: number,
+  buildingTime: number,
 }
 
-// Listen for GameActionEnum socket events. Use these to control what happens.
+interface MultiPlayerGameProps {
+  settings: MultiPlayerGameSettings,
+  lobby: LobbyInformation,
+}
 
-export function MultiPlayerGame() {
-  const [gameRunning, setGameRunning] = useState(false);
+export const MultiPlayerGame = ({
+  settings, 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  lobby,
+}: MultiPlayerGameProps) => {
   const [grid, setGrid] = useState<GridCell[][]>([])
   const [towers, setTowers] = useState<Tower[]>([])
   const [resources, setResources] = useState({ gold: 0, lumber: 0 });
@@ -27,31 +33,33 @@ export function MultiPlayerGame() {
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (countdown <= 0) {
-      handleStartButton();
-      return;
-    }
-    
-    const interval = setInterval(() => {
-      setCountdown(prev => Math.max(prev - 1, 0));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countdown]);
+  const { rounds, buildingTime } = settings;
 
   useEffect(() => {
-    if (!isStopwatchRunning || (totalSimulationTime !== null && stopwatch >= totalSimulationTime)) {
-      return;
-    }
-    
-    const interval = setInterval(() => {
-      setStopwatch(prev => prev + 1);
-    }, 1000);
 
-    return () => clearInterval(interval);
-  }, [isStopwatchRunning, stopwatch, totalSimulationTime]);
+      const socket = getSocket();
+
+      function onRoundStart(config: StartingState) {
+        
+      }
+
+      function onRoundEnd(roundResult: Result[]) {
+        
+      }
+
+      // Implement later
+      //function onGameEnd() {}
+  
+      socket.on(GameActionEnum.SERVER_ROUND_CONFIG, onRoundStart);
+      socket.on(GameActionEnum.SERVER_ROUND_RESULT, onRoundEnd);
+      //socket.on(GameActionEnum.SERVER_FINAL_RESULT, onGameEnd);
+  
+      return () => {
+        socket.off(GameActionEnum.SERVER_ROUND_CONFIG);
+        socket.off(GameActionEnum.SERVER_ROUND_RESULT);
+        //socket.off(GameActionEnum.SERVER_FINAL_RESULT);
+      };
+    }, []);
 
   const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
     if (isRunning) return;
@@ -89,8 +97,10 @@ export function MultiPlayerGame() {
     }
   };
 
-  const handleStartButton = () => {
-    if (isRunning) return;
+  const handleRunnerStart = () => {
+    if (isRunning) {
+      return;
+    }
     
     const path = findShortestPath(grid, defaultStart, defaultGoal);
     if (!path) return;
@@ -109,21 +119,8 @@ export function MultiPlayerGame() {
     const totalSimTime = timeSteps.length * defaultTimeStep;
     setTotalSimulationTime(totalSimTime);
   };
-
-  const handleReset = () => {
-    const newState = generateStartingState();
-    setGrid(newState.grid);
-    setTowers(newState.towers);
-    setResources({ gold: newState.gold, lumber: newState.lumber });
-    setRunnerPath([]);
-    setIsRunning(false);
-    setCountdown(0);
-    setStopwatch(0);
-    setIsStopwatchRunning(false);
-    setTotalSimulationTime(null);
-  };
   
-  return gameRunning ? (
+  return (
     <BaseGame
       startingState={{ width: defaultWidth, height: defaultHeight }}
       towers={towers}
@@ -138,5 +135,5 @@ export function MultiPlayerGame() {
       handleStartButton={null}
       handleReset={null}
     />
-  ) : null;
+  );
 }

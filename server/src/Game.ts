@@ -1,10 +1,4 @@
-import { GridCell, LobbyInformation, PlayerData, StartingState } from "@mazing/util";
-
-interface Result {
-  player: PlayerData;
-  duration: number;
-  finalMaze: GridCell[][];
-}
+import { GridCell, LobbyInformation, PlayerData, Result, StartingState } from "@mazing/util";
 
 export enum GameStatusEnum {
   WAITING = 'waiting',
@@ -106,14 +100,17 @@ export class Game {
       .filter(result => result !== undefined);
   }
   
-  getLobbyInformation(): LobbyInformation{
+  getLobbyInformation(): LobbyInformation {
     return {
       host: this.host,
       gameId: this.id,
       numPlayers: this.players.size,
-      playerNames: Array.from(this.players.values()).map(player => player.name),
-    }
-  }
+      players: Array.from(this.players.entries()).map(([id, player]) => ({
+        id,
+        name: player.name,
+      })),
+    };
+  }  
 
   serialize() {
     return {

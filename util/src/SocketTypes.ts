@@ -1,3 +1,5 @@
+import { GridCell } from "./Grid";
+
 export enum GameActionEnum {
 
   CLIENT_ROUND_RESULT = 'client-round-result',
@@ -16,7 +18,7 @@ export interface LobbyInformation {
   gameId: string,
   host: PlayerData,
   numPlayers: number,
-  playerNames: string[],
+  players: PlayerData[],
 }
 
 export interface ChatMessage {
@@ -29,4 +31,10 @@ export interface ChatRequest {
   gameId: string;
   message: string;
   sender: string;
+}
+
+export interface Result {
+  player: PlayerData;
+  duration: number;
+  finalMaze: GridCell[][];
 }

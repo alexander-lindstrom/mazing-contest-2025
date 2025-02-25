@@ -12,7 +12,7 @@ export const MultiPlayerGameController = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentGame, setCurrentGame] = useState<LobbyInformation | null>(null);
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
-  const [gameStarted, setGameStarted] = useState(false); // Add this state
+  const [gameStarted, setGameStarted] = useState(false);
 
   useEffect(() => {
     const socket = getSocket();
@@ -130,7 +130,8 @@ export const MultiPlayerGameController = () => {
   if (gameStarted && currentGame) {
     return (
       <MultiPlayerGame 
-        // 
+        settings={{ rounds: 10, buildingTime: 45 }}
+        lobby={currentGame}
       />
     );
   } else if (currentGame) {

@@ -131,6 +131,8 @@ export const MultiPlayerGameController = () => {
       <MultiPlayerGame 
         settings={{ rounds: 10, buildingTime: 45 }}
         lobby={currentGame}
+        chatLog={chatLog}
+        onChatMessage={handleChatMessage}
       />
     );
   } else if (currentGame) {

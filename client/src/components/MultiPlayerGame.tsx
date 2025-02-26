@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultHeight, defaultStart,
+import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
   defaultTimeStep, defaultWidth, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
   LobbyInformation,
   Position, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
+import { ChatRoom } from '@/components/ChatRoom';
 import { getSocket } from '@/socket';
 
 interface MultiPlayerGameSettings {
@@ -15,12 +16,15 @@ interface MultiPlayerGameSettings {
 interface MultiPlayerGameProps {
   settings: MultiPlayerGameSettings,
   lobby: LobbyInformation,
+  chatLog: ChatMessage[];
+  onChatMessage: (message: string) => void;
 }
 
 export const MultiPlayerGame = ({
   settings, 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   lobby,
+  chatLog,
+  onChatMessage,
 }: MultiPlayerGameProps) => {
   const [grid, setGrid] = useState<GridCell[][]>([])
   const [towers, setTowers] = useState<Tower[]>([])
@@ -32,12 +36,11 @@ export const MultiPlayerGame = ({
   const [stopwatch, setStopwatch] = useState(0);
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
-
+  
   // add rounds later
   const { buildingTime } = settings;
 
   useEffect(() => {
-
     const socket = getSocket();
 
     function onRoundStart(config: StartingState) {
@@ -184,19 +187,31 @@ export const MultiPlayerGame = ({
   };
   
   return (
-    <BaseGame
-      startingState={{ width: defaultWidth, height: defaultHeight }}
-      towers={towers}
-      grid={grid}
-      handleCellClick={handleCellClick}
-      runnerPath={runnerPath}
-      isRunning={isRunning}
-      clapEvents={clapEvents}
-      resources={resources}
-      stopwatch={stopwatch}
-      countdown={countdown}
-      handleStartButton={null}
-      handleReset={null}
-    />
+    <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex-grow">
+        <BaseGame
+          startingState={{ width: defaultWidth, height: defaultHeight }}
+          towers={towers}
+          grid={grid}
+          handleCellClick={handleCellClick}
+          runnerPath={runnerPath}
+          isRunning={isRunning}
+          clapEvents={clapEvents}
+          resources={resources}
+          stopwatch={stopwatch}
+          countdown={countdown}
+          handleStartButton={null}
+          handleReset={null}
+        />
+      </div>
+      
+      <div className="w-full lg:w-80">
+        <ChatRoom
+          chatLog={chatLog}
+          onSendMessage={onChatMessage}
+          title={`Game Chat: ${lobby.gameId.substring(0, 8)}`}
+        />
+      </div>
+    </div>
   );
 }

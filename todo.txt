@@ -1,3 +1,12 @@
-Break out chat window from GameRoomView.
-    re-use in MultiPlayerGame
-Complete MultiPlayerGame - see comments.
+In lobby:
+    Show that a game has started.
+    Change color of join game button
+    Gray out button for games which are full or have started
+
+In game room:
+    Allow host to choose settings.
+
+
+In game:
+    Display score information.
+    Work on making the game progress.

@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LobbyInformation } from '@mazing/util';
+import { LobbyInformation, GameStatusEnum } from '@mazing/util';
 
 interface LobbyViewProps {
   isConnected: boolean;
@@ -23,6 +23,11 @@ export const LobbyView = ({
   onHostGame,
   onJoinGame,
 }: LobbyViewProps) => {
+
+  const waitingGames = availableGames.filter(game => game.gameStatus === GameStatusEnum.WAITING);
+  const startedGames = availableGames.filter(game => game.gameStatus === GameStatusEnum.RUNNING);
+  const finishedGames = availableGames.filter(game => game.gameStatus === GameStatusEnum.FINISHED);
+
   return (
     <div className="max-w-md mx-auto p-4">
       {error && (
@@ -58,11 +63,30 @@ export const LobbyView = ({
                 Host New Game
               </Button>
 
-              {availableGames.length > 0 && (
+              {waitingGames.length > 0 && (
                 <div>
                   <h3 className="text-lg font-medium my-2">Available Games</h3>
                   <div className="space-y-2">
-                    {availableGames.map((lobbyInfo) => (
+                    {waitingGames.map((lobbyInfo) => (
+                      <Button
+                        key={lobbyInfo.gameId}
+                        onClick={() => onJoinGame(lobbyInfo.gameId)}
+                        variant="outline"
+                        className="w-full bg-green-500 hover:bg-green-600 text-white"
+                        disabled={!isConnected}
+                      >
+                        {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {startedGames.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-medium my-2">Ongoing Games</h3>
+                  <div className="space-y-2">
+                    {startedGames.map((lobbyInfo) => (
                       <Button
                         key={lobbyInfo.gameId}
                         onClick={() => onJoinGame(lobbyInfo.gameId)}
@@ -70,7 +94,26 @@ export const LobbyView = ({
                         className="w-full"
                         disabled={!isConnected}
                       >
-                        Join Game {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
+                        {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {finishedGames.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-medium my-2">Completed Games</h3>
+                  <div className="space-y-2">
+                    {finishedGames.map((lobbyInfo) => (
+                      <Button
+                        key={lobbyInfo.gameId}
+                        onClick={() => onJoinGame(lobbyInfo.gameId)}
+                        variant="outline"
+                        className="w-full"
+                        disabled={!isConnected}
+                      >
+                        {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
                       </Button>
                     ))}
                   </div>

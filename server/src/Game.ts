@@ -1,10 +1,4 @@
-import { GridCell, LobbyInformation, PlayerData, Result, StartingState } from "@mazing/util";
-
-export enum GameStatusEnum {
-  WAITING = 'waiting',
-  RUNNING = 'running',
-  FINISHED = 'finished'
-}
+import { GameStatusEnum, LobbyInformation, PlayerData, Result, StartingState } from "@mazing/util";
 
 interface GameState {
   status: GameStatusEnum;
@@ -104,6 +98,7 @@ export class Game {
     return {
       host: this.host,
       gameId: this.id,
+      gameStatus: this.state.status,
       numPlayers: this.players.size,
       players: Array.from(this.players.entries()).map(([id, player]) => ({
         id,

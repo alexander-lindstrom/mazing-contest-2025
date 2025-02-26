@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
-import { Game, GameStatusEnum } from './Game';
-import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, GameActionEnum, generateStartingState,
+import { Game } from './Game';
+import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, GameActionEnum, GameStatusEnum, generateStartingState,
    LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
 
 export interface GameAction {

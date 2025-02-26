@@ -16,6 +16,7 @@ export interface PlayerData {
 
 export interface LobbyInformation {
   gameId: string,
+  gameStatus: GameStatusEnum,
   host: PlayerData,
   numPlayers: number,
   players: PlayerData[],
@@ -37,4 +38,10 @@ export interface Result {
   player: PlayerData;
   duration: number;
   finalMaze: GridCell[][];
+}
+
+export enum GameStatusEnum {
+  WAITING = 'waiting',
+  RUNNING = 'running',
+  FINISHED = 'finished'
 }

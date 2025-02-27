@@ -1,5 +1,5 @@
-import { ChatMessage, ChatRequest, PlayerData } from "@mazing/util";
-import { GameAction, GameManager } from "./GameManager";
+import { ChatMessage, ChatRequest, GameAction, PlayerData } from "@mazing/util";
+import { GameManager } from "./GameManager";
 import { Server, Socket } from "socket.io";
 
 function listGames(io: Server, socket: Socket, gameManager: GameManager, updateAll: boolean){
@@ -68,7 +68,9 @@ export function setupGameServer(io: Server): void {
         gameManager.startGame(io, socket, gameId);
       })
   
+      // Deosn't work because client is not actuall sending this event. Need to update on client side if want to stick with it.
       socket.on('game-action', (action: GameAction) => {
+        console.log("game action!")
         gameManager.handleGameAction(io, socket, action);
       });
   

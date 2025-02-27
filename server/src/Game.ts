@@ -1,4 +1,4 @@
-import { GameStatusEnum, LobbyInformation, PlayerData, Result, StartingState } from "@mazing/util";
+import { GameStatusEnum, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState } from "@mazing/util";
 
 interface GameState {
   status: GameStatusEnum;
@@ -8,6 +8,12 @@ interface GameState {
   currentRound: number; // zero-indexed
   results: Map<string, Result[]>;
   startingConfigs: StartingState[];
+}
+
+export interface Result {
+  player: PlayerData;
+  duration: number;
+  finalMaze: GridCell[][];
 }
 
 export class Game {
@@ -88,11 +94,21 @@ export class Game {
     );
   }
 
-  getResultsForCurrentRound(): Result[] {
+  getResultsForCurrentRound(): RoundResult[] {
     return Array.from(this.state.results.values())
-      .map(resultsArray => resultsArray[this.state.currentRound])
-      .filter(result => result !== undefined);
+      .map(resultsArray => {
+        const currentRound = this.state.currentRound;
+        if (!resultsArray[currentRound]) return undefined;
+  
+        const cumulativeDuration = resultsArray
+          .slice(0, currentRound + 1)
+          .reduce((sum, result) => sum + result.duration, 0);
+  
+        return { ...resultsArray[currentRound], cumulativeDuration };
+      })
+      .filter((result): result is RoundResult => result !== undefined);
   }
+  
   
   getLobbyInformation(): LobbyInformation {
     return {

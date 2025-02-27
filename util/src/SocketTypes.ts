@@ -34,9 +34,10 @@ export interface ChatRequest {
   sender: string;
 }
 
-export interface Result {
+export interface RoundResult {
   player: PlayerData;
   duration: number;
+  cumulativeDuration: number
   finalMaze: GridCell[][];
 }
 
@@ -44,4 +45,9 @@ export enum GameStatusEnum {
   WAITING = 'waiting',
   RUNNING = 'running',
   FINISHED = 'finished'
+}
+
+export interface GameAction {
+  type: GameActionEnum;
+  payload: any;
 }

@@ -1,13 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
 import { Game } from './Game';
-import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, GameActionEnum, GameStatusEnum, generateStartingState,
+import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, GameAction, GameActionEnum, GameStatusEnum, generateStartingState,
    LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
-
-export interface GameAction {
-  type: GameActionEnum;
-  payload: any;
-}
 
 export class GameManager {
   private games: Map<string, Game>;
@@ -143,6 +138,7 @@ export class GameManager {
 
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
 
+    console.log("client sent result!")
     if (game.getState().status !== GameStatusEnum.RUNNING) {
       throw new Error("Cannot send result for game which is not running!");
     }

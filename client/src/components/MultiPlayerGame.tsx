@@ -3,7 +3,7 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
   defaultTimeStep, defaultWidth, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
   LobbyInformation,
-  Position, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
+  Position, RoundResult, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import { ChatRoom } from '@/components/ChatRoom';
 import { getSocket } from '@/socket';
@@ -57,12 +57,16 @@ export const MultiPlayerGame = ({
       setIsStopwatchRunning(false);
     }
 
-    // function onRoundEnd(roundResult: Result[]) { }
+    function onRoundEnd(result: RoundResult[]) { 
+
+      console.log(result)
+
+    }
 
     // function onGameEnd() {}
 
     socket.on(GameActionEnum.SERVER_ROUND_CONFIG, onRoundStart);
-    //socket.on(GameActionEnum.SERVER_ROUND_RESULT, onRoundEnd);
+    socket.on(GameActionEnum.SERVER_ROUND_RESULT, onRoundEnd);
     //socket.on(GameActionEnum.SERVER_FINAL_RESULT, onGameEnd);
 
     return () => {
@@ -112,7 +116,8 @@ export const MultiPlayerGame = ({
               lumber: resources.lumber
             };
             
-            socket.emit(GameActionEnum.CLIENT_ROUND_RESULT, finalState);
+            console.log("sending result (client)")
+            socket.emit('game-action', { type: GameActionEnum.CLIENT_ROUND_RESULT, payload: finalState });
             
             return totalSimulationTime;
           }

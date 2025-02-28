@@ -8,4 +8,4 @@ In game:
     Work on making the game progress.
 
 Other:
-    Client sends round result twice.
+    Receiving result from user does not seem to work correctly.

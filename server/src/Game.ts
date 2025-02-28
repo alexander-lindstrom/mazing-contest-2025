@@ -40,12 +40,19 @@ export class Game {
   }
 
   addPlayer(socketId: string, playerData: PlayerData): number {
-    if (this.players.size >= this.maxPlayers) {
-      throw new Error('Game is full');
+    if (this.players.has(socketId)) {
+        throw new Error('Player already added');
     }
+
+    if (this.players.size >= this.maxPlayers) {
+        throw new Error('Game is full');
+    }
+
     this.players.set(socketId, playerData);
+    this.state.results.set(socketId, []);
+
     return this.players.size;
-  }
+}
 
   removePlayer(socketId: string): number {
     this.players.delete(socketId);
@@ -85,7 +92,11 @@ export class Game {
   }
 
   setResult(playerId: string, result: Result){
-    this.state.results.get(playerId)?.push(result);
+    const player = this.state.results.get(playerId);
+    if (!player){
+      throw new Error("Player not found!");
+    }
+    player.push(result);
   }
 
   allResultsReceived(){

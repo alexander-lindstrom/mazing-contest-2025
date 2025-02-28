@@ -68,7 +68,6 @@ export function setupGameServer(io: Server): void {
         gameManager.startGame(io, socket, gameId);
       })
   
-      // Deosn't work because client is not actuall sending this event. Need to update on client side if want to stick with it.
       socket.on('game-action', (action: GameAction) => {
         console.log("game action!")
         gameManager.handleGameAction(io, socket, action);

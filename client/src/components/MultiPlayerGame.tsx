@@ -7,6 +7,7 @@ import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defau
 import BaseGame from '@/components/BaseGame';
 import { ChatRoom } from '@/components/ChatRoom';
 import { getSocket } from '@/socket';
+import ResultDisplay from './ResultDisplay';
 
 interface MultiPlayerGameSettings {
   rounds: number,
@@ -18,6 +19,7 @@ interface MultiPlayerGameProps {
   lobby: LobbyInformation,
   chatLog: ChatMessage[];
   onChatMessage: (message: string) => void;
+  initialScore: RoundResult[] | null;
 }
 
 export const MultiPlayerGame = ({
@@ -25,6 +27,7 @@ export const MultiPlayerGame = ({
   lobby,
   chatLog,
   onChatMessage,
+  initialScore
 }: MultiPlayerGameProps) => {
   const [grid, setGrid] = useState<GridCell[][]>([])
   const [towers, setTowers] = useState<Tower[]>([])
@@ -36,9 +39,10 @@ export const MultiPlayerGame = ({
   const [stopwatch, setStopwatch] = useState(0);
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
+  const [currentScore, setCurrentScore] = useState<RoundResult[] | null>(initialScore)
   
   // add rounds later
-  const { buildingTime } = settings;
+  const { rounds, buildingTime } = settings;
 
   useEffect(() => {
     const socket = getSocket();
@@ -59,6 +63,7 @@ export const MultiPlayerGame = ({
 
     function onRoundEnd(result: RoundResult[]) { 
 
+      setCurrentScore(result);
       console.log(result)
 
     }
@@ -217,6 +222,12 @@ export const MultiPlayerGame = ({
           title={`Game Chat: ${lobby.gameId.substring(0, 8)}`}
         />
       </div>
+
+      <ResultDisplay 
+        score={currentScore}
+        roundNumber={3}
+        totalRounds={rounds}
+      />
     </div>
   );
 }

@@ -131,7 +131,7 @@ export class GameManager {
       startTime: Date.now(),
       startingConfigs: [config]
     });
-    io.to(game.id).emit('game-started', game.id);
+    io.to(game.id).emit('game-started', game.getResultsForCurrentRound());
     io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, config);
     console.log("sent start msg");
   }

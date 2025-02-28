@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getSocket } from '@/socket';
-import { ChatMessage, LobbyInformation } from '@mazing/util';
+import { ChatMessage, LobbyInformation, RoundResult } from '@mazing/util';
 import { GameRoomView } from '../components/GameRoomView';
 import { LobbyView } from '../components/LobbyView';
 import { MultiPlayerGame } from '../components/MultiPlayerGame';
@@ -13,6 +13,7 @@ export const MultiPlayerGameController = () => {
   const [currentGame, setCurrentGame] = useState<LobbyInformation | null>(null);
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [initialScore, setInitialScore] = useState<RoundResult[] | null>(null)
 
   useEffect(() => {
     const socket = getSocket();
@@ -48,8 +49,8 @@ export const MultiPlayerGameController = () => {
       setChatLog((prevChatLog) => [...prevChatLog, message]);
     }
 
-    function onGameStart() {
-      console.log("Game startd!")
+    function onGameStart(initialScore: RoundResult[]) {
+      setInitialScore(initialScore);
       setGameStarted(true);
     }
 
@@ -133,6 +134,7 @@ export const MultiPlayerGameController = () => {
         lobby={currentGame}
         chatLog={chatLog}
         onChatMessage={handleChatMessage}
+        initialScore={initialScore}
       />
     );
   } else if (currentGame) {

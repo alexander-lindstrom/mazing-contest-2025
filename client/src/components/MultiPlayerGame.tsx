@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
   defaultTimeStep, defaultWidth, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
@@ -102,14 +102,19 @@ export const MultiPlayerGame = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown]);
 
+  const resultSentRef = useRef(false);
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
+    
+    // Needs to be reset between roudns in some way.
+    resultSentRef.current = false;
     
     if (isStopwatchRunning) {
       timer = setInterval(() => {
         setStopwatch(prevTime => {
-          if (totalSimulationTime !== null && prevTime >= totalSimulationTime) {
+          if (totalSimulationTime !== null && prevTime >= totalSimulationTime && !resultSentRef.current) {
             setIsStopwatchRunning(false);
+            resultSentRef.current = true;
             
             const socket = getSocket();
             const finalState: StartingState = {
@@ -121,20 +126,21 @@ export const MultiPlayerGame = ({
               lumber: resources.lumber
             };
             
-            console.log("sending result (client)")
+            console.log("sending result (client)");
             socket.emit('game-action', { type: GameActionEnum.CLIENT_ROUND_RESULT, payload: finalState });
-            
-            return totalSimulationTime;
           }
-          return prevTime + 1;
+          
+          return totalSimulationTime !== null && prevTime >= totalSimulationTime
+            ? totalSimulationTime
+            : prevTime + 1;
         });
-      }, 1000);
-    }
-    
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [isStopwatchRunning, totalSimulationTime, grid, towers, resources]);
+    }, 1000);
+  }
+  
+  return () => {
+    if (timer) clearInterval(timer);
+  };
+}, [isStopwatchRunning, totalSimulationTime, grid, towers, resources]);
 
   const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
     if (isRunning) return;

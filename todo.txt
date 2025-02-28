@@ -8,4 +8,4 @@ In game:
     Work on making the game progress.
 
 Other:
-    Fix result validation method (always fails)
+    Client sends round result twice.

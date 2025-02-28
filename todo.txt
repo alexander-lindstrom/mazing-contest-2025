@@ -6,3 +6,6 @@ In game room:
 In game:
     Display score information.
     Work on making the game progress.
+
+Other:
+    Fix result validation method (always fails)

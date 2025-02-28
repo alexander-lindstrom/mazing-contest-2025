@@ -147,6 +147,7 @@ export class GameManager {
     const path = findShortestPath(finalResult.grid, defaultStart, defaultGoal);
     
     if (!validateRoundResult(game.getConfig(), finalResult) || !path) {
+      console.log(finalResult, path)
       throw new Error("Invalid round result!");
     }
 

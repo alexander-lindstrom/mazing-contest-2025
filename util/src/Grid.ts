@@ -180,12 +180,13 @@ export function validateRoundResult(initial: StartingState, final: StartingState
   const initialTotal = getTotalTowerValue(initial.grid);
   const finalTotal = getTotalTowerValue(final.grid);
 
-  const maxAllowedGold = initialTotal.gold + initial.gold;
-  const maxAllowedLumber = initialTotal.lumber + initial.lumber;
+  const goldDifference = (finalTotal.gold - initialTotal.gold) / 4;
+  const lumberDifference = (finalTotal.lumber - initialTotal.lumber) / 4;
 
-  return (
-    finalTotal.gold <= maxAllowedGold &&
-    finalTotal.lumber <= maxAllowedLumber &&
-    checkNonSellableTowers(initial.grid, final.grid)
-  );
+  const hasEnoughGold = goldDifference <= initial.gold;
+  const hasEnoughLumber = lumberDifference <= initial.lumber;
+
+  const nonSellablePreserved = checkNonSellableTowers(initial.grid, final.grid);
+
+  return hasEnoughGold && hasEnoughLumber && nonSellablePreserved;
 }

@@ -4,9 +4,8 @@ import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defau
   defaultTimeStep, defaultWidth, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
   Position, RoundResult, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
-import { ChatRoom } from '@/components/ChatRoom';
 import { getSocket } from '@/socket';
-import ResultDisplay from './ResultDisplay';
+import GameInterface from './GameInterface';
 
 interface MultiPlayerGameSettings {
   rounds: number,
@@ -216,18 +215,13 @@ export const MultiPlayerGame = ({
         />
       </div>
       
-      <div className="w-full lg:w-80">
-        <ChatRoom
-          chatLog={chatLog}
-          onSendMessage={onChatMessage}
-          title="Chat room"
-        />
-      </div>
-
-      <ResultDisplay 
-        score={currentScore}
-        totalRounds={rounds}
+      <GameInterface
+        chatLog={chatLog}
+        onChatMessage={onChatMessage}
+        currentScore={currentScore}
+        rounds={rounds}
       />
+      
     </div>
   );
 }

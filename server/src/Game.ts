@@ -66,12 +66,13 @@ export class Game {
     this.state.startingConfigs[this.state.currentRound] = config;
   }
 
-  startNextRound() {
+  startNextRound(): boolean {
     if (this.state.currentRound + 1 === this.state.rounds) {
-      throw new Error("Max rounds already reached!");
+      return false;
     }
     this.state.currentRound++;
     this.generateRoundConfig();
+    return true;
   }
 
   startGame() {

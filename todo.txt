@@ -4,8 +4,9 @@ In game room:
     Allow host to choose settings.
 
 In game:
-    Display score information.
-    Work on making the game progress.
-
+    List all players also before any results are recieved.
+    Make the layout reasonable.
+    Give the option to select which plyer to view (during running phase).
+   
 Other:
     Receiving result from user does not seem to work correctly.

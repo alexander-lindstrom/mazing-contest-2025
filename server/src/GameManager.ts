@@ -121,7 +121,6 @@ export class GameManager {
 
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
 
-    console.log("client sent result!")
     if (game.getState().status !== GameStatusEnum.RUNNING) {
       throw new Error("Cannot send result for game which is not running!");
     }
@@ -137,8 +136,12 @@ export class GameManager {
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player: game.getPlayerData(socket.id) });
     if (game.allResultsReceived()) {
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound());
-      game.startNextRound();
-      io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig())
+      if (game.startNextRound()) {
+        io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig())
+      }
+      else{
+        io.to(game.id).emit(GameActionEnum.SERVER_GAME_ENDED);
+      }
     }
   }
 }

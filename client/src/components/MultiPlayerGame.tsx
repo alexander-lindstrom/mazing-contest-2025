@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
   defaultTimeStep, defaultWidth, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
-  LobbyInformation,
   Position, RoundResult, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import { ChatRoom } from '@/components/ChatRoom';
@@ -16,7 +15,6 @@ interface MultiPlayerGameSettings {
 
 interface MultiPlayerGameProps {
   settings: MultiPlayerGameSettings,
-  lobby: LobbyInformation,
   chatLog: ChatMessage[];
   onChatMessage: (message: string) => void;
   initialScore: RoundResult[] | null;
@@ -24,7 +22,6 @@ interface MultiPlayerGameProps {
 
 export const MultiPlayerGame = ({
   settings, 
-  lobby,
   chatLog,
   onChatMessage,
   initialScore
@@ -106,7 +103,6 @@ export const MultiPlayerGame = ({
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
     
-    // Needs to be reset between roudns in some way.
     resultSentRef.current = false;
     
     if (isStopwatchRunning) {
@@ -126,7 +122,6 @@ export const MultiPlayerGame = ({
               lumber: resources.lumber
             };
             
-            console.log("sending result (client)");
             socket.emit('game-action', { type: GameActionEnum.CLIENT_ROUND_RESULT, payload: finalState });
           }
           
@@ -225,7 +220,7 @@ export const MultiPlayerGame = ({
         <ChatRoom
           chatLog={chatLog}
           onSendMessage={onChatMessage}
-          title={`Game Chat: ${lobby.gameId.substring(0, 8)}`}
+          title="Chat room"
         />
       </div>
 

@@ -6,7 +6,7 @@ export enum GameActionEnum {
 
   SERVER_ROUND_CONFIG = 'server-round-config',
   SERVER_ROUND_RESULT = 'server-round-result',
-  SERVER_FINAL_RESULT = 'server-final-result'
+  SERVER_GAME_ENDED = 'server-game-ended'
 }
 
 export interface PlayerData {

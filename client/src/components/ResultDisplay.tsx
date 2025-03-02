@@ -11,15 +11,15 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   score,
   totalRounds
 }) => {
-  const roundNumber = score && score.length > 0 ? score[0].round : 0;
+  const roundNumber = score && score.length > 0 ? score[0].round + 1: 1;
   if (!score || score.length === 0) {
     return (
       <div className="w-full">
         <Card className="border-[3px] border-black p-4">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Round {roundNumber} Results</h2>
+            <h2 className="text-xl font-bold">Score</h2>
             <div className="text-sm font-medium">
-              Progress: {roundNumber} / {totalRounds}
+              Round: {roundNumber} / {totalRounds}
             </div>
           </div>
           <div className="py-4 text-center">No results available yet</div>
@@ -32,9 +32,9 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
     <div className="w-full">
       <Card className="border-[3px] border-black p-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Round {roundNumber} Results</h2>
+          <h2 className="text-xl font-bold">Score</h2>
           <div className="text-sm font-medium">
-            Progress: {roundNumber} / {totalRounds}
+            Round: {roundNumber} / {totalRounds}
           </div>
         </div>
         

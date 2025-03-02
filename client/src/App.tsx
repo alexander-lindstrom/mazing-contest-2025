@@ -7,8 +7,7 @@ function App() {
   const [gameMode, setGameMode] = useState<"single" | "multi" | null>(null);
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white font-bold text-lg">
-      <h1 className="text-4xl mb-6 drop-shadow-lg">Mazing Contest!</h1>
+    <div className="relative min-h-screen flex flex-col justify-center bg-gray-600 text-white font-bold text-lg">
       {gameMode === null && (
         <div className="flex flex-col items-center space-y-4 bg-white/20 p-8 rounded-2xl shadow-xl backdrop-blur-lg border-4 border-white">
           <h1 className="text-3xl mb-4 drop-shadow-lg">Select Game Mode</h1>

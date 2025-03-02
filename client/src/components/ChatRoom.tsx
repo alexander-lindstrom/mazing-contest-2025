@@ -59,7 +59,6 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({
               </div>
             ) : (
               <div className="text-lg font-bold text-center p-8 border-2 border-dashed border-gray-400">
-                Chat messages will appear here...
               </div>
             )}
           </div>

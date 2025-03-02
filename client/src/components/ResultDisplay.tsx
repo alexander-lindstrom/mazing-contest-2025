@@ -44,8 +44,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
         <div className="bg-white border-4 border-black rounded-lg p-4">
           <div className="grid grid-cols-3 gap-2 font-black mb-2 text-blue-600 px-2 py-2 bg-cyan-200 border-2 border-black rounded-md">
             <div>PLAYER</div>
-            <div>ROUND TIME</div>
-            <div>TOTAL TIME</div>
+            <div>ROUND</div>
+            <div>TOTAL</div>
           </div>
           
           {score.map((playerResult, index) => (

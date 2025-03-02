@@ -4,15 +4,14 @@ import { RoundResult } from '@mazing/util';
 
 interface ResultDisplayProps {
   score: RoundResult[] | null;
-  roundNumber: number;
   totalRounds: number;
 }
 
 const ResultDisplay: React.FC<ResultDisplayProps> = ({
   score,
-  roundNumber,
   totalRounds
 }) => {
+  const roundNumber = score && score.length > 0 ? score[0].round : 0;
   if (!score || score.length === 0) {
     return (
       <div className="w-full">

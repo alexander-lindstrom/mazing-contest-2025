@@ -89,18 +89,6 @@ export class GameManager {
     // Todo:
   }
 
-  getStats() {
-    return {
-      totalGames: this.games.size,
-      totalPlayers: this.playerToGame.size,
-      games: Array.from(this.games.values()).map(game => ({
-        id: game.id,
-        players: game.getPlayerCount(),
-        status: game.serialize().state.status
-      }))
-    };
-  }
-
   handleGameAction(io: Server, socket: Socket, action: GameAction) {
 
     const game = this.getGameByPlayer(socket.id);
@@ -133,7 +121,6 @@ export class GameManager {
     });
     io.to(game.id).emit('game-started', game.getResultsForCurrentRound());
     io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, config);
-    console.log("sent start msg");
   }
 
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
@@ -147,14 +134,16 @@ export class GameManager {
     const path = findShortestPath(finalResult.grid, defaultStart, defaultGoal);
     
     if (!validateRoundResult(game.getConfig(), finalResult) || !path) {
-      console.log(finalResult, path)
       throw new Error("Invalid round result!");
     }
 
     const duration = simulateRunnerMovement(false, [], path).length * defaultTimeStep;
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player: game.getPlayerData(socket.id) });
     if (game.allResultsReceived()) {
-      io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound);
+      console.log("Recv all results - broadcasting")
+      console.log(game)
+      console.log(this.games)
+      io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound());
     }
   }
 }

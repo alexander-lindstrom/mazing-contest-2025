@@ -101,7 +101,8 @@ export const MultiPlayerGameController = () => {
     socket?.emit('req-join-game', {
       gameId: gameId,
       playerData: {
-        name: playerName
+        name: playerName,
+        id: socket.id
       }
     });    
   };

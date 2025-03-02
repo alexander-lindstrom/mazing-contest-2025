@@ -231,7 +231,6 @@ export const MultiPlayerGame = ({
 
       <ResultDisplay 
         score={currentScore}
-        roundNumber={3}
         totalRounds={rounds}
       />
     </div>

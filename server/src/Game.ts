@@ -37,6 +37,8 @@ export class Game {
       results: new Map(),
       startingConfigs: [],
     };
+
+    this.state.results.set(host.id, []);
   }
 
   addPlayer(socketId: string, playerData: PlayerData): number {
@@ -115,11 +117,10 @@ export class Game {
           .slice(0, currentRound + 1)
           .reduce((sum, result) => sum + result.duration, 0);
   
-        return { ...resultsArray[currentRound], cumulativeDuration };
+        return { ...resultsArray[currentRound], cumulativeDuration, round: currentRound };
       })
       .filter((result): result is RoundResult => result !== undefined);
   }
-  
   
   getLobbyInformation(): LobbyInformation {
     return {
@@ -133,13 +134,4 @@ export class Game {
       })),
     };
   }  
-
-  serialize() {
-    return {
-      id: this.id,
-      playerCount: this.players.size,
-      players: Array.from(this.players.entries()),
-      state: this.state
-    };
-  }
 }

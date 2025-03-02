@@ -35,6 +35,7 @@ export interface ChatRequest {
 }
 
 export interface RoundResult {
+  round: number;
   player: PlayerData;
   duration: number;
   cumulativeDuration: number

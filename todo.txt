@@ -4,6 +4,7 @@ In game room:
     Allow host to choose settings.
 
 In game:
+    React to the game ending in some way (SERVER_GAME_END)
     List all players also before any results are recieved.
     Make the layout reasonable.
     Give the option to select which plyer to view (during running phase).

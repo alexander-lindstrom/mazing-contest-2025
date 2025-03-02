@@ -37,7 +37,6 @@ export const MultiPlayerGame = ({
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
   const [currentScore, setCurrentScore] = useState<RoundResult[] | null>(initialScore)
   
-  // add rounds later
   const { rounds, buildingTime } = settings;
 
   useEffect(() => {
@@ -197,8 +196,9 @@ export const MultiPlayerGame = ({
   };
   
   return (
-    <div className="flex flex-col lg:flex-row gap-4">
-      <div className="flex-grow">
+    <div className="flex flex-col lg:flex-row gap-4 items-start w-full">
+      {/* BaseGame - Takes up remaining space */}
+      <div className="flex-grow w-full lg:w-auto">
         <BaseGame
           startingState={{ width: defaultWidth, height: defaultHeight }}
           towers={towers}
@@ -214,14 +214,16 @@ export const MultiPlayerGame = ({
           handleReset={null}
         />
       </div>
-      
-      <GameInterface
-        chatLog={chatLog}
-        onChatMessage={onChatMessage}
-        currentScore={currentScore}
-        rounds={rounds}
-      />
-      
+  
+      {/* GameInterface - Fixed width and aligned to the right of BaseGame */}
+      <div className="w-full lg:w-96"> {/* Constrain width on larger screens */}
+        <GameInterface
+          chatLog={chatLog}
+          onChatMessage={onChatMessage}
+          currentScore={currentScore}
+          rounds={rounds}
+        />
+      </div>
     </div>
   );
 }

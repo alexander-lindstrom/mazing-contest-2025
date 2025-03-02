@@ -35,23 +35,25 @@ const BaseGame: React.FC<BaseGameProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center w-full max-w-6xl">
-  
       <div className="flex w-full space-x-6">
         <div className="flex flex-col items-center min-w-[300px] max-w-[350px]">
           <ResourceCard resources={resources} isRunning={isRunning} stopwatch={stopwatch} countdown={countdown} />
         </div>
   
+        {/* Grid Container */}
         <div className="flex-grow">
-          <GridRenderer
-            width={startingState.width}
-            height={startingState.height}
-            towers={towers}
-            grid={grid}
-            handleClick={handleCellClick}
-            runnerPath={runnerPath}
-            showRunner={isRunning}
-            clapEvents={clapEvents}
-          />
+          <div className="rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <GridRenderer
+              width={startingState.width}
+              height={startingState.height}
+              towers={towers}
+              grid={grid}
+              handleClick={handleCellClick}
+              runnerPath={runnerPath}
+              showRunner={isRunning}
+              clapEvents={clapEvents}
+            />
+          </div>
         </div>
   
         {handleStartButton && handleReset && (

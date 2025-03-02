@@ -11,29 +11,29 @@ interface GameInterfaceProps {
 }
 
 const GameInterface: React.FC<GameInterfaceProps> = ({
-  chatLog,
-  onChatMessage,
-  currentScore,
-  rounds
-}) => {
-  return (
-    <div className="flex flex-col gap-4 w-full max-w-lg">
-      <div className="w-full">
+    chatLog,
+    onChatMessage,
+    currentScore,
+    rounds
+  }) => {
+return (
+    <div className="flex flex-col gap-4 w-full">
+    <div className="w-full">
         <ResultDisplay 
-          score={currentScore}
-          totalRounds={rounds}
+        score={currentScore}
+        totalRounds={rounds}
         />
-      </div>
-      
-      <div className="w-full">
-        <ChatRoom
-          chatLog={chatLog}
-          onSendMessage={onChatMessage}
-          title="Chat room"
-        />
-      </div>
     </div>
-  );
+    
+    <div className="w-full">
+        <ChatRoom
+        chatLog={chatLog}
+        onSendMessage={onChatMessage}
+        title="Chat room"
+        />
+    </div>
+    </div>
+);
 };
 
 export default GameInterface;

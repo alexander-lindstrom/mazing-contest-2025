@@ -57,7 +57,10 @@ const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep }) => {
       y={currentPosition.y * cellSize + cellSize / 2}
       radius={cellSize / 3}
       fill={isSlowed ? "blue" : "red"}
+      stroke="black"
+      strokeWidth={2}
     />
+
   );
 };
 

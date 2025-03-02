@@ -16,21 +16,22 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resources, isRunning, stopw
         </div>
         
         <div className="bg-white border-4 border-black rounded-lg p-4">
+
+          <div className="grid grid-cols-2 gap-2 py-3 px-2 border-t-2 border-black bg-green-100 text-center">
+            <div className="font-bold">Time:</div>
+            <div className="font-mono font-bold">{isRunning ? stopwatch : countdown}</div>
+          </div>
           
           <div className="grid grid-cols-2 gap-2 py-3 px-2 border-t-2 border-black bg-purple-100 text-center">
-            <div className="font-bold">Gold</div>
+            <div className="font-bold">Gold:</div>
             <div className="font-mono font-bold">{resources.gold}</div>
           </div>
           
           <div className="grid grid-cols-2 gap-2 py-3 px-2 border-t-2 border-black bg-green-100 text-center">
-            <div className="font-bold">Lumber</div>
+            <div className="font-bold">Wood:</div>
             <div className="font-mono font-bold">{resources.lumber}</div>
           </div>
           
-          <div className="grid grid-cols-2 gap-2 py-3 px-2 border-t-2 border-black bg-purple-100 text-center">
-            <div className="font-bold">Time</div>
-            <div className="font-mono font-bold">{isRunning ? stopwatch : countdown}</div>
-          </div>
         </div>
       </Card>
     </div>

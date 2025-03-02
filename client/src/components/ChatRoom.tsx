@@ -46,7 +46,7 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({
         <ScrollArea className="h-48 rounded-md border-4 border-black p-4 bg-white">
           <div ref={scrollRef}>
             {chatLog.length > 0 ? (
-              <div className="space-y-2 text-sm">
+              <div className="space-y-1 text-sm">
                 {chatLog.map(({ sender, timestamp, message }, index) => (
                   <div key={index} className="flex items-start gap-2 py-2 border-b border-gray-200">
                     <span className="font-bold">{sender}:</span>

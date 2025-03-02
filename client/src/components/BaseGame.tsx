@@ -35,9 +35,6 @@ const BaseGame: React.FC<BaseGameProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center w-full max-w-6xl">
-      <h1 className="text-3xl font-bold text-center mb-4">
-        Mazing Contest!
-      </h1>
   
       <div className="flex w-full space-x-6">
         <div className="flex flex-col items-center min-w-[300px] max-w-[350px]">
@@ -61,13 +58,13 @@ const BaseGame: React.FC<BaseGameProps> = ({
           <div className="flex flex-col space-y-6 w-80">
             <div className="flex space-x-4">
               <Button
-                className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
+                className="bg-blue-400 text-black hover:bg-blue-500 font-bold py-6 px-12 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-2xl"
                 onClick={handleStartButton}
               >
                 Start
               </Button>
               <Button
-                className="bg-blue-600 hover:bg-blue-500 text-white border-[3px] border-black px-4 py-2"
+                className="bg-green-400 text-black hover:bg-green-500 font-bold py-6 px-12 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-2xl"
                 onClick={handleReset}
               >
                 Regenerate

@@ -8,5 +8,6 @@ In game:
     Make the layout reasonable.
     Give the option to select which plyer to view (during running phase).
    
-Other:
-    Receiving result from user does not seem to work correctly.
+
+Long term:
+    Add sounds

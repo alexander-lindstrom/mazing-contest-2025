@@ -196,9 +196,8 @@ export const MultiPlayerGame = ({
   };
   
   return (
-    <div className="flex flex-col lg:flex-row gap-4 items-start w-full">
-      {/* BaseGame - Takes up remaining space */}
-      <div className="flex-grow w-full lg:w-auto">
+    <div className="flex flex-col lg:flex-row gap-2 items-start w-full">
+      <div className="max-w-[1200px]">
         <BaseGame
           startingState={{ width: defaultWidth, height: defaultHeight }}
           towers={towers}
@@ -215,8 +214,7 @@ export const MultiPlayerGame = ({
         />
       </div>
   
-      {/* GameInterface - Fixed width and aligned to the right of BaseGame */}
-      <div className="w-full lg:w-96"> {/* Constrain width on larger screens */}
+      <div className="lg:w-96 ml-2">
         <GameInterface
           chatLog={chatLog}
           onChatMessage={onChatMessage}

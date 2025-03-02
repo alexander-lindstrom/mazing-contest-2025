@@ -106,21 +106,16 @@ export class GameManager {
     }
 }
 
-   startGame(io: Server, socket: Socket, gameId: string){
+   startGame(io: Server, socket: Socket, gameId: string) {
 
     const game = this.getGame(gameId);
     if (!game || !game.canStart(socket.id)) {
       throw new Error ("Game cannot start!");
     }
       
-    const config = generateStartingState();
-    game.updateGameState({
-      status: GameStatusEnum.RUNNING,
-      startTime: Date.now(),
-      startingConfigs: [config]
-    });
+    game.startGame();
     io.to(game.id).emit('game-started', game.getResultsForCurrentRound());
-    io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, config);
+    io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
   }
 
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
@@ -140,10 +135,9 @@ export class GameManager {
     const duration = simulateRunnerMovement(false, [], path).length * defaultTimeStep;
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player: game.getPlayerData(socket.id) });
     if (game.allResultsReceived()) {
-      console.log("Recv all results - broadcasting")
-      console.log(game)
-      console.log(this.games)
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound());
+      game.startNextRound();
+      io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig())
     }
   }
 }

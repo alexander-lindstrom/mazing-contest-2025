@@ -1,4 +1,4 @@
-import { GameStatusEnum, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState } from "@mazing/util";
+import { GameStatusEnum, generateStartingState, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState } from "@mazing/util";
 
 interface GameState {
   status: GameStatusEnum;
@@ -61,12 +61,23 @@ export class Game {
     return this.players.size;
   }
 
-  updateGameState(newState: Partial<GameState>): void {
-    this.state = {
-      ...this.state,
-      ...newState,
-      lastUpdateTime: Date.now()
-    };
+  generateRoundConfig() {
+    const config = generateStartingState();
+    this.state.startingConfigs[this.state.currentRound] = config;
+  }
+
+  startNextRound() {
+    if (this.state.currentRound + 1 === this.state.rounds) {
+      throw new Error("Max rounds already reached!");
+    }
+    this.state.currentRound++;
+    this.generateRoundConfig();
+  }
+
+  startGame() {
+    this.state.status = GameStatusEnum.RUNNING;
+    this.state.startTime = Date.now();
+    this.generateRoundConfig();
   }
 
   getPlayerCount(): number {

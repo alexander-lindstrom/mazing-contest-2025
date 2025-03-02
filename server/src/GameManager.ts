@@ -12,9 +12,7 @@ export class GameManager {
     this.games = new Map();
     this.playerToGame = new Map();
     
-    // Todo:
-    // Auto-cleanup of finished games after 5 minutes
-    //setInterval(() => this.cleanupFinishedGames(), 5 * 60 * 1000);
+    setInterval(() => this.cleanupFinishedGames(), 5 * 60 * 1000);
   }
 
   createGame(host: PlayerData): Game {
@@ -44,7 +42,6 @@ export class GameManager {
     this.playerToGame.set(socket.id, gameId);
     
     socket.join(gameId);
-    
     return game;
   }
 
@@ -84,9 +81,13 @@ export class GameManager {
   }      
 
   private cleanupFinishedGames(): void {
-    const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
     
-    // Todo:
+    for (const [gameId, game] of this.games.entries()) {
+      if (game.getState().creationTime < oneHourAgo) {
+        this.games.delete(gameId);
+      }
+    }
   }
 
   handleGameAction(io: Server, socket: Socket, action: GameAction) {
@@ -104,7 +105,7 @@ export class GameManager {
         default:
             throw new Error("No such game action!");
     }
-}
+  }
 
    startGame(io: Server, socket: Socket, gameId: string) {
 

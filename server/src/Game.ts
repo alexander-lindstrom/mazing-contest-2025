@@ -3,7 +3,7 @@ import { GameStatusEnum, generateStartingState, GridCell, LobbyInformation, Play
 interface GameState {
   status: GameStatusEnum;
   startTime: number | null;
-  lastUpdateTime: number | null;
+  creationTime: number;
   rounds: number;
   currentRound: number; // zero-indexed
   results: Map<string, Result[]>;
@@ -31,7 +31,7 @@ export class Game {
     this.state = {
       status: GameStatusEnum.WAITING,
       startTime: null,
-      lastUpdateTime: null,
+      creationTime: Date.now(),
       rounds: rounds,
       currentRound: 0,
       results: new Map(),

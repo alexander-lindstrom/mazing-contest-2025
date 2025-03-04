@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
-  defaultTimeStep, defaultWidth, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
+  defaultTimeStep, defaultWidth, FinalResults, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
   Position, RoundResult, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import { getSocket } from '@/socket';
 import GameInterface from './GameInterface';
+import FinalResultsDisplay from './FinalResultsDisplay';
 
 interface MultiPlayerGameSettings {
   rounds: number,
@@ -35,7 +36,9 @@ export const MultiPlayerGame = ({
   const [stopwatch, setStopwatch] = useState(0);
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
-  const [currentScore, setCurrentScore] = useState<RoundResult[] | null>(initialScore)
+  const [currentScore, setCurrentScore] = useState<RoundResult[] | null>(initialScore);
+  const [gameEnded, setGameEnded] = useState(false);
+  const [finalResult, setFinalResult] = useState<FinalResults | null >(null)
   
   const { rounds, buildingTime } = settings;
 
@@ -63,16 +66,19 @@ export const MultiPlayerGame = ({
 
     }
 
-    // function onGameEnd() {}
+    function onGameEnd(finalResult: FinalResults) {
+      setFinalResult(finalResult);
+      setGameEnded(true);
+    }
 
     socket.on(GameActionEnum.SERVER_ROUND_CONFIG, onRoundStart);
     socket.on(GameActionEnum.SERVER_ROUND_RESULT, onRoundEnd);
-    //socket.on(GameActionEnum.SERVER_FINAL_RESULT, onGameEnd);
+    socket.on(GameActionEnum.SERVER_GAME_ENDED, onGameEnd);
 
     return () => {
       socket.off(GameActionEnum.SERVER_ROUND_CONFIG);
       socket.off(GameActionEnum.SERVER_ROUND_RESULT);
-      //socket.off(GameActionEnum.SERVER_FINAL_RESULT);
+      socket.off(GameActionEnum.SERVER_GAME_ENDED);
     };
   }, [buildingTime]);
 
@@ -197,22 +203,30 @@ export const MultiPlayerGame = ({
   
   return (
     <div className="flex flex-col lg:flex-row gap-2 items-start w-full">
-      <div className="max-w-[1200px]">
-        <BaseGame
-          startingState={{ width: defaultWidth, height: defaultHeight }}
-          towers={towers}
-          grid={grid}
-          handleCellClick={handleCellClick}
-          runnerPath={runnerPath}
-          isRunning={isRunning}
-          clapEvents={clapEvents}
-          resources={resources}
-          stopwatch={stopwatch}
-          countdown={countdown}
-          handleStartButton={null}
-          handleReset={null}
-        />
-      </div>
+      {!gameEnded && (
+        <div className="max-w-[1200px]">
+          <BaseGame
+            startingState={{ width: defaultWidth, height: defaultHeight }}
+            towers={towers}
+            grid={grid}
+            handleCellClick={handleCellClick}
+            runnerPath={runnerPath}
+            isRunning={isRunning}
+            clapEvents={clapEvents}
+            resources={resources}
+            stopwatch={stopwatch}
+            countdown={countdown}
+            handleStartButton={null}
+            handleReset={null}
+          />
+        </div>
+      )}
+
+      {gameEnded && finalResult && (
+        <div className="lg:w-96 ml-2">
+          <FinalResultsDisplay finalResults={finalResult} totalRounds={rounds} />
+        </div>
+      )}
   
       <div className="lg:w-96 ml-2">
         <GameInterface
@@ -220,6 +234,7 @@ export const MultiPlayerGame = ({
           onChatMessage={onChatMessage}
           currentScore={currentScore}
           rounds={rounds}
+          gameEnded={gameEnded}
         />
       </div>
     </div>

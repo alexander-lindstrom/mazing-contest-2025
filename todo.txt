@@ -5,9 +5,10 @@ In game room:
 
 In game:
     Handle player sending an invalid maze.
-    React to new round starting in some way.
-    React to the game ending in some way (SERVER_GAME_END).
-        Post game screen?
+    Round starting:
+        Play sound or something
+    Game ending:
+        Post game screen
     List all players also before any results are recieved.
     Give the option to select which player to view (during running phase).
    

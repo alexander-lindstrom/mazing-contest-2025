@@ -1,4 +1,4 @@
-import { GameStatusEnum, generateStartingState, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState } from "@mazing/util";
+import { FinalResult, FinalResults, GameStatusEnum, generateStartingState, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState } from "@mazing/util";
 
 interface GameState {
   status: GameStatusEnum;
@@ -23,7 +23,7 @@ export class Game {
   private state: GameState;
   private host: PlayerData;
 
-  constructor(id: string, host: PlayerData, maxPlayers: number = 8, rounds: number = 10) {
+  constructor(id: string, host: PlayerData, maxPlayers: number = 8, rounds: number = 5) {
     this.id = id;
     this.maxPlayers = maxPlayers;
     this.players = new Map([[host.id, host]]);
@@ -132,6 +132,28 @@ export class Game {
         return { ...resultsArray[currentRound], cumulativeDuration, round: currentRound };
       })
       .filter((result): result is RoundResult => result !== undefined);
+  }
+
+  public getFinalResults(): FinalResults {
+    const finalResults: FinalResult[] = [];
+
+    this.state.results.forEach((results, playerId) => {
+      const player = this.players.get(playerId);
+      if (player) {
+        const durations = results.map(result => result.duration);
+        
+        const finalResult: FinalResult = {
+          player,
+          durations,
+        };
+
+        finalResults.push(finalResult);
+      }
+    });
+
+    return {
+      players: finalResults,
+    };
   }
   
   getLobbyInformation(): LobbyInformation {

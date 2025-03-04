@@ -1,6 +1,9 @@
 import { io, Socket } from 'socket.io-client';
 
-const URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const URL =
+  import.meta.env.MODE === 'development'
+    ? 'http://localhost:5000'
+    : import.meta.env.VITE_BACKEND_URL;
 
 let socket: Socket | null = null;
 

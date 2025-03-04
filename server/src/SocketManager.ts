@@ -6,7 +6,6 @@ export function setupGameServer(io: Server): void {
   const gameManager = new GameManager(io);
   
   io.on("connection", (socket: Socket) => {
-    console.log("Client connected:", socket.id);
     
     // initial info to client
     listGames(io, socket, gameManager, false);
@@ -27,7 +26,6 @@ export function setupGameServer(io: Server): void {
   }
 
   function handleCreateGame(socket: Socket, name: string) {
-    console.log("Request to create game from:", name);
     const game = gameManager.createGame({ name, id: socket.id });
     listGames(io, socket, gameManager, true);
     socket.emit("game-joined", game.getLobbyInformation());
@@ -68,12 +66,10 @@ export function setupGameServer(io: Server): void {
   }
 
   function handleGameAction(socket: Socket, action: GameAction) {
-    console.log("game action!");
     gameManager.handleGameAction(io, socket, action);
   }
 
   function handleDisconnect(socket: Socket, reason: string) {
-    console.log("Client disconnected:", socket.id, reason);
     const game = gameManager.leaveGame(socket);
     if (game) {
       io.to(game.id).emit("player-update", game.getLobbyInformation());

@@ -8,30 +8,34 @@ interface GameInterfaceProps {
   onChatMessage: (message: string) => void;
   currentScore: RoundResult[] | null;
   rounds: number;
+  gameEnded: boolean;
 }
 
 const GameInterface: React.FC<GameInterfaceProps> = ({
     chatLog,
     onChatMessage,
     currentScore,
-    rounds
+    rounds,
+    gameEnded
   }) => {
 return (
     <div className="flex flex-col gap-4 w-full">
-    <div className="w-full">
-        <ResultDisplay 
-        score={currentScore}
-        totalRounds={rounds}
-        />
-    </div>
+      {!gameEnded && (
+        <div className="w-full">
+            <ResultDisplay 
+            score={currentScore}
+            totalRounds={rounds}
+            />
+        </div>
+      )}
     
-    <div className="w-full">
-        <ChatRoom
-        chatLog={chatLog}
-        onSendMessage={onChatMessage}
-        title="Chat room"
-        />
-    </div>
+      <div className="w-full">
+          <ChatRoom
+          chatLog={chatLog}
+          onSendMessage={onChatMessage}
+          title="Chat room"
+          />
+      </div>
     </div>
 );
 };

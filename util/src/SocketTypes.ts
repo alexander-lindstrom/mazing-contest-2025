@@ -52,3 +52,12 @@ export interface GameAction {
   type: GameActionEnum;
   payload: any;
 }
+
+export interface FinalResult {
+  player: PlayerData;
+  durations: number[];
+}
+
+export interface FinalResults {
+  players: FinalResult[];
+}

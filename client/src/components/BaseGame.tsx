@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
 import GridRenderer from "./GridRenderer";
 import { ClapEvent, GridCell, Position, Tower } from "@mazing/util";
 import { KonvaEventObject } from "konva/lib/Node";
 import ResourceCard from "./ResourceCard";
 import { useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
+import SoundButton from "./SoundButton";
 
 interface BaseGameProps {
   startingState: { width: number; height: number };
@@ -91,18 +91,18 @@ const BaseGame: React.FC<BaseGameProps> = ({
         {handleStartButton && handleReset && (
           <div className="flex flex-col space-y-6 w-80">
             <div className="flex space-x-4">
-              <Button
+              <SoundButton
                 className="bg-blue-400 text-black hover:bg-blue-500 font-bold py-4 px-8 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-xl"
                 onClick={handleStartButton}
               >
                 Start
-              </Button>
-              <Button
+              </SoundButton>
+              <SoundButton
                 className="bg-green-400 text-black hover:bg-green-500 font-bold py-4 px-8 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-xl"
                 onClick={handleReset}
               >
                 Regenerate
-              </Button>
+              </SoundButton>
             </div>
           </div>
         )}

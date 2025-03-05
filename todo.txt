@@ -2,8 +2,10 @@ In lobby:
 
 In game room:
     Allow host to choose settings.
+    Disable start button if too few players
 
 In game:
+    Sound for when you click tower that cannot be sold. Meepmoop
     Handle player sending an invalid maze.
     Round starting:
         Play sound or something
@@ -12,9 +14,3 @@ In game:
     List all players also before any results are recieved.
     Give the option to select which player to view (during running phase).
    
-Long term:
-    Add sounds
-
-Deploy:
-    Hetzner
-    nginx

@@ -68,6 +68,7 @@ export const GameRoomView = ({
             </Button>
             {game.host.name === playerName && (
               <Button 
+                disabled={game.numPlayers < 2}
                 onClick={onStartGame}
                 className="bg-green-400 text-black hover:bg-green-500 font-bold py-2 px-4 border-3 border-black rounded shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
               >

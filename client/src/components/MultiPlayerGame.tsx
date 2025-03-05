@@ -7,6 +7,9 @@ import BaseGame from '@/components/BaseGame';
 import { getSocket } from '@/socket';
 import GameInterface from './GameInterface';
 import FinalResultsDisplay from './FinalResultsDisplay';
+import useStartButtonClickSound from '@/hooks/useStartButtonSound';
+import useSellTowerSound from '@/hooks/useSellTowerSound';
+import useBuildTowerSound from '@/hooks/useBuildTowerSound';
 
 interface MultiPlayerGameSettings {
   rounds: number,
@@ -38,7 +41,10 @@ export const MultiPlayerGame = ({
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
   const [currentScore, setCurrentScore] = useState<RoundResult[] | null>(initialScore);
   const [gameEnded, setGameEnded] = useState(false);
-  const [finalResult, setFinalResult] = useState<FinalResults | null >(null)
+  const [finalResult, setFinalResult] = useState<FinalResults | null >(null);
+  const startRoundSound = useStartButtonClickSound();
+  const sellTowerSound = useSellTowerSound();
+  const buildTowerSound = useBuildTowerSound();
   
   const { rounds, buildingTime } = settings;
 
@@ -46,6 +52,7 @@ export const MultiPlayerGame = ({
     const socket = getSocket();
 
     function onRoundStart(config: StartingState) {
+      startRoundSound();
       setGrid(config.grid);
       setTowers(config.towers);
       setResources({ gold: config.gold, lumber: config.lumber });
@@ -60,10 +67,7 @@ export const MultiPlayerGame = ({
     }
 
     function onRoundEnd(result: RoundResult[]) { 
-
       setCurrentScore(result);
-      console.log(result)
-
     }
 
     function onGameEnd(finalResult: FinalResults) {
@@ -80,7 +84,7 @@ export const MultiPlayerGame = ({
       socket.off(GameActionEnum.SERVER_ROUND_RESULT);
       socket.off(GameActionEnum.SERVER_GAME_ENDED);
     };
-  }, [buildingTime]);
+  }, [buildingTime, startRoundSound]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
@@ -151,6 +155,7 @@ export const MultiPlayerGame = ({
         tower.positions.some(pos => pos.x === x && pos.y === y)
       );
       if (towerIndex !== -1) {
+        sellTowerSound();
         const tower = towers[towerIndex];
         const goldDiff = 1;
         const lumberDiff = tower.type === GridCell.CLAP_TOWER ? 1 : 0;
@@ -167,7 +172,10 @@ export const MultiPlayerGame = ({
     } else if (canPlaceTower(grid, x, y)) {
       const positions = get2x2Positions({ x, y });
       const lumberCost = shiftPress ? 1 : 0;
-      if (resources.gold < 1 || resources.lumber < lumberCost) return;
+      if (resources.gold < 1 || resources.lumber < lumberCost) {
+        return;
+      } 
+      buildTowerSound();
       positions.forEach(pos => {
         newGrid[pos.y][pos.x] = shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER;
       });

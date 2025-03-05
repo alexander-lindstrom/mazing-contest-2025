@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LobbyInformation, GameStatusEnum } from '@mazing/util';
+import SoundButton from './SoundButton';
 
 interface LobbyViewProps {
   isConnected: boolean;
@@ -55,27 +56,27 @@ export const LobbyView = ({
             </div>
 
             <div className="space-y-2">
-              <Button
+              <SoundButton
                 onClick={onHostGame}
                 className="w-full bg-green-400 text-black hover:bg-green-500 font-bold py-3 px-6 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
                 disabled={!isConnected}
               >
                 Host New Game
-              </Button>
+              </SoundButton>
 
               {waitingGames.length > 0 && (
                 <div>
                   <h3 className="text-lg font-medium my-2 text-black">Available Games</h3>
                   <div className="space-y-2">
                     {waitingGames.map((lobbyInfo) => (
-                      <Button
+                      <SoundButton
                         key={lobbyInfo.gameId}
                         onClick={() => onJoinGame(lobbyInfo.gameId)}
                         className="w-full bg-blue-400 text-black hover:bg-blue-500 font-bold py-3 px-6 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
                         disabled={!isConnected}
                       >
                         {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
-                      </Button>
+                      </SoundButton>
                     ))}
                   </div>
                 </div>

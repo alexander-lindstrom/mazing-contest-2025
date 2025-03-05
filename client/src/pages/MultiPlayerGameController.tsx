@@ -4,6 +4,8 @@ import { ChatMessage, LobbyInformation, RoundResult } from '@mazing/util';
 import { GameRoomView } from '../components/GameRoomView';
 import { LobbyView } from '../components/LobbyView';
 import { MultiPlayerGame } from '../components/MultiPlayerGame';
+import useStartButtonClickSound from '@/hooks/useStartButtonSound';
+import useStopButtonClickSound from '@/hooks/useStopButtonSound';
 
 export const MultiPlayerGameController = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -14,6 +16,8 @@ export const MultiPlayerGameController = () => {
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [initialScore, setInitialScore] = useState<RoundResult[] | null>(null)
+  const startButtonClick = useStartButtonClickSound();
+  const stopButtonClick = useStopButtonClickSound();
 
   useEffect(() => {
     const socket = getSocket();
@@ -108,6 +112,7 @@ export const MultiPlayerGameController = () => {
   };
 
   const handleLeaveGame = () => {
+    stopButtonClick();
     const socket = getSocket();
     socket?.emit('req-leave-game', {
       gameId: currentGame?.gameId
@@ -115,6 +120,7 @@ export const MultiPlayerGameController = () => {
   };
 
   const handleStartGame = () => {
+    startButtonClick();
     const socket = getSocket();
     socket?.emit('req-start-game', currentGame?.gameId)
   };

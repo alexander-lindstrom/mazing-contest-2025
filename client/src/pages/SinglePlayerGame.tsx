@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, get2x2Positions, GridCell, Position, simulateRunnerMovement } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
+import useSellTowerSound from '@/hooks/useSellTowerSound';
+import useBuildTowerSound from '@/hooks/useBuildTowerSound';
 
 const startingState = generateStartingState();
 const INITIAL_COUNTDOWN = 45;
@@ -17,6 +19,8 @@ export function SinglePlayerGame() {
   const [stopwatch, setStopwatch] = useState(0);
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
+  const sellTowerSound = useSellTowerSound();
+  const buildTowerSound = useBuildTowerSound();
 
   useEffect(() => {
     if (countdown <= 0) {
@@ -54,6 +58,7 @@ export function SinglePlayerGame() {
         tower.positions.some(pos => pos.x === x && pos.y === y)
       );
       if (towerIndex !== -1) {
+        sellTowerSound();
         const tower = towers[towerIndex];
         const goldDiff = 1;
         const lumberDiff = tower.type === GridCell.CLAP_TOWER ? 1 : 0;
@@ -70,7 +75,10 @@ export function SinglePlayerGame() {
     } else if (canPlaceTower(grid, x, y)) {
       const positions = get2x2Positions({ x, y });
       const lumberCost = shiftPress ? 1 : 0;
-      if (resources.gold < 1 || resources.lumber < lumberCost) return;
+      if (resources.gold < 1 || resources.lumber < lumberCost) {
+        return;
+      }
+      buildTowerSound();
       positions.forEach(pos => {
         newGrid[pos.y][pos.x] = shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER;
       });

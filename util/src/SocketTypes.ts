@@ -61,3 +61,8 @@ export interface FinalResult {
 export interface FinalResults {
   players: FinalResult[];
 }
+
+export interface GameSettingsData {
+  rounds: number;
+  duration: number;
+}

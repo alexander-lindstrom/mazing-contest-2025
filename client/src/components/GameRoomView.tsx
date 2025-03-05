@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ChatMessage, LobbyInformation } from '@mazing/util';
+import { ChatMessage, GameSettingsData, LobbyInformation } from '@mazing/util';
 import { ChatRoom } from './ChatRoom';
+import { useState } from 'react';
+import GameSettings from './GameSettings';
 
 interface GameRoomViewProps {
   game: LobbyInformation;
@@ -21,6 +23,18 @@ export const GameRoomView = ({
   onChatMessage,
   chatLog,
 }: GameRoomViewProps) => {
+
+  // Needs to be controlled by the parent so it can be passed to server
+  const [gameSettings, setGameSettings] = useState({
+    rounds: 5,
+    duration: 45,
+  });
+  const isHost = game.host.name === playerName;
+
+  const handleSettingsChange = (newSettings: GameSettingsData) => {
+    setGameSettings(newSettings);
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <Card className="bg-yellow-300 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 transition-transform">
@@ -49,11 +63,23 @@ export const GameRoomView = ({
               </CardContent>
             </Card>
 
-            <ChatRoom 
-              chatLog={chatLog}
-              onSendMessage={onChatMessage}
-              className="md:col-span-2"
-            />
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <ChatRoom 
+                  chatLog={chatLog}
+                  onSendMessage={onChatMessage}
+                />
+              </div>
+              
+              <div className="md:col-span-1">
+                <GameSettings
+                  rounds={gameSettings.rounds}
+                  duration={gameSettings.duration}
+                  onSettingsChange={handleSettingsChange}
+                  isHost={isHost}
+                />
+              </div>
+            </div>
           </div>
 
           <Separator className="my-4 border-2 border-black" />
@@ -66,7 +92,7 @@ export const GameRoomView = ({
             >
               Leave Game
             </Button>
-            {game.host.name === playerName && (
+            {isHost && (
               <Button 
                 disabled={game.numPlayers < 2}
                 onClick={onStartGame}

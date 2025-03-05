@@ -4,7 +4,7 @@ import buttonClickSound from '../sounds/button_stop.wav';
 const useStopButtonClickSound = () => {
   const buttonClick = new Howl({
     src: [buttonClickSound],
-    volume: 0.5,
+    volume: 0.2,
   });
 
   const playButtonClick = () => {

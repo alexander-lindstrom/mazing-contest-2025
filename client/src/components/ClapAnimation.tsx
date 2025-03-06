@@ -16,6 +16,7 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
   cellSize,
 }) => {
   const [activeClaps, setActiveClaps] = useState<{ id: number; x: number; y: number; progress: number }[]>([]);
+  //const clapTowerSound = useClapTowerSound();
 
   useEffect(() => {
     let animationFrame: number;

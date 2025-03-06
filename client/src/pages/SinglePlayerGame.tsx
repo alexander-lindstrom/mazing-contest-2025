@@ -4,6 +4,7 @@ import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defa
 import BaseGame from '@/components/BaseGame';
 import useSellTowerSound from '@/hooks/useSellTowerSound';
 import useBuildTowerSound from '@/hooks/useBuildTowerSound';
+import useInvalidActionSound from '@/hooks/useInvalidActionSound';
 
 const startingState = generateStartingState();
 const INITIAL_COUNTDOWN = 45;
@@ -21,6 +22,7 @@ export function SinglePlayerGame() {
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
   const sellTowerSound = useSellTowerSound();
   const buildTowerSound = useBuildTowerSound();
+  const invalidActionSound = useInvalidActionSound();
 
   useEffect(() => {
     if (countdown <= 0) {
@@ -85,6 +87,9 @@ export function SinglePlayerGame() {
       setGrid(newGrid);
       setTowers([...towers, { type: shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER, positions }]);
       setResources({ gold: resources.gold - 1, lumber: resources.lumber - lumberCost });
+    }
+    else{
+      invalidActionSound();
     }
   };
 

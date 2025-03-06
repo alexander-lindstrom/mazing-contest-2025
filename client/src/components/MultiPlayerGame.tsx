@@ -10,6 +10,7 @@ import FinalResultsDisplay from './FinalResultsDisplay';
 import useStartButtonClickSound from '@/hooks/useStartButtonSound';
 import useSellTowerSound from '@/hooks/useSellTowerSound';
 import useBuildTowerSound from '@/hooks/useBuildTowerSound';
+import useInvalidActionSound from '@/hooks/useInvalidActionSound';
 
 
 interface MultiPlayerGameProps {
@@ -41,6 +42,7 @@ export const MultiPlayerGame = ({
   const startRoundSound = useStartButtonClickSound();
   const sellTowerSound = useSellTowerSound();
   const buildTowerSound = useBuildTowerSound();
+  const invalidActionSound = useInvalidActionSound();
   
   const { rounds, duration: buildingTime } = settings;
 
@@ -178,6 +180,9 @@ export const MultiPlayerGame = ({
       setGrid(newGrid);
       setTowers([...towers, { type: shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER, positions }]);
       setResources({ gold: resources.gold - 1, lumber: resources.lumber - lumberCost });
+    }
+    else{
+      invalidActionSound();
     }
   };
 

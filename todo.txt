@@ -1,8 +1,6 @@
 In lobby:
 
 In game room:
-    Allow host to choose settings.
-    Disable start button if too few players
 
 In game:
     Sound for when you click tower that cannot be sold. Meepmoop

@@ -7,11 +7,11 @@ const useSellTowerSound = () => {
     volume: 0.5,
   });
 
-  const playButtonClick = () => {
+  const playSellTower = () => {
     buttonClick.play();
   };
 
-  return playButtonClick;
+  return playSellTower;
 };
 
 export default useSellTowerSound;

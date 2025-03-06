@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ChatMessage, GameSettingsData, LobbyInformation } from '@mazing/util';
 import { ChatRoom } from './ChatRoom';
-import { useState } from 'react';
 import GameSettings from './GameSettings';
 
 interface GameRoomViewProps {
@@ -13,6 +12,8 @@ interface GameRoomViewProps {
   onStartGame: () => void;
   onChatMessage: (message: string) => void;
   chatLog: ChatMessage[];
+  gameSettings: GameSettingsData,
+  updateGameSettings: (settings: GameSettingsData) => void; 
 }
 
 export const GameRoomView = ({
@@ -22,17 +23,14 @@ export const GameRoomView = ({
   onStartGame,
   onChatMessage,
   chatLog,
+  gameSettings, 
+  updateGameSettings,
 }: GameRoomViewProps) => {
 
-  // Needs to be controlled by the parent so it can be passed to server
-  const [gameSettings, setGameSettings] = useState({
-    rounds: 5,
-    duration: 45,
-  });
-  const isHost = game.host.name === playerName;
 
+  const isHost = game.host.name === playerName;
   const handleSettingsChange = (newSettings: GameSettingsData) => {
-    setGameSettings(newSettings);
+    updateGameSettings(newSettings);
   };
 
   return (
@@ -73,8 +71,7 @@ export const GameRoomView = ({
               
               <div className="md:col-span-1">
                 <GameSettings
-                  rounds={gameSettings.rounds}
-                  duration={gameSettings.duration}
+                  settings={gameSettings}
                   onSettingsChange={handleSettingsChange}
                   isHost={isHost}
                 />

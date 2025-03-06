@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
 import { Game } from './Game';
 import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, GameAction, GameActionEnum, GameStatusEnum, generateStartingState,
-   LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
+   LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, UpdateSettingsRequest, validateRoundResult } from '@mazing/util';
 
 export class GameManager {
   private games: Map<string, Game>;
@@ -80,16 +80,6 @@ export class GameManager {
     return Array.from(this.games.values()).map(game => game.getLobbyInformation());
   }      
 
-  private cleanupFinishedGames(): void {
-    const oneHourAgo = Date.now() - (60 * 60 * 1000);
-    
-    for (const [gameId, game] of this.games.entries()) {
-      if (game.getState().creationTime < oneHourAgo) {
-        this.games.delete(gameId);
-      }
-    }
-  }
-
   handleGameAction(io: Server, socket: Socket, action: GameAction) {
 
     const game = this.getGameByPlayer(socket.id);
@@ -117,6 +107,27 @@ export class GameManager {
     game.startGame();
     io.to(game.id).emit('game-started', game.getResultsForCurrentRound());
     io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
+  }
+
+  updateSettings(io: Server, socket: Socket, req: UpdateSettingsRequest) {
+    const game = this.getGame(req.gameId);
+    if (!game) {
+      throw new Error("Game not found!");
+    }
+    if (!game.isHost(socket.id)) {
+      throw new Error("Only host can change settings!");
+    }
+    io.to(req.gameId).emit("update-settings", { rounds: req.settings.rounds, duration: req.settings.duration });
+  }
+
+  private cleanupFinishedGames(): void {
+    const oneHourAgo = Date.now() - (60 * 60 * 1000);
+    
+    for (const [gameId, game] of this.games.entries()) {
+      if (game.getState().creationTime < oneHourAgo) {
+        this.games.delete(gameId);
+      }
+    }
   }
 
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){

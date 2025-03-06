@@ -1,4 +1,4 @@
-import { ChatMessage, ChatRequest, GameAction, PlayerData } from "@mazing/util";
+import { ChatMessage, ChatRequest, GameAction, PlayerData, UpdateSettingsRequest } from "@mazing/util";
 import { GameManager } from "./GameManager";
 import { Server, Socket } from "socket.io";
 
@@ -16,7 +16,9 @@ export function setupGameServer(io: Server): void {
     socket.on("req-leave-game", () => handleLeaveGame(socket));
     socket.on("req-chat-message", (req: ChatRequest) => handleChatMessage(req));
     socket.on("req-start-game", (gameId: string) => handleStartGame(socket, gameId));
+    socket.on("req-update-settings", (req: UpdateSettingsRequest) => handleSettingsReq(socket, req));
     socket.on("game-action", (action: GameAction) => handleGameAction(socket, action));
+    
     socket.on("disconnect", (reason: string) => handleDisconnect(socket, reason));
   });
 
@@ -59,6 +61,10 @@ export function setupGameServer(io: Server): void {
       timestamp: Date.now() 
     };
     io.to(req.gameId).emit("chat-broadcast", message);
+  }
+
+  function handleSettingsReq(socket: Socket, req: UpdateSettingsRequest) {
+    gameManager.updateSettings(io, socket, req);
   }
 
   function handleStartGame(socket: Socket, gameId: string) {

@@ -85,6 +85,10 @@ export class Game {
     return this.players.size;
   }
 
+  isHost(id: string) {
+    return id === this.host.id;
+  }
+
   getPlayerData(id: string){
     const player = this.players.get(id);
     if (!player) {

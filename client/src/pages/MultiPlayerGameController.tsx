@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getSocket } from '@/socket';
-import { ChatMessage, LobbyInformation, RoundResult } from '@mazing/util';
+import { ChatMessage, GameSettingsData, LobbyInformation, RoundResult } from '@mazing/util';
 import { GameRoomView } from '../components/GameRoomView';
 import { LobbyView } from '../components/LobbyView';
 import { MultiPlayerGame } from '../components/MultiPlayerGame';
@@ -15,7 +15,8 @@ export const MultiPlayerGameController = () => {
   const [currentGame, setCurrentGame] = useState<LobbyInformation | null>(null);
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
-  const [initialScore, setInitialScore] = useState<RoundResult[] | null>(null)
+  const [initialScore, setInitialScore] = useState<RoundResult[] | null>(null);
+  const [gameSettings, setGameSettings] = useState<GameSettingsData>( {rounds: 5, duration: 45} );
   const startButtonClick = useStartButtonClickSound();
   const stopButtonClick = useStopButtonClickSound();
 
@@ -58,6 +59,10 @@ export const MultiPlayerGameController = () => {
       setGameStarted(true);
     }
 
+    function onSettingsUpdate(settings: GameSettingsData) {
+      setGameSettings(settings);
+    }
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('list-games', onGamesList);
@@ -66,6 +71,7 @@ export const MultiPlayerGameController = () => {
     socket.on('player-update', onPlayerUpdate);
     socket.on('chat-broadcast', onChatBroadcast);
     socket.on('game-started', onGameStart);
+    socket.on('update-settings', onSettingsUpdate);
 
     return () => {
       socket.off('connect', onConnect);
@@ -76,6 +82,7 @@ export const MultiPlayerGameController = () => {
       socket.off('player-update', onPlayerUpdate);
       socket.off('chat-broadcast', onChatBroadcast);
       socket.off('game-start', onGameStart);
+      socket.off('update-settings', onSettingsUpdate);
     };
   }, []);
 
@@ -134,10 +141,15 @@ export const MultiPlayerGameController = () => {
     });
   }
 
+  const clientSettingsUpdate = (settings: GameSettingsData) => {
+    const socket = getSocket();
+    socket?.emit('req-update-settings', { gameId: currentGame?.gameId, settings: settings })
+  }
+
   if (gameStarted && currentGame) {
     return (
       <MultiPlayerGame 
-        settings={{ rounds: 5, buildingTime: 45 }}
+        settings={gameSettings}
         chatLog={chatLog}
         onChatMessage={handleChatMessage}
         initialScore={initialScore}
@@ -152,6 +164,8 @@ export const MultiPlayerGameController = () => {
         onStartGame={handleStartGame}
         onChatMessage={handleChatMessage}
         chatLog={chatLog}
+        gameSettings={gameSettings}
+        updateGameSettings={clientSettingsUpdate}
       />
     );
   }

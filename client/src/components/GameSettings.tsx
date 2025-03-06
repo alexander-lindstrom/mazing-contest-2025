@@ -7,25 +7,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardHeader,  CardContent } from "@/components/ui/card";
+import { GameSettingsData } from '@mazing/util';
 
 interface GameSettingsProps {
   onSettingsChange: (settings: GameSettingsData) => void;
-  rounds: number;
-  duration: number;
+  settings: GameSettingsData
   isHost: boolean;
 }
 
-interface GameSettingsData {
-  rounds: number;
-  duration: number;
-}
 
 const GameSettings: React.FC<GameSettingsProps> = ({ 
   onSettingsChange, 
-  rounds,
-  duration,
+  settings,
   isHost 
 }) => {
+
+  const { rounds, duration } = settings;
   const handleRoundsChange = (value: string): void => {
     const newRounds = parseInt(value);
     onSettingsChange({ rounds: newRounds, duration });

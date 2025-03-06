@@ -66,3 +66,8 @@ export interface GameSettingsData {
   rounds: number;
   duration: number;
 }
+
+export interface UpdateSettingsRequest {
+  gameId: string;
+  settings: GameSettingsData;
+}

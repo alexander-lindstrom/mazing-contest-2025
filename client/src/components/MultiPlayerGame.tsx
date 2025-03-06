@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
-  defaultTimeStep, defaultWidth, FinalResults, findShortestPath, GameActionEnum, get2x2Positions, GridCell,
+  defaultTimeStep, defaultWidth, FinalResults, findShortestPath, GameActionEnum, GameSettingsData, get2x2Positions, GridCell,
   Position, RoundResult, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import { getSocket } from '@/socket';
@@ -11,13 +11,9 @@ import useStartButtonClickSound from '@/hooks/useStartButtonSound';
 import useSellTowerSound from '@/hooks/useSellTowerSound';
 import useBuildTowerSound from '@/hooks/useBuildTowerSound';
 
-interface MultiPlayerGameSettings {
-  rounds: number,
-  buildingTime: number,
-}
 
 interface MultiPlayerGameProps {
-  settings: MultiPlayerGameSettings,
+  settings: GameSettingsData,
   chatLog: ChatMessage[];
   onChatMessage: (message: string) => void;
   initialScore: RoundResult[] | null;
@@ -46,7 +42,7 @@ export const MultiPlayerGame = ({
   const sellTowerSound = useSellTowerSound();
   const buildTowerSound = useBuildTowerSound();
   
-  const { rounds, buildingTime } = settings;
+  const { rounds, duration: buildingTime } = settings;
 
   useEffect(() => {
     const socket = getSocket();

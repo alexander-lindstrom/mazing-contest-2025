@@ -5,7 +5,7 @@ import Runner from "./Runner";
 import { canPlaceTower, ClapEvent, defaultTimeStep, getBaseCellColor, getCellColor, getCenterPoint, GridCell, GridParams, Position, Tower } from "@mazing/util";
 import ClapAnimation from "./ClapAnimation";
 
-const CELL_PADDING = 1;
+const CELL_PADDING = 0;
 
 export type GridRendererParams = GridParams & {
   handleClick: (x: number, y: number, e: KonvaEventObject<MouseEvent>) => void;

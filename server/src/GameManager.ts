@@ -19,7 +19,7 @@ export class GameManager {
 
     const gameId = randomUUID();
     if (this.games.has(gameId)) {
-      throw new Error('Game ID already exists');
+      console.error('Game ID already exists');
     }
     const game = new Game(gameId, host);
     this.games.set(gameId, game);
@@ -28,14 +28,15 @@ export class GameManager {
     return game;
   }
 
-  joinGame(gameId: string, socket: Socket, playerData: PlayerData): Game {
+  joinGame(gameId: string, socket: Socket, playerData: PlayerData): Game | undefined{
     const game = this.games.get(gameId);
     if (!game) {
-      throw new Error('Game not found');
+      console.error('Game not found');
+      return;
     }
 
     if (game.getState().status !== GameStatusEnum.WAITING) {
-      throw new Error("Cannot join started game!");
+      console.error("Cannot join started game!");
     }
     
     game.addPlayer(socket.id, playerData);
@@ -84,7 +85,8 @@ export class GameManager {
 
     const game = this.getGameByPlayer(socket.id);
     if (!game){
-      throw new Error("Player not part of a game!")
+      console.error("Player not part of a game!")
+      return;
     }
 
     switch(action.type) {
@@ -93,7 +95,7 @@ export class GameManager {
             break;
 
         default:
-            throw new Error("No such game action!");
+            console.error("No such game action!");
     }
   }
 
@@ -101,7 +103,8 @@ export class GameManager {
 
     const game = this.getGame(gameId);
     if (!game || !game.canStart(socket.id)) {
-      throw new Error ("Game cannot start!");
+      console.error ("Game cannot start!");
+      return;
     }
       
     game.startGame();
@@ -112,11 +115,14 @@ export class GameManager {
   updateSettings(io: Server, socket: Socket, req: UpdateSettingsRequest) {
     const game = this.getGame(req.gameId);
     if (!game) {
-      throw new Error("Game not found!");
+      console.error("Game not found!");
+      return;
     }
     if (!game.isHost(socket.id)) {
-      throw new Error("Only host can change settings!");
+      console.error("Only host can change settings!");
+      return;
     }
+    game.updateSettings(req.settings);
     io.to(req.gameId).emit("update-settings", { rounds: req.settings.rounds, duration: req.settings.duration });
   }
 
@@ -133,24 +139,32 @@ export class GameManager {
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
 
     if (game.getState().status !== GameStatusEnum.RUNNING) {
-      throw new Error("Cannot send result for game which is not running!");
+      console.error("Cannot send result for game which is not running!");
+      return;
     }
 
     const finalResult = action.payload as StartingState;
     const path = findShortestPath(finalResult.grid, defaultStart, defaultGoal);
     
     if (!validateRoundResult(game.getConfig(), finalResult) || !path) {
-      throw new Error("Invalid round result!");
+      console.error("Invalid round result!");
+      // Todo: what should happen here?
+      return;
     }
 
     const duration = simulateRunnerMovement([], path).length * defaultTimeStep;
-    game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player: game.getPlayerData(socket.id) });
+    const player = game.getPlayerData(socket.id);
+    if (!player) {
+      return;
+    }
+    game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player });
     if (game.allResultsReceived()) {
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound());
       if (game.startNextRound()) {
         io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig())
       }
       else{
+        console.log("Game has ended!");
         io.to(game.id).emit(GameActionEnum.SERVER_GAME_ENDED, game.getFinalResults());
       }
     }

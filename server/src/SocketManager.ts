@@ -37,6 +37,9 @@ export function setupGameServer(io: Server): void {
   function handleJoinGame(socket: Socket, { gameId, playerData }: { gameId: string; playerData: PlayerData }) {
 
     const game = gameManager.joinGame(gameId, socket, playerData);
+    if (!game) {
+      return;
+    }
     io.to(gameId).emit("player-update", game.getLobbyInformation());
     socket.emit("game-joined", game.getLobbyInformation());
     socket.join(game.id);
@@ -50,7 +53,7 @@ export function setupGameServer(io: Server): void {
       io.to(game.id).emit("player-update", game.getLobbyInformation());
       listGames(io, socket, gameManager, true);
     } else {
-      throw new Error("Could not find game to leave!");
+      console.error("Could not find game to leave!");
     }
   }
 

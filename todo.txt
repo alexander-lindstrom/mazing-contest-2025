@@ -3,11 +3,9 @@ In lobby:
 In game room:
 
 In game:
-    Sounds stop working after a while.
-    Fix lobby stuff - no longer throw error for everything causing server to stop.
+    Remove "grid" look?
     Allow sharing single player game
-    Game ending:
-        Post game screen
+    Fix post game screen appearance
     List all players also before any results are recieved.
     Give the option to select which player to view (during running phase).
 

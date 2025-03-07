@@ -1,4 +1,4 @@
-import { FinalResult, FinalResults, GameStatusEnum, generateStartingState, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState } from "@mazing/util";
+import { FinalResult, FinalResults, GameSettingsData, GameStatusEnum, generateStartingState, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState } from "@mazing/util";
 
 interface GameState {
   status: GameStatusEnum;
@@ -41,13 +41,15 @@ export class Game {
     this.state.results.set(host.id, []);
   }
 
-  addPlayer(socketId: string, playerData: PlayerData): number {
+  addPlayer(socketId: string, playerData: PlayerData): number | undefined  {
     if (this.players.has(socketId)) {
-        throw new Error('Player already added');
+        console.error('Player already added');
+        return;
     }
 
     if (this.players.size >= this.maxPlayers) {
-        throw new Error('Game is full');
+        console.error('Game is full');
+        return;
     }
 
     this.players.set(socketId, playerData);
@@ -92,13 +94,18 @@ export class Game {
   getPlayerData(id: string){
     const player = this.players.get(id);
     if (!player) {
-      throw new Error("Couldn't get player!");
+      console.error("Couldn't get player!");
+      return;
     }
     return player;
   }
 
   getState(): GameState {
     return this.state;
+  }
+
+  updateSettings(settings: GameSettingsData) {
+    this.state.rounds = settings.rounds;
   }
 
   canStart(playerId: string): boolean {
@@ -112,7 +119,8 @@ export class Game {
   setResult(playerId: string, result: Result){
     const player = this.state.results.get(playerId);
     if (!player){
-      throw new Error("Player not found!");
+      console.error("Player not found!");
+      return;
     }
     player.push(result);
   }

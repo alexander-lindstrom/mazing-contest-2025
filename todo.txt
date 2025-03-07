@@ -3,10 +3,10 @@ In lobby:
 In game room:
 
 In game:
-    Handle player sending an invalid maze.
+    Unify/change tower colors
+    Allow sharing single player game
+    Fix lobby stuff - no longer throw error for everything causing server to stop.
     Game ending:
         Post game screen
     List all players also before any results are recieved.
     Give the option to select which player to view (during running phase).
-    Unify/change tower colors
-   

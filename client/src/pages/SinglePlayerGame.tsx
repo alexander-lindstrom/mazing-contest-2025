@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, get2x2Positions, GridCell, Position, simulateRunnerMovement } from '@mazing/util';
+import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, get2x2Positions, GridCell, pathExists, Position, simulateRunnerMovement } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import useSellTowerSound from '@/hooks/useSellTowerSound';
 import useBuildTowerSound from '@/hooks/useBuildTowerSound';
@@ -51,7 +51,13 @@ export function SinglePlayerGame() {
   }, [isStopwatchRunning, stopwatch, totalSimulationTime]);
 
   const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
-    if (isRunning) return;
+    if (isRunning) {
+      return;
+    }
+    if (!pathExists(grid, defaultStart, defaultGoal, { x, y })) {
+      invalidActionSound();
+      return;
+    }
     const newGrid = grid.map(row => [...row]);
     const shiftPress = e.evt.shiftKey;
 

@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, get2x2Positions, GridCell, pathExists, Position, simulateRunnerMovement } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
-import useSellTowerSound from '@/hooks/useSellTowerSound';
-import useBuildTowerSound from '@/hooks/useBuildTowerSound';
-import useInvalidActionSound from '@/hooks/useInvalidActionSound';
+import invalidSound from "../sounds/invalid_action.mp3";
+import buildSound from "../sounds/building_tower.wav";
+import sellSound from "../sounds/selling_tower.wav";
+import useSound from '@/hooks/useSound';
 
 const startingState = generateStartingState();
 const INITIAL_COUNTDOWN = 45;
@@ -20,9 +21,9 @@ export function SinglePlayerGame() {
   const [stopwatch, setStopwatch] = useState(0);
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
-  const sellTowerSound = useSellTowerSound();
-  const buildTowerSound = useBuildTowerSound();
-  const invalidActionSound = useInvalidActionSound();
+  const sellTowerSound = useSound(sellSound, 0.5);
+  const buildTowerSound = useSound(buildSound, 0.5);
+  const invalidActionSound = useSound(invalidSound, 0.5);
 
   useEffect(() => {
     if (countdown <= 0) {

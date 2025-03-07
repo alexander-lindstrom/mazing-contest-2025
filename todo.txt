@@ -3,10 +3,13 @@ In lobby:
 In game room:
 
 In game:
-    Unify/change tower colors
-    Allow sharing single player game
+    Sounds stop working after a while.
     Fix lobby stuff - no longer throw error for everything causing server to stop.
+    Allow sharing single player game
     Game ending:
         Post game screen
     List all players also before any results are recieved.
     Give the option to select which player to view (during running phase).
+
+General:
+    Add ability to leave/go back without refreshing.

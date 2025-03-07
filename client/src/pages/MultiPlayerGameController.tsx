@@ -4,8 +4,9 @@ import { ChatMessage, GameSettingsData, LobbyInformation, RoundResult } from '@m
 import { GameRoomView } from '../components/GameRoomView';
 import { LobbyView } from '../components/LobbyView';
 import { MultiPlayerGame } from '../components/MultiPlayerGame';
-import useStartButtonClickSound from '@/hooks/useStartButtonSound';
-import useStopButtonClickSound from '@/hooks/useStopButtonSound';
+import startSound from "../sounds/button_start.wav";
+import stopSound from "../sounds/button_stop.wav";
+import useSound from '@/hooks/useSound';
 
 export const MultiPlayerGameController = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -17,8 +18,8 @@ export const MultiPlayerGameController = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [initialScore, setInitialScore] = useState<RoundResult[] | null>(null);
   const [gameSettings, setGameSettings] = useState<GameSettingsData>( {rounds: 5, duration: 45} );
-  const startButtonClick = useStartButtonClickSound();
-  const stopButtonClick = useStopButtonClickSound();
+  const startButtonClick = useSound(startSound, 0.5);
+  const stopButtonClick = useSound(stopSound, 0.5);
 
   useEffect(() => {
     const socket = getSocket();

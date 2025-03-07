@@ -1,7 +1,8 @@
-import useClapTowerSound from "@/hooks/useClapTowerSound";
+import useSound from "@/hooks/useSound";
 import { ClapEvent, defaultClapRange } from "@mazing/util";
 import React, { useEffect, useRef, useState } from "react";
 import { Circle, Group } from "react-konva";
+import clapTowerSound from "../sounds/clap_tower_effect.wav";
 
 interface ClapAnimationProps {
   events: ClapEvent[];
@@ -18,7 +19,7 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
 }) => {
   const [activeClaps, setActiveClaps] = useState<{ id: string; x: number; y: number; progress: number; opacity: number }[]>([]);
   const playedEventIds = useRef<Set<string>>(new Set());
-  const clapTowerSound = useClapTowerSound();
+  const playClapTowerSound = useSound(clapTowerSound, 0.5);
 
   useEffect(() => {
     let animationFrame: number;
@@ -41,7 +42,7 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
           }
 
           if (timeInEvent >= 0 && timeInEvent <= 0.05 && !playedEventIds.current.has(event.id)) {
-            clapTowerSound();
+            playClapTowerSound();
             playedEventIds.current.add(event.id);
           }
 

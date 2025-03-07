@@ -7,10 +7,11 @@ import BaseGame from '@/components/BaseGame';
 import { getSocket } from '@/socket';
 import GameInterface from './GameInterface';
 import FinalResultsDisplay from './FinalResultsDisplay';
-import useStartButtonClickSound from '@/hooks/useStartButtonSound';
-import useSellTowerSound from '@/hooks/useSellTowerSound';
-import useBuildTowerSound from '@/hooks/useBuildTowerSound';
-import useInvalidActionSound from '@/hooks/useInvalidActionSound';
+import startSound from "../sounds/button_start.wav";
+import invalidSound from "../sounds/invalid_action.mp3";
+import buildSound from "../sounds/building_tower.wav";
+import sellSound from "../sounds/selling_tower.wav";
+import useSound from '@/hooks/useSound';
 
 
 interface MultiPlayerGameProps {
@@ -39,10 +40,10 @@ export const MultiPlayerGame = ({
   const [currentScore, setCurrentScore] = useState<RoundResult[] | null>(initialScore);
   const [gameEnded, setGameEnded] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResults | null >(null);
-  const startRoundSound = useStartButtonClickSound();
-  const sellTowerSound = useSellTowerSound();
-  const buildTowerSound = useBuildTowerSound();
-  const invalidActionSound = useInvalidActionSound();
+  const playStartSound = useSound(startSound, 0.5);
+  const playInvalidSound = useSound(invalidSound, 0.5);
+  const playBuildSound = useSound(buildSound, 0.5);
+  const playSellSound = useSound(sellSound, 0.5);
   
   const { rounds, duration: buildingTime } = settings;
 
@@ -50,7 +51,7 @@ export const MultiPlayerGame = ({
     const socket = getSocket();
 
     function onRoundStart(config: StartingState) {
-      startRoundSound();
+      playStartSound();
       setGrid(config.grid);
       setTowers(config.towers);
       setResources({ gold: config.gold, lumber: config.lumber });
@@ -82,7 +83,7 @@ export const MultiPlayerGame = ({
       socket.off(GameActionEnum.SERVER_ROUND_RESULT);
       socket.off(GameActionEnum.SERVER_GAME_ENDED);
     };
-  }, [buildingTime, startRoundSound]);
+  }, [buildingTime, playStartSound]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
@@ -153,7 +154,7 @@ export const MultiPlayerGame = ({
         tower.positions.some(pos => pos.x === x && pos.y === y)
       );
       if (towerIndex !== -1) {
-        sellTowerSound();
+        playSellSound();
         const tower = towers[towerIndex];
         const goldDiff = 1;
         const lumberDiff = tower.type === GridCell.CLAP_TOWER ? 1 : 0;
@@ -173,7 +174,7 @@ export const MultiPlayerGame = ({
       if (resources.gold < 1 || resources.lumber < lumberCost) {
         return;
       } 
-      buildTowerSound();
+      playBuildSound();
       positions.forEach(pos => {
         newGrid[pos.y][pos.x] = shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER;
       });
@@ -182,7 +183,7 @@ export const MultiPlayerGame = ({
       setResources({ gold: resources.gold - 1, lumber: resources.lumber - lumberCost });
     }
     else{
-      invalidActionSound();
+      playInvalidSound();
     }
   };
 

@@ -3,10 +3,8 @@ In lobby:
 In game room:
 
 In game:
-    Sound for when you click tower that cannot be sold. Meepmoop
+    Slow tower sound
     Handle player sending an invalid maze.
-    Round starting:
-        Play sound or something
     Game ending:
         Post game screen
     List all players also before any results are recieved.

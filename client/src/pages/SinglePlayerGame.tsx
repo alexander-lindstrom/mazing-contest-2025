@@ -99,7 +99,7 @@ export function SinglePlayerGame() {
     const path = findShortestPath(grid, defaultStart, defaultGoal);
     if (!path) return;
     
-    const timeSteps = simulateRunnerMovement(true, towers, path);
+    const timeSteps = simulateRunnerMovement(towers, path);
     const positions = timeSteps.map(step => step.position);
     const claps = timeSteps.flatMap(step => step.claps || []);
     

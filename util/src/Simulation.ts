@@ -1,4 +1,5 @@
 import { GridCell, Position, Tower } from "./Grid";
+import { randomUUID } from 'crypto';
 
 export const defaultTimeStep = 0.001;
 export const defaultClapRange = 3;
@@ -23,11 +24,10 @@ export interface ClapEvent {
   x: number;
   y: number;
   time: number;
+  id: string;
 }
 
-// Option to not check for clapEvents (server does not care)
 export function simulateRunnerMovement(
-  calculateClaps: boolean,
   towers: Tower[],
   shortestPath: Position[],
   dt: number = defaultTimeStep,
@@ -71,26 +71,25 @@ export function simulateRunnerMovement(
     
     const clapsThisStep: ClapEvent[] = [];
 
-    if (calculateClaps) {
-      for (const tower of towers) {
-        if (tower.type === GridCell.CLAP_TOWER || tower.type === GridCell.CLAP_TOWER_NOSELL) {
-          const centerPoint = getCenterPoint(tower.positions);
-          const towerDistance = Math.sqrt(
-            (centerPoint.x - runnerX) ** 2 + (centerPoint.y - runnerY) ** 2
-          );
-          
-          if (towerDistance <= clapRange) {
-            const lastClap = lastClapTimes.get(tower) ?? -Infinity;
-            if (time - lastClap >= clapCooldown) {
-              slowTimeRemaining = slowDuration;
-              lastClapTimes.set(tower, time);
+    for (const tower of towers) {
+      if (tower.type === GridCell.CLAP_TOWER || tower.type === GridCell.CLAP_TOWER_NOSELL) {
+        const centerPoint = getCenterPoint(tower.positions);
+        const towerDistance = Math.sqrt(
+          (centerPoint.x - runnerX) ** 2 + (centerPoint.y - runnerY) ** 2
+        );
+        
+        if (towerDistance <= clapRange) {
+          const lastClap = lastClapTimes.get(tower) ?? -Infinity;
+          if (time - lastClap >= clapCooldown) {
+            slowTimeRemaining = slowDuration;
+            lastClapTimes.set(tower, time);
 
-              clapsThisStep.push({
-                x: centerPoint.x,
-                y: centerPoint.y,
-                time: time
-              });
-            }
+            clapsThisStep.push({
+              x: centerPoint.x,
+              y: centerPoint.y,
+              time: time,
+              id: randomUUID(),
+            });
           }
         }
       }

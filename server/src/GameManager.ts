@@ -145,7 +145,7 @@ export class GameManager {
       throw new Error("Invalid round result!");
     }
 
-    const duration = simulateRunnerMovement(false, [], path).length * defaultTimeStep;
+    const duration = simulateRunnerMovement([], path).length * defaultTimeStep;
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player: game.getPlayerData(socket.id) });
     if (game.allResultsReceived()) {
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound());

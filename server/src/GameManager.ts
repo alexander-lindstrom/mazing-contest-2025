@@ -132,8 +132,6 @@ export class GameManager {
 
   private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
 
-    console.log("ASDSA")
-
     if (game.getState().status !== GameStatusEnum.RUNNING) {
       throw new Error("Cannot send result for game which is not running!");
     }

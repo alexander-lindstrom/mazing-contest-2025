@@ -1,5 +1,5 @@
 import { GridCell, Position, Tower } from "./Grid";
-import { randomUUID } from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 
 export const defaultTimeStep = 0.001;
 export const defaultClapRange = 3;
@@ -88,7 +88,7 @@ export function simulateRunnerMovement(
               x: centerPoint.x,
               y: centerPoint.y,
               time: time,
-              id: randomUUID(),
+              id: uuidv4(),
             });
           }
         }

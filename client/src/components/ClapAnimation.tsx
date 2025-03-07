@@ -1,5 +1,6 @@
+import useClapTowerSound from "@/hooks/useClapTowerSound";
 import { ClapEvent, defaultClapRange } from "@mazing/util";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Circle, Group } from "react-konva";
 
 interface ClapAnimationProps {
@@ -7,7 +8,7 @@ interface ClapAnimationProps {
   cellSize: number;
 }
 
-const duration = 0.5
+const duration = 0.5;
 const persistenceDuration = 1;
 const radius = defaultClapRange;
 
@@ -15,8 +16,9 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
   events,
   cellSize,
 }) => {
-  const [activeClaps, setActiveClaps] = useState<{ id: number; x: number; y: number; progress: number }[]>([]);
-  //const clapTowerSound = useClapTowerSound();
+  const [activeClaps, setActiveClaps] = useState<{ id: string; x: number; y: number; progress: number; opacity: number }[]>([]);
+  const playedEventIds = useRef<Set<string>>(new Set());
+  const clapTowerSound = useClapTowerSound();
 
   useEffect(() => {
     let animationFrame: number;
@@ -26,22 +28,29 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
       const currentTime = (performance.now() - startTime) / 1000;
       const newClaps = events
         .filter((event) => currentTime >= event.time && currentTime <= event.time + duration + persistenceDuration)
-        .map((event, index) => {
+        .map((event) => {
           const timeInEvent = currentTime - event.time;
           let progress = 0;
+          let opacity = 1;
 
           if (timeInEvent <= duration) {
             progress = timeInEvent / duration;
-          }
-          else if (timeInEvent <= duration + persistenceDuration) {
+          } else if (timeInEvent <= duration + persistenceDuration) {
             progress = 1;
+            opacity = 1 - (timeInEvent - duration) / persistenceDuration;
+          }
+
+          if (timeInEvent >= 0 && timeInEvent <= 0.05 && !playedEventIds.current.has(event.id)) {
+            clapTowerSound();
+            playedEventIds.current.add(event.id);
           }
 
           return {
-            id: index,
+            id: event.id,
             x: event.x * cellSize + cellSize / 2,
             y: event.y * cellSize + cellSize / 2,
             progress,
+            opacity,
           };
         });
 
@@ -51,11 +60,12 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
 
     animationFrame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationFrame);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cellSize, events]);
 
   return (
     <Group>
-      {activeClaps.map(({ id, x, y, progress }) => (
+      {activeClaps.map(({ id, x, y, progress, opacity }) => (
         <Circle
           key={id}
           x={x}
@@ -63,7 +73,7 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
           radius={progress * cellSize * radius}
           stroke="blue"
           strokeWidth={2}
-          opacity={1}
+          opacity={opacity}
         />
       ))}
     </Group>

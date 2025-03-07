@@ -80,11 +80,11 @@ export const getCellColor = (cell: GridCell): string => {
     case GridCell.BLOCK_TOWER:
       return '#E74C3C'; // Bright red
     case GridCell.BLOCK_TOWER_NOSELL:
-      return '#922B21'; // Darker red
+      return '#E74C3C'; // Bright red
     case GridCell.CLAP_TOWER:
       return '#3498DB'; // Bright blue
     case GridCell.CLAP_TOWER_NOSELL:
-      return '#1F618D'; // Darker blue
+      return '#3498DB'; // Bright blue
     default:
       return '#FFFFFF';
   }
@@ -98,8 +98,14 @@ export const getBaseCellColor = (cell: GridCell): string => {
       return '#006400'; // Darker green
     case GridCell.SAND:
       return '#FFBF00'; // Sand yellow
-    default:
-      return '#674422';
+    case GridCell.BLOCK_TOWER_NOSELL:
+      return '#5C4033';
+    case GridCell.CLAP_TOWER_NOSELL:
+      return '#5C4033';
+    case GridCell.BLOCK_TOWER:
+      return '#8B5A2B';
+    case GridCell.CLAP_TOWER:
+      return '#8B5A2B';
   }
 };
 

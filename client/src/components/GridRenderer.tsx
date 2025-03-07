@@ -1,8 +1,8 @@
-import { Stage, Layer, Rect, Group } from "react-konva";
+import { Stage, Layer, Rect, Group, RegularPolygon, Line } from "react-konva";
 import { useCallback, useState, useMemo } from "react";
 import { KonvaEventObject } from "konva/lib/Node";
 import Runner from "./Runner";
-import { canPlaceTower, ClapEvent, defaultTimeStep, getBaseCellColor, getCellColor, getCenterPoint, GridParams, Position, Tower } from "@mazing/util";
+import { canPlaceTower, ClapEvent, defaultTimeStep, getBaseCellColor, getCellColor, getCenterPoint, GridCell, GridParams, Position, Tower } from "@mazing/util";
 import ClapAnimation from "./ClapAnimation";
 
 const CELL_PADDING = 1;
@@ -84,44 +84,104 @@ const GridRenderer: React.FC<GridRendererParams> = ({
     if (grid.length === 0 || grid[0].length === 0) return null;
 
     return grid.map((row, y) =>
-      row.map((cell, x) => (
-        <Rect
-          key={`${x}-${y}`}
-          x={x * CELL_SIZE + CELL_PADDING}
-          y={y * CELL_SIZE + CELL_PADDING}
-          width={CELL_SIZE - 2 * CELL_PADDING}
-          height={CELL_SIZE - 2 * CELL_PADDING}
-          fill={getBaseCellColor(cell)}
-          strokeWidth={1}
-          stroke="#000"
-          cornerRadius={2}
-          cursor="pointer"
-        />
-      ))
+      row.map((cell, x) => {
+        return (
+          <Rect
+            key={`${x}-${y}`}
+            x={x * CELL_SIZE + CELL_PADDING}
+            y={y * CELL_SIZE + CELL_PADDING}
+            width={CELL_SIZE - 2 * CELL_PADDING}
+            height={CELL_SIZE - 2 * CELL_PADDING}
+            fill={getBaseCellColor(cell)}
+            strokeWidth={1}
+            stroke="#000"
+            cornerRadius={2}
+            cursor="pointer"
+          />
+        );
+      })
     );
+  };
+
+  const renderFrostSymbol = (centerX: number, centerY: number, size: number) => {
+    const snowflakeRadius = size * 0.35;
+    const lines = [];
+    
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x1 = centerX;
+      const y1 = centerY;
+      const x2 = centerX + snowflakeRadius * Math.cos(angle);
+      const y2 = centerY + snowflakeRadius * Math.sin(angle);
+      
+      lines.push(
+        <Line
+          key={`frost-line-${i}`}
+          points={[x1, y1, x2, y2]}
+          stroke="#ffffff"
+          strokeWidth={2}
+        />
+      );
+      
+      const crossSize = snowflakeRadius * 0.3;
+      const crossAngle = Math.PI / 6;
+      
+      const cx1 = x2 + crossSize * Math.cos(angle + crossAngle);
+      const cy1 = y2 + crossSize * Math.sin(angle + crossAngle);
+      const cx2 = x2 + crossSize * Math.cos(angle - crossAngle);
+      const cy2 = y2 + crossSize * Math.sin(angle - crossAngle);
+      
+      lines.push(
+        <Line
+          key={`frost-cross-1-${i}`}
+          points={[x2, y2, cx1, cy1]}
+          stroke="#ffffff"
+          strokeWidth={1.5}
+        />
+      );
+      
+      lines.push(
+        <Line
+          key={`frost-cross-2-${i}`}
+          points={[x2, y2, cx2, cy2]}
+          stroke="#ffffff"
+          strokeWidth={1.5}
+        />
+      );
+    }
+    
+    return lines;
   };
 
   const renderTowers = () => {
     if (grid.length === 0 || grid[0].length === 0) return null;
 
     return towers.map((tower, index) => {
+      if (tower.type === GridCell.BLOCK_TOWER || tower.type === GridCell.BLOCK_TOWER_NOSELL) {
+        return;
+      }
       const { positions, type } = tower;
       const center = getCenterPoint(positions);
+      
+      const centerX = (center.x + 0.5) * CELL_SIZE;
+      const centerY = (center.y + 0.5) * CELL_SIZE;
+      
+      const radius = CELL_SIZE * 0.85;
+      
       return (
-        <Rect
-          key={`tower-${index}`}
-          x={(center.x + 0.5) * CELL_SIZE}
-          y={(center.y + 0.5) * CELL_SIZE}
-          width={Math.SQRT2 * CELL_SIZE}
-          height={Math.SQRT2 * CELL_SIZE}
-          fill={getCellColor(type)}
-          strokeWidth={1}
-          stroke="#000"
-          rotation={45}
-          offsetX={(Math.SQRT2 * CELL_SIZE) / 2}
-          offsetY={(Math.SQRT2 * CELL_SIZE) / 2}
-          cornerRadius={4}
-        />
+        <Group key={`tower-${index}`}>
+          <RegularPolygon
+            x={centerX}
+            y={centerY}
+            sides={6}
+            radius={radius}
+            fill={getCellColor(type)}
+            strokeWidth={1}
+            stroke="#000"
+            rotation={0}
+          />
+          {renderFrostSymbol(centerX, centerY, CELL_SIZE * 1.7)}
+        </Group>
       );
     });
   };

@@ -10,6 +10,8 @@ const CELL_PADDING = 0;
 export type GridRendererParams = GridParams & {
   handleClick: (x: number, y: number, e: KonvaEventObject<MouseEvent>) => void;
   runnerPath: Position[];
+  runnerStatus: boolean[];
+  runnerAngle: number[];
   showRunner: boolean;
   clapEvents: ClapEvent[];
   towers: Tower[];
@@ -21,6 +23,8 @@ const GridRenderer: React.FC<GridRendererParams> = ({
   grid = [],
   handleClick,
   runnerPath,
+  runnerStatus,
+  runnerAngle,
   showRunner,
   clapEvents,
   towers,
@@ -226,12 +230,22 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       </Layer>
       {runnerPath && showRunner && (
         <Layer>
-          <Runner runnerPath={runnerPath} cellSize={CELL_SIZE} timestep={defaultTimeStep} />
+          <Runner 
+            runnerPath={runnerPath} 
+            cellSize={CELL_SIZE} 
+            timestep={defaultTimeStep}
+            runnerStatus={runnerStatus}
+            runnerAngle={runnerAngle}
+          />
+
         </Layer>
       )}
       {clapEvents.length > 0 && showRunner && (
         <Layer>
-          <ClapAnimation events={clapEvents} cellSize={CELL_SIZE} />
+          <ClapAnimation 
+            events={clapEvents} 
+            cellSize={CELL_SIZE}
+          />
         </Layer>
       )}
     </Stage>

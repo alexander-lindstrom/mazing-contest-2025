@@ -5,8 +5,6 @@ In game room:
 
 In game:
 
-    Fix post game screen appearance
-    Indicate the direction of the circle in show way. Add turn rate. Fix ball color flickering
     Give the option to select which player to view (during running phase).
     Show round results before starting new round (only for a few seconds?)
     

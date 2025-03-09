@@ -63,6 +63,8 @@ export const MultiPlayerGame = ({
   const [towers, setTowers] = useState<Tower[]>([])
   const [resources, setResources] = useState({ gold: 0, lumber: 0 });
   const [runnerPath, setRunnerPath] = useState<Position[]>([]);
+  const [runnerStatus, setRunnerStatus] = useState<boolean[]>([]);
+  const [runnerAngle, setRunnerAngle] = useState<number[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [clapEvents, setClapEvents] = useState<ClapEvent[]>([]);
   const [countdown, setCountdown] = useState(0);
@@ -89,6 +91,8 @@ export const MultiPlayerGame = ({
       setResources({ gold: config.gold, lumber: config.lumber });
       
       setRunnerPath([]);
+      setRunnerStatus([]);
+      setRunnerAngle([]);
       setClapEvents([]);
       setIsRunning(false);
       setTotalSimulationTime(null);
@@ -229,9 +233,13 @@ export const MultiPlayerGame = ({
     
     const timeSteps = simulateRunnerMovement(towers, path);
     const positions = timeSteps.map(step => step.position);
+    const runnerStatus = timeSteps.map(step => step.isSlowed);
+    const runnerAngle = timeSteps.map(step => step.angle);
     const claps = timeSteps.flatMap(step => step.claps || []);
     
     setRunnerPath(positions);
+    setRunnerStatus(runnerStatus);
+    setRunnerAngle(runnerAngle);
     setClapEvents(claps);
     setIsRunning(true);
     
@@ -269,6 +277,8 @@ export const MultiPlayerGame = ({
               grid={grid}
               handleCellClick={handleCellClick}
               runnerPath={runnerPath}
+              runnerStatus={runnerStatus}
+              runnerAngle={runnerAngle}
               isRunning={isRunning}
               clapEvents={clapEvents}
               resources={resources}

@@ -164,7 +164,6 @@ export class GameManager {
         io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig())
       }
       else{
-        console.log("Game has ended!");
         io.to(game.id).emit(GameActionEnum.SERVER_GAME_ENDED, game.getFinalResults());
       }
     }

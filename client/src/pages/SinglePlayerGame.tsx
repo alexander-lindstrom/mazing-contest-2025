@@ -19,6 +19,8 @@ export function SinglePlayerGame() {
   const [towers, setTowers] = useState(startingState.towers);
   const [resources, setResources] = useState({ gold: startingState.gold, lumber: startingState.lumber });
   const [runnerPath, setRunnerPath] = useState<Position[]>([]);
+  const [runnerStatus, setRunnerStatus] = useState<boolean[]>([]);
+  const [runnerAngle, setRunnerAngle] = useState<number[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [clapEvents, setClapEvents] = useState<ClapEvent[]>([]);
   const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN);
@@ -110,6 +112,8 @@ export function SinglePlayerGame() {
     setTowers(state.towers);
     setResources({ gold: state.gold, lumber: state.lumber });
     setRunnerPath([]);
+    setRunnerStatus([]);
+    setRunnerAngle([]);
     setIsRunning(false);
     setCountdown(INITIAL_COUNTDOWN);
     setStopwatch(0);
@@ -125,9 +129,13 @@ export function SinglePlayerGame() {
     
     const timeSteps = simulateRunnerMovement(towers, path);
     const positions = timeSteps.map(step => step.position);
+    const runnerStatus = timeSteps.map(step => step.isSlowed);
+    const runnerAngle = timeSteps.map(step => step.angle);
     const claps = timeSteps.flatMap(step => step.claps || []);
     
     setRunnerPath(positions);
+    setRunnerStatus(runnerStatus);
+    setRunnerAngle(runnerAngle);
     setClapEvents(claps);
     setIsRunning(true);
     setCountdown(0);
@@ -173,6 +181,8 @@ export function SinglePlayerGame() {
       grid={grid}
       handleCellClick={handleCellClick}
       runnerPath={runnerPath}
+      runnerStatus={runnerStatus}
+      runnerAngle={runnerAngle}
       isRunning={isRunning}
       clapEvents={clapEvents}
       resources={resources}

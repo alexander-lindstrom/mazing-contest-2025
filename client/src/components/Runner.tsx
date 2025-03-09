@@ -1,14 +1,16 @@
-import { defaultBaseSpeed, distance2D, Position } from '@mazing/util';
+import { Position } from '@mazing/util';
 import { useEffect, useRef, useState } from 'react';
-import { Circle } from 'react-konva';
+import { Circle, Line } from 'react-konva';
 
 type RunnerProps = {
   runnerPath: Position[];
+  runnerStatus: boolean[];
+  runnerAngle: number[];
   cellSize: number;
   timestep: number;
 };
 
-const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep }) => {
+const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep, runnerStatus, runnerAngle }) => {
   const [currentPosition, setCurrentPosition] = useState<Position | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -16,7 +18,7 @@ const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep }) => {
   const totalDuration = runnerPath.length * timestep;
 
   useEffect(() => {
-    if (runnerPath.length < 2){
+    if (runnerPath.length < 2) {
       return;
     }
 
@@ -28,12 +30,8 @@ const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep }) => {
       const progress = elapsed / totalDuration;
       const index = Math.min(Math.floor(progress * runnerPath.length), runnerPath.length - 1);
       setCurrentPosition(runnerPath[index]);
-      if (index + 1 < runnerPath.length){
-        const slowedMovement = distance2D(runnerPath[index], runnerPath[index + 1]) < defaultBaseSpeed * 0.75 * timestep;
-        if (slowedMovement !== isSlowed) {
-          setIsSlowed(slowedMovement);
-        }
-      }
+
+      setIsSlowed(runnerStatus[index]);
 
       if (index < runnerPath.length - 1) {
         animationFrameRef.current = requestAnimationFrame(animate);
@@ -47,20 +45,38 @@ const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep }) => {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isSlowed, runnerPath, timestep, totalDuration]);
+  }, [runnerPath, timestep, totalDuration, runnerStatus]);
 
   if (!currentPosition) return null;
 
-  return (
-    <Circle
-      x={currentPosition.x * cellSize + cellSize / 2}
-      y={currentPosition.y * cellSize + cellSize / 2}
-      radius={cellSize / 3}
-      fill={isSlowed ? "blue" : "red"}
-      stroke="black"
-      strokeWidth={2}
-    />
+  const angle = runnerAngle[runnerPath.indexOf(currentPosition)];
 
+  const lineLength = cellSize / 3;
+
+  return (
+    <>
+      <Circle
+        x={currentPosition.x * cellSize + cellSize / 2}
+        y={currentPosition.y * cellSize + cellSize / 2}
+        radius={cellSize / 3}
+        fill={isSlowed ? "blue" : "red"}
+        stroke="black"
+        strokeWidth={2}
+        rotation={angle * (180 / Math.PI)}
+      />
+      <Line
+        points={[
+          currentPosition.x * cellSize + cellSize / 2,
+          currentPosition.y * cellSize + cellSize / 2,
+          currentPosition.x * cellSize + cellSize / 2 + lineLength * Math.cos(angle),
+          currentPosition.y * cellSize + cellSize / 2 + lineLength * Math.sin(angle),
+        ]}
+        stroke="black"
+        strokeWidth={3}
+        lineCap="round"
+        lineJoin="round"
+      />
+    </>
   );
 };
 

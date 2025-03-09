@@ -12,6 +12,8 @@ interface BaseGameProps {
   grid: GridCell[][];
   handleCellClick: (x: number, y: number, e: KonvaEventObject<MouseEvent>) => void;
   runnerPath: Position[];
+  runnerStatus: boolean[];
+  runnerAngle: number[];
   isRunning: boolean;
   clapEvents: ClapEvent[];
   resources: { gold: number; lumber: number };
@@ -30,6 +32,8 @@ const BaseGame: React.FC<BaseGameProps> = ({
   grid,
   handleCellClick,
   runnerPath,
+  runnerStatus,
+  runnerAngle,
   isRunning,
   clapEvents,
   resources,
@@ -107,6 +111,8 @@ const BaseGame: React.FC<BaseGameProps> = ({
             grid={grid}
             handleClick={handleCellClick}
             runnerPath={runnerPath}
+            runnerStatus={runnerStatus}
+            runnerAngle={runnerAngle}
             showRunner={isRunning}
             clapEvents={clapEvents}
           />

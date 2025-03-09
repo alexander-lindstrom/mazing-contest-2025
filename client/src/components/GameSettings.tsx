@@ -48,7 +48,7 @@ const GameSettings: React.FC<GameSettingsProps> = ({
                   <SelectValue placeholder="Select rounds" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-2 border-black">
-                  {[3, 5, 7, 10].map((num) => (
+                  {[1, 2, 3, 4, 5, 7, 10].map((num) => (
                     <SelectItem key={num} value={num.toString()}>
                       {num}
                     </SelectItem>

@@ -6,7 +6,6 @@ import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defau
   Position, RoundResult, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import { getSocket } from '@/socket';
-import FinalResultsDisplay from './FinalResultsDisplay';
 import startSound from "../sounds/button_start.wav";
 import invalidSound from "../sounds/invalid_action.mp3";
 import buildSound from "../sounds/building_tower.wav";
@@ -14,6 +13,7 @@ import sellSound from "../sounds/selling_tower.wav";
 import useSound from '@/hooks/useSound';
 import Scoreboard, { PlayerScore } from './ScoreBoard';
 import { GameChat } from './GameChat';
+import FinalScoreBoard from './FinalResultsDisplay';
 
 
 interface MultiPlayerGameProps {
@@ -247,7 +247,7 @@ export const MultiPlayerGame = ({
     <div className="flex flex-col lg:flex-row gap-2 items-start w-full">
       {!gameEnded && (
         <>
-          <div className="flex flex-col space-y-4 w-96"> {/* Adjust width as needed */}
+          <div className="flex flex-col space-y-4 w-96">
             <div>
               <Scoreboard
                 players={extractPlayerScores(players, currentScore)}
@@ -283,11 +283,23 @@ export const MultiPlayerGame = ({
           </div>
         </>
       )}
-
       {gameEnded && finalResult && (
-        <div className="lg:w-96 ml-2">
-          <FinalResultsDisplay finalResults={finalResult} totalRounds={rounds} />
-        </div>
+        <>
+          <div className="flex flex-col space-y-4 w-96 lg:w-auto">
+            <div className="lg:w-96 ml-2">
+              <FinalScoreBoard
+                finalResults={finalResult}
+                totalRounds={rounds}
+              />
+            </div>
+            <div className="lg:w-96 ml-2">
+              <GameChat
+                chatLog={chatLog}
+                onSendMessage={onChatMessage}
+              />
+            </div>
+          </div>
+        </>
       )}
 
     </div>

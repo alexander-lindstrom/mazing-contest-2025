@@ -1,16 +1,15 @@
 In lobby:
 
 In game room:
+    Change appearance in some way.
 
 In game:
-     Restructure scoring. To the left show only players and total score. On round end
-        display round results for a few seconds. On player leave -> remove.
-    Move chat below scoring (left)
+
     Fix post game screen appearance
-    List all players also before any results are recieved.
+    Indicate the direction of the circle in show way. Add turn rate. Fix ball color flickering
     Give the option to select which player to view (during running phase).
-   
-    Indicate the direction of the circle in show way. Add turn rate.
+    Show round results before starting new round (only for a few seconds?)
+    
 
 General:
     Add ability to leave/go back without refreshing.

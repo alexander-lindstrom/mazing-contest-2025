@@ -6,8 +6,12 @@ import invalidSound from "../sounds/invalid_action.mp3";
 import buildSound from "../sounds/building_tower.wav";
 import sellSound from "../sounds/selling_tower.wav";
 import useSound from '@/hooks/useSound';
+import { getParamFromUrl, removeParamFromUrl } from '@/util/url';
 
-let startingState = generateStartingState();
+
+const seed = getParamFromUrl("seed");
+removeParamFromUrl("seed");
+let startingState = generateStartingState(seed || undefined);
 const INITIAL_COUNTDOWN = 60;
 
 export function SinglePlayerGame() {
@@ -145,21 +149,21 @@ export function SinglePlayerGame() {
   } 
 
   const handleShare = () => {
-
     const baseUrl = import.meta.env.MODE === 'development'
       ? 'http://localhost:5173'
       : import.meta.env.VITE_URL;
-    console.log(JSON.stringify(startingState))
-    const base64Settings = btoa(JSON.stringify(startingState));
-    const fullUrl = `${baseUrl}?settings=${encodeURIComponent(base64Settings)}`; 
+  
+    const seed = startingState.seed;
+    const fullUrl = `${baseUrl}?seed=${encodeURIComponent(seed)}`;
+  
     navigator.clipboard.writeText(fullUrl)
-    .then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 4000);
-    })
-    .catch((error) => {
-      console.error('Failed to copy URL to clipboard:', error);
-    });
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 4000);
+      })
+      .catch((error) => {
+        console.error('Failed to copy URL to clipboard:', error);
+      });
   };
   
   return (

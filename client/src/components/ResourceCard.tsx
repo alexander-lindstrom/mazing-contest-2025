@@ -1,4 +1,6 @@
+import React from 'react';
 import { Card } from "@/components/ui/card";
+import { Clock, Coins, Trees } from "lucide-react";
 
 interface ResourceCardProps {
   resources: { gold: number; lumber: number };
@@ -8,33 +10,34 @@ interface ResourceCardProps {
 }
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ resources, isRunning, stopwatch, countdown }) => {
+  const timeValue = isRunning ? stopwatch.toFixed(1) : countdown;
+  
   return (
-    <div className="w-full">
-      <Card className="bg-yellow-300 border-4 border-black p-6 rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 transition-transform">
-        <div className="text-2xl font-black uppercase tracking-tight text-center mb-4">
-          Resources
+    <Card className="w-full bg-slate-800 p-3 rounded-lg shadow-lg">
+      <div className="flex flex-row items-center space-x-3">
+
+        <div className="flex items-center bg-slate-700 rounded-lg p-2">
+          <Clock className="text-blue-400 mr-2" size={18} />
+          <div className="font-mono font-bold text-white whitespace-nowrap">
+            {timeValue}
+          </div>
+        </div>
+
+        <div className="flex items-center bg-slate-700 rounded-lg p-2">
+          <Coins className="text-yellow-400 mr-2" size={18} />
+          <div className="font-mono font-bold text-white whitespace-nowrap">
+            {resources.gold}
+          </div>
         </div>
         
-        <div className="bg-white border-4 border-black rounded-lg p-4">
-
-          <div className="grid grid-cols-2 gap-2 py-3 px-2 border-t-2 border-black bg-green-100 text-center">
-            <div className="font-bold">Time:</div>
-            <div className="font-mono font-bold">{isRunning ? stopwatch.toFixed(1) : countdown}</div>
+        <div className="flex items-center bg-slate-700 rounded-lg p-2">
+          <Trees className="text-green-400 mr-2" size={18} />
+          <div className="font-mono font-bold text-white whitespace-nowrap">
+            {resources.lumber}
           </div>
-          
-          <div className="grid grid-cols-2 gap-2 py-3 px-2 border-t-2 border-black bg-purple-100 text-center">
-            <div className="font-bold">Gold:</div>
-            <div className="font-mono font-bold">{resources.gold}</div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-2 py-3 px-2 border-t-2 border-black bg-green-100 text-center">
-            <div className="font-bold">Wood:</div>
-            <div className="font-mono font-bold">{resources.lumber}</div>
-          </div>
-          
         </div>
-      </Card>
-    </div>
+      </div>
+    </Card>
   );
 };
 

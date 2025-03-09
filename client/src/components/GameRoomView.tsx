@@ -2,8 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ChatMessage, GameSettingsData, LobbyInformation } from '@mazing/util';
-import { ChatRoom } from './ChatRoom';
 import GameSettings from './GameSettings';
+import { GameRoomChat } from './GameRoomChat';
 
 interface GameRoomViewProps {
   game: LobbyInformation;
@@ -63,7 +63,7 @@ export const GameRoomView = ({
 
             <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
-                <ChatRoom 
+                <GameRoomChat 
                   chatLog={chatLog}
                   onSendMessage={onChatMessage}
                 />

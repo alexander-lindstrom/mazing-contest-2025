@@ -2,16 +2,18 @@ import { useState, useEffect, useRef } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
   defaultTimeStep, defaultWidth, FinalResults, findShortestPath, GameActionEnum, GameSettingsData, get2x2Positions, GridCell,
+  PlayerData,
   Position, RoundResult, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import { getSocket } from '@/socket';
-import GameInterface from './GameInterface';
 import FinalResultsDisplay from './FinalResultsDisplay';
 import startSound from "../sounds/button_start.wav";
 import invalidSound from "../sounds/invalid_action.mp3";
 import buildSound from "../sounds/building_tower.wav";
 import sellSound from "../sounds/selling_tower.wav";
 import useSound from '@/hooks/useSound';
+import Scoreboard, { PlayerScore } from './ScoreBoard';
+import { GameChat } from './GameChat';
 
 
 interface MultiPlayerGameProps {
@@ -19,13 +21,43 @@ interface MultiPlayerGameProps {
   chatLog: ChatMessage[];
   onChatMessage: (message: string) => void;
   initialScore: RoundResult[] | null;
+  players: PlayerData[];
 }
+
+const extractPlayerScores = (
+  players: PlayerData[],
+  roundResults: RoundResult[] | null
+): PlayerScore[] => {
+
+  if (!roundResults || roundResults.length === 0) {
+    return players.map((player) => ({
+      id: player.id,
+      name: player.name,
+      score: 0,
+    }));
+  }
+
+  return roundResults.map((result) => ({
+    id: result.player.id,
+    name: result.player.name,
+    score: result.duration,
+  }));
+};
+
+const extractRound = (roundResults: RoundResult[] | null) => {
+  if (roundResults && roundResults[0]){
+    return roundResults[0].round;
+  }
+  return 0;
+}
+
 
 export const MultiPlayerGame = ({
   settings, 
   chatLog,
   onChatMessage,
-  initialScore
+  initialScore,
+  players
 }: MultiPlayerGameProps) => {
   const [grid, setGrid] = useState<GridCell[][]>([])
   const [towers, setTowers] = useState<Tower[]>([])
@@ -214,25 +246,41 @@ export const MultiPlayerGame = ({
   return (
     <div className="flex flex-col lg:flex-row gap-2 items-start w-full">
       {!gameEnded && (
-        <div className="max-w-[1200px]">
-          <BaseGame
-            startingState={{ width: defaultWidth, height: defaultHeight }}
-            towers={towers}
-            grid={grid}
-            handleCellClick={handleCellClick}
-            runnerPath={runnerPath}
-            isRunning={isRunning}
-            clapEvents={clapEvents}
-            resources={resources}
-            stopwatch={stopwatch}
-            countdown={countdown}
-            handleStartButton={null}
-            handleReset={null}
-            handleGenerateNew={null}
-            handleShare={null}
-            copied={false}
-          />
-        </div>
+        <>
+          <div className="flex flex-col space-y-4 w-96"> {/* Adjust width as needed */}
+            <div>
+              <Scoreboard
+                players={extractPlayerScores(players, currentScore)}
+                round={extractRound(currentScore)}
+              />
+            </div>
+            <div>
+              <GameChat
+                chatLog={chatLog}
+                onSendMessage={onChatMessage}
+              />
+            </div>
+          </div>
+          <div className="max-w-[1200px]">
+            <BaseGame
+              startingState={{ width: defaultWidth, height: defaultHeight }}
+              towers={towers}
+              grid={grid}
+              handleCellClick={handleCellClick}
+              runnerPath={runnerPath}
+              isRunning={isRunning}
+              clapEvents={clapEvents}
+              resources={resources}
+              stopwatch={stopwatch}
+              countdown={countdown}
+              handleStartButton={null}
+              handleReset={null}
+              handleGenerateNew={null}
+              handleShare={null}
+              copied={false}
+            />
+          </div>
+        </>
       )}
 
       {gameEnded && finalResult && (
@@ -240,16 +288,7 @@ export const MultiPlayerGame = ({
           <FinalResultsDisplay finalResults={finalResult} totalRounds={rounds} />
         </div>
       )}
-  
-      <div className="lg:w-96 ml-2">
-        <GameInterface
-          chatLog={chatLog}
-          onChatMessage={onChatMessage}
-          currentScore={currentScore}
-          rounds={rounds}
-          gameEnded={gameEnded}
-        />
-      </div>
+
     </div>
   );
 }

@@ -19,7 +19,7 @@ function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-orange-800 text-white font-bold text-lg">
+    <div className="relative min-h-screen flex flex-col justify-center bg-gradient-to-br from-blue-900 via-navy-900 to-gray-900 text-white font-bold text-lg">
       <div className="absolute inset-0 bg-black/20"></div>
 
       <div className="relative z-10">

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, get2x2Positions, GridCell, pathExists, Position, simulateRunnerMovement } from '@mazing/util';
+import { canPlaceTower, canSellTower, ClapEvent, defaultGoal, defaultStart, defaultTimeStep, findShortestPath, generateStartingState, get2x2Positions, GridCell, pathExists, Position, simulateRunnerMovement, StartingState } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
 import invalidSound from "../sounds/invalid_action.mp3";
 import buildSound from "../sounds/building_tower.wav";
 import sellSound from "../sounds/selling_tower.wav";
 import useSound from '@/hooks/useSound';
 
-const startingState = generateStartingState();
-const INITIAL_COUNTDOWN = 45;
+let startingState = generateStartingState();
+const INITIAL_COUNTDOWN = 60;
 
 export function SinglePlayerGame() {
   const [grid, setGrid] = useState(startingState.grid);
@@ -24,6 +24,7 @@ export function SinglePlayerGame() {
   const sellTowerSound = useSound(sellSound, 0.5);
   const buildTowerSound = useSound(buildSound, 0.5);
   const invalidActionSound = useSound(invalidSound, 0.5);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (countdown <= 0) {
@@ -100,6 +101,18 @@ export function SinglePlayerGame() {
     }
   };
 
+  const restart = (state: StartingState) => {
+    setGrid(state.grid);
+    setTowers(state.towers);
+    setResources({ gold: state.gold, lumber: state.lumber });
+    setRunnerPath([]);
+    setIsRunning(false);
+    setCountdown(INITIAL_COUNTDOWN);
+    setStopwatch(0);
+    setIsStopwatchRunning(false);
+    setTotalSimulationTime(null);
+  }
+
   const handleStartButton = () => {
     if (isRunning) return;
     
@@ -121,17 +134,32 @@ export function SinglePlayerGame() {
     setTotalSimulationTime(totalSimTime);
   };
 
-  const handleReset = () => {
+  const handleRegenerate = () => {
     const newState = generateStartingState();
-    setGrid(newState.grid);
-    setTowers(newState.towers);
-    setResources({ gold: newState.gold, lumber: newState.lumber });
-    setRunnerPath([]);
-    setIsRunning(false);
-    setCountdown(INITIAL_COUNTDOWN);
-    setStopwatch(0);
-    setIsStopwatchRunning(false);
-    setTotalSimulationTime(null);
+    startingState = newState;
+    restart(newState);
+  };
+
+  const handleReset = () => {
+    restart(startingState);
+  } 
+
+  const handleShare = () => {
+
+    const baseUrl = import.meta.env.MODE === 'development'
+      ? 'http://localhost:5173'
+      : import.meta.env.VITE_URL;
+    console.log(JSON.stringify(startingState))
+    const base64Settings = btoa(JSON.stringify(startingState));
+    const fullUrl = `${baseUrl}?settings=${encodeURIComponent(base64Settings)}`; 
+    navigator.clipboard.writeText(fullUrl)
+    .then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 4000);
+    })
+    .catch((error) => {
+      console.error('Failed to copy URL to clipboard:', error);
+    });
   };
   
   return (
@@ -148,6 +176,9 @@ export function SinglePlayerGame() {
       countdown={countdown}
       handleStartButton={handleStartButton}
       handleReset={handleReset}
+      handleGenerateNew={handleRegenerate}
+      handleShare={handleShare}
+      copied={copied}
     />
   );
 }

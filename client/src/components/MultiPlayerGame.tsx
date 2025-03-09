@@ -228,6 +228,9 @@ export const MultiPlayerGame = ({
             countdown={countdown}
             handleStartButton={null}
             handleReset={null}
+            handleGenerateNew={null}
+            handleShare={null}
+            copied={false}
           />
         </div>
       )}

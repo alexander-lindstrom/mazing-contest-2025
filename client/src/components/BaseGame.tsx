@@ -19,6 +19,9 @@ interface BaseGameProps {
   countdown: number;
   handleStartButton: (() => void) | null;
   handleReset: (() => void) | null;
+  handleGenerateNew: (() => void) | null;
+  handleShare: (() => void) | null;
+  copied: boolean;
 }
 
 const BaseGame: React.FC<BaseGameProps> = ({
@@ -34,6 +37,9 @@ const BaseGame: React.FC<BaseGameProps> = ({
   countdown,
   handleStartButton,
   handleReset,
+  handleGenerateNew,
+  handleShare,
+  copied,
 }) => {
   const [ref, bounds] = useMeasure();
   const [gridDimensions, setGridDimensions] = useState({ width: 0, height: 0 });
@@ -88,7 +94,7 @@ const BaseGame: React.FC<BaseGameProps> = ({
           </div>
         </div>
 
-        {handleStartButton && handleReset && (
+        {handleStartButton && handleReset && handleGenerateNew && handleShare && (
           <div className="flex flex-col space-y-6 w-80">
             <div className="flex space-x-4">
               <SoundButton
@@ -98,10 +104,22 @@ const BaseGame: React.FC<BaseGameProps> = ({
                 Start
               </SoundButton>
               <SoundButton
-                className="bg-green-400 text-black hover:bg-green-500 font-bold py-4 px-8 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-xl"
+                className="bg-yellow-400 text-black hover:bg-yellow-500 font-bold py-4 px-8 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-xl"
                 onClick={handleReset}
               >
-                Regenerate
+                Reset
+              </SoundButton>
+              <SoundButton
+                className="bg-red-400 text-black hover:bg-red-500 font-bold py-4 px-8 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-xl"
+                onClick={handleGenerateNew}
+              >
+                New
+              </SoundButton>
+              <SoundButton
+                className="bg-green-400 text-black hover:bg-green-500 font-bold py-4 px-8 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all text-xl"
+                onClick={handleShare}
+              >
+                {copied ? "Copied!" : "Share"}
               </SoundButton>
             </div>
           </div>

@@ -9,16 +9,17 @@ export interface PlayerScore {
 
 interface ScoreboardProps {
   players: PlayerScore[];
-  round: number;
+  round: number; // zero indexed
+  numRounds: number; 
 }
 
-const Scoreboard: React.FC<ScoreboardProps> = ({ players, round }) => {
+const Scoreboard: React.FC<ScoreboardProps> = ({ players, round, numRounds }) => {
   const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
   return (
     <Card className="w-full bg-slate-800 p-3 rounded-lg shadow-lg">
-      <div className="text-center text-white font-mono font-bold text-lg mb-4">
-        Round {round}
+      <div className="text-left text-white font-mono font-bold text-lg mb-4">
+        Round {round + 1} of {numRounds}
       </div>
 
       <div className="flex flex-col space-y-2">

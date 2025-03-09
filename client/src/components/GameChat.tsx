@@ -16,7 +16,7 @@ export const GameChat: React.FC<GameChatProps> = ({
   chatLog,
   onSendMessage,
   className = '',
-  title = 'Chat',
+  title,
 }) => {
   const [chatMessage, setChatMessage] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);

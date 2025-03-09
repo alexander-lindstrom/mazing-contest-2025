@@ -252,6 +252,7 @@ export const MultiPlayerGame = ({
               <Scoreboard
                 players={extractPlayerScores(players, currentScore)}
                 round={extractRound(currentScore)}
+                numRounds={settings.rounds}
               />
             </div>
             <div>

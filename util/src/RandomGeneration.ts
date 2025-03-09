@@ -14,7 +14,6 @@ const maxLumber = 3
 export type StartingState = GridParams & {
   gold: number,
   lumber: number,
-  seed: string,
 }
 
 function getRandomInRange(min: number, max: number, rng: () => number) {

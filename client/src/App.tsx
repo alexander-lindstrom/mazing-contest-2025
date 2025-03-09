@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SinglePlayerGame } from "./pages/SinglePlayerGame";
 import { MultiPlayerGameController } from "./pages/MultiPlayerGameController";
 import SoundButton from "./components/SoundButton";
+import { getParamFromUrl, removeParamFromUrl } from "./util/url";
 
 function App() {
   const [gameMode, setGameMode] = useState<"single" | "multi" | null>(null);
+
+  useEffect(() => {
+
+    const mode = getParamFromUrl("mode");
+    if (mode === "single") {
+      setGameMode("single");
+    } else if (mode === "multi") {
+      setGameMode("multi");
+    }
+    removeParamFromUrl("mode");
+  }, []);
 
   return (
     <div className="relative min-h-screen flex flex-col justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-orange-800 text-white font-bold text-lg">

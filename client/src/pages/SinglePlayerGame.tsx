@@ -154,7 +154,7 @@ export function SinglePlayerGame() {
       : import.meta.env.VITE_URL;
   
     const seed = startingState.seed;
-    const fullUrl = `${baseUrl}?seed=${encodeURIComponent(seed)}`;
+    const fullUrl = `${baseUrl}?mode=single&seed=${encodeURIComponent(seed)}`;
   
     navigator.clipboard.writeText(fullUrl)
       .then(() => {

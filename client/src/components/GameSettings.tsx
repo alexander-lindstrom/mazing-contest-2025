@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Import shadcn Tooltip
 import { GameSettingsData } from '@mazing/util';
 
 interface GameSettingsProps {
@@ -38,11 +39,21 @@ const GameSettings: React.FC<GameSettingsProps> = ({
   };
 
   return (
-    <Card className="w-full bg-slate-800 p-3 rounded-lg shadow-lg">
+    <Card className="w-full bg-slate-700 p-3 rounded-lg shadow-lg">
       <CardContent>
         <div className="space-y-4">
+          {/* Rounds */}
           <div className="flex flex-col space-y-2">
-            <label className="font-mono font-bold text-white">ROUNDS</label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <label className="font-mono font-bold text-white cursor-help">
+                  Rounds
+                </label>
+              </TooltipTrigger>
+              <TooltipContent className="bg-slate-800 text-white border-slate-700">
+                <p>Number of rounds in the game</p>
+              </TooltipContent>
+            </Tooltip>
             {isHost ? (
               <Select value={rounds.toString()} onValueChange={handleRoundsChange}>
                 <SelectTrigger className="bg-slate-700 border-slate-600 text-white font-mono font-bold">
@@ -57,14 +68,24 @@ const GameSettings: React.FC<GameSettingsProps> = ({
                 </SelectContent>
               </Select>
             ) : (
-              <div className="bg-slate-700 rounded-lg p-2 font-mono font-bold text-white">
+              <div className="bg-slate-700 border-slate-600 rounded-lg p-2 font-mono font-bold text-white border">
                 {rounds}
               </div>
             )}
           </div>
 
+          {/* Duration */}
           <div className="flex flex-col space-y-2">
-            <label className="font-mono font-bold text-white">BUILD TIME</label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <label className="font-mono font-bold text-white cursor-help">
+                  Duration
+                </label>
+              </TooltipTrigger>
+              <TooltipContent className="bg-slate-800 text-white border-slate-700">
+                <p>Duration of each round in seconds</p>
+              </TooltipContent>
+            </Tooltip>
             {isHost ? (
               <Select value={duration.toString()} onValueChange={handleDurationChange}>
                 <SelectTrigger className="bg-slate-700 border-slate-600 text-white font-mono font-bold">
@@ -79,14 +100,24 @@ const GameSettings: React.FC<GameSettingsProps> = ({
                 </SelectContent>
               </Select>
             ) : (
-              <div className="bg-slate-700 rounded-lg p-2 font-mono font-bold text-white">
-                {duration}
+              <div className="bg-slate-700 border-slate-600 rounded-lg p-2 font-mono font-bold text-white border">
+                {duration} sec
               </div>
             )}
           </div>
 
+          {/* Transition */}
           <div className="flex flex-col space-y-2">
-            <label className="font-mono font-bold text-white">Transition time </label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <label className="font-mono font-bold text-white cursor-help">
+                  Transition
+                </label>
+              </TooltipTrigger>
+              <TooltipContent className="bg-slate-800 text-white border-slate-700">
+                <p>Delay between rounds in seconds</p>
+              </TooltipContent>
+            </Tooltip>
             {isHost ? (
               <Select value={roundTransitionDelay.toString()} onValueChange={handleRoundTransitionDelayChange}>
                 <SelectTrigger className="bg-slate-700 border-slate-600 text-white font-mono font-bold">
@@ -101,8 +132,8 @@ const GameSettings: React.FC<GameSettingsProps> = ({
                 </SelectContent>
               </Select>
             ) : (
-              <div className="bg-slate-700 rounded-lg p-2 font-mono font-bold text-white">
-                {roundTransitionDelay} seconds
+              <div className="bg-slate-700 border-slate-600 rounded-lg p-2 font-mono font-bold text-white border">
+                {roundTransitionDelay} sec
               </div>
             )}
           </div>

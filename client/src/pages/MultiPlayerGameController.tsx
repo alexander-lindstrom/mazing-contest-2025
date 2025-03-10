@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getSocket } from '@/socket';
-import { ChatMessage, GameSettingsData, LobbyInformation, RoundResult } from '@mazing/util';
+import { ChatMessage, GameSettingsData, LobbyInformation, PlayerData, RoundResult } from '@mazing/util';
 import { GameRoomView } from '../components/GameRoomView';
 import { LobbyView } from '../components/LobbyView';
 import { MultiPlayerGame } from '../components/MultiPlayerGame';
@@ -10,7 +10,7 @@ import useSound from '@/hooks/useSound';
 
 export const MultiPlayerGameController = () => {
   const [isConnected, setIsConnected] = useState(false);
-  const [playerName, setPlayerName] = useState('');
+  const [player, setPlayer] = useState<PlayerData>({ name: "", id: "" });
   const [availableGames, setAvailableGames] = useState<LobbyInformation[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentGame, setCurrentGame] = useState<LobbyInformation | null>(null);
@@ -25,9 +25,17 @@ export const MultiPlayerGameController = () => {
     const socket = getSocket();
     socket.connect();
 
-    function onConnect() {
+    function onConnect(socketId: string | undefined) {
       setIsConnected(true);
-    }
+      if (socketId) {
+        setPlayer((prevPlayer) => ({
+          ...prevPlayer,
+          id: socketId,
+        }));
+      } else {
+        console.warn("Socket ID is not available after connection.");
+      }
+    }    
 
     function onDisconnect() {
       setIsConnected(false);
@@ -64,7 +72,9 @@ export const MultiPlayerGameController = () => {
       setGameSettings(settings);
     }
 
-    socket.on('connect', onConnect);
+    socket.on("connect", () => {
+      onConnect(socket.id);
+    });    
     socket.on('disconnect', onDisconnect);
     socket.on('list-games', onGamesList);
     socket.on('game-joined', onGameJoined);
@@ -75,7 +85,7 @@ export const MultiPlayerGameController = () => {
     socket.on('update-settings', onSettingsUpdate);
 
     return () => {
-      socket.off('connect', onConnect);
+      socket.off("connect", () => onConnect(socket.id));
       socket.off('disconnect', onDisconnect);
       socket.off('list-games', onGamesList);
       socket.off('game-joined', onGameJoined);
@@ -88,23 +98,26 @@ export const MultiPlayerGameController = () => {
   }, []);
 
   const handleHostGame = () => {
-    if (!playerName.trim()) {
+    if (!player.name.trim()) {
       setError('Please enter your name before hosting a game');
       return;
     }
     const socket = getSocket();
-    socket?.emit('req-create-game', playerName);
+    socket?.emit('req-create-game', player.name);
   };
 
   const setPlayerNameAndClearError = (name: string) => {
-    setPlayerName(name);
+    setPlayer((prevPlayer) => ({
+      ...prevPlayer,
+      name: name,
+    }));
     if (error) {
       setError(null);
     }
   };
 
   const handleRequestJoinGame = (gameId: string) => {
-    if (!playerName.trim()) {
+    if (!player.name.trim()) {
       setError('Please enter your name before joining a game');
       return;
     }
@@ -113,7 +126,7 @@ export const MultiPlayerGameController = () => {
     socket?.emit('req-join-game', {
       gameId: gameId,
       playerData: {
-        name: playerName,
+        name: player.name,
         id: socket.id
       }
     });    
@@ -137,7 +150,7 @@ export const MultiPlayerGameController = () => {
     const socket = getSocket();
     socket?.emit('req-chat-message', {
       message: message,
-      sender: playerName,
+      sender: player.name,
       gameId: currentGame?.gameId,
     });
   }
@@ -161,7 +174,7 @@ export const MultiPlayerGameController = () => {
     return (
       <GameRoomView
         game={currentGame}
-        playerName={playerName}
+        player={player}
         onLeaveGame={handleLeaveGame}
         onStartGame={handleStartGame}
         onChatMessage={handleChatMessage}
@@ -175,7 +188,7 @@ export const MultiPlayerGameController = () => {
   return (
     <LobbyView
       isConnected={isConnected}
-      playerName={playerName}
+      playerName={player.name}
       error={error}
       availableGames={availableGames}
       onHostGame={handleHostGame}

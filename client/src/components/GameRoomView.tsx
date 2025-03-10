@@ -1,14 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ChatMessage, GameSettingsData, LobbyInformation } from '@mazing/util';
+import { ChatMessage, GameSettingsData, LobbyInformation, PlayerData } from '@mazing/util';
 import GameSettings from './GameSettings';
 import { GameChat } from './GameChat';
 import PlayersList from './PlayersList';
 
 interface GameRoomViewProps {
   game: LobbyInformation;
-  playerName: string;
+  player: PlayerData;
   onLeaveGame: () => void;
   onStartGame: () => void;
   onChatMessage: (message: string) => void;
@@ -19,7 +19,7 @@ interface GameRoomViewProps {
 
 export const GameRoomView = ({
   game,
-  playerName,
+  player,
   onLeaveGame,
   onStartGame,
   onChatMessage,
@@ -27,7 +27,7 @@ export const GameRoomView = ({
   gameSettings,
   updateGameSettings,
 }: GameRoomViewProps) => {
-  const isHost = game.host.name === playerName;
+  const isHost = game.host.id === player.id;
 
   const handleSettingsChange = (newSettings: GameSettingsData) => {
     updateGameSettings(newSettings);
@@ -35,7 +35,7 @@ export const GameRoomView = ({
 
   const players = game.players.map((player) => ({
     name: player.name,
-    isHost: player.name === game.host.name,
+    isHost: player.id === game.host.id,
   }));
 
   return (

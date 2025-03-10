@@ -13,7 +13,8 @@ import sellSound from "../sounds/selling_tower.wav";
 import useSound from '@/hooks/useSound';
 import Scoreboard, { PlayerScore } from './ScoreBoard';
 import { GameChat } from './GameChat';
-import FinalScoreBoard from './FinalResultsDisplay';
+import RoundResultsDialog from './RoundResultsDialog';
+import FinalResultsDisplay from './FinalResultsDisplay';
 
 
 interface MultiPlayerGameProps {
@@ -46,11 +47,10 @@ const extractPlayerScores = (
 
 const extractRound = (roundResults: RoundResult[] | null) => {
   if (roundResults && roundResults[0]){
-    return roundResults[0].round;
+    return roundResults[0].round + 1;
   }
   return 0;
 }
-
 
 export const MultiPlayerGame = ({
   settings, 
@@ -74,12 +74,15 @@ export const MultiPlayerGame = ({
   const [currentScore, setCurrentScore] = useState<RoundResult[] | null>(initialScore);
   const [gameEnded, setGameEnded] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResults | null >(null);
+  const [isRoundResultsDialogOpen, setIsRoundResultsDialogOpen] = useState(false);
   const playStartSound = useSound(startSound, 0.5);
   const playInvalidSound = useSound(invalidSound, 0.5);
   const playBuildSound = useSound(buildSound, 0.5);
   const playSellSound = useSound(sellSound, 0.5);
   
   const { rounds, duration: buildingTime } = settings;
+  const playerScores = extractPlayerScores(players, currentScore);
+  const round = extractRound(currentScore);
 
   useEffect(() => {
     const socket = getSocket();
@@ -101,9 +104,10 @@ export const MultiPlayerGame = ({
       setIsStopwatchRunning(false);
     }
 
-    function onRoundEnd(result: RoundResult[]) { 
+    const onRoundEnd = (result: RoundResult[]) => {
       setCurrentScore(result);
-    }
+      setIsRoundResultsDialogOpen(true);
+    };
 
     function onGameEnd(finalResult: FinalResults) {
       setFinalResult(finalResult);
@@ -258,8 +262,8 @@ export const MultiPlayerGame = ({
           <div className="flex flex-col space-y-4 w-96">
             <div>
               <Scoreboard
-                players={extractPlayerScores(players, currentScore)}
-                round={extractRound(currentScore)}
+                players={playerScores}
+                round={round}
                 numRounds={settings.rounds}
               />
             </div>
@@ -294,23 +298,32 @@ export const MultiPlayerGame = ({
         </>
       )}
       {gameEnded && finalResult && (
-        <>
-          <div className="flex flex-col space-y-4 w-96 lg:w-auto">
-            <div className="lg:w-96 ml-2">
-              <FinalScoreBoard
-                finalResults={finalResult}
-                totalRounds={rounds}
-              />
-            </div>
-            <div className="lg:w-96 ml-2">
+        <div className="flex flex-col gap-4 w-full">
+          <div className="w-full">
+            <FinalResultsDisplay
+              finalResults={finalResult}
+              totalRounds={rounds}
+            />
+          </div>
+          <div className="flex justify-left w-full">
+            <div className="w-96">
               <GameChat
                 chatLog={chatLog}
                 onSendMessage={onChatMessage}
               />
             </div>
           </div>
-        </>
+        </div>
       )}
+
+      <RoundResultsDialog
+        players={playerScores}
+        round={round}
+        numRounds={settings.rounds}
+        open={isRoundResultsDialogOpen}
+        onOpenChange={setIsRoundResultsDialogOpen}
+        autoCloseDelay={5000}
+      />
 
     </div>
   );

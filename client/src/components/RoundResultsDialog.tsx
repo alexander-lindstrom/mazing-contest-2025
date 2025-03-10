@@ -2,24 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { FinalResults } from '@mazing/util';
+
+interface PlayerScore {
+  id: string;
+  name: string;
+  score: number;
+}
 
 interface RoundResultsDialogProps {
-  roundResults: FinalResults;
-  totalRounds: number;
+  players: PlayerScore[];
+  round: number; // zero indexed
+  numRounds: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   autoCloseDelay?: number;
 }
 
 const RoundResultsDialog: React.FC<RoundResultsDialogProps> = ({
-  roundResults,
-  totalRounds,
+  players,
+  round,
   open,
   onOpenChange,
   autoCloseDelay = 5000,
 }) => {
   const [progress, setProgress] = useState(100);
+
+  const sortedPlayers = [...players].sort((a, b) => a.score - b.score);
 
   useEffect(() => {
     if (!open) return;
@@ -43,7 +51,7 @@ const RoundResultsDialog: React.FC<RoundResultsDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Round Results</DialogTitle>
+          <DialogTitle>Round {round} Results</DialogTitle>
         </DialogHeader>
 
         <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -53,34 +61,29 @@ const RoundResultsDialog: React.FC<RoundResultsDialogProps> = ({
           />
         </div>
 
-
         <Card className="bg-slate-800 p-4 rounded-lg shadow-lg">
           <div className="bg-slate-700 rounded-lg p-3">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="text-white">Placement</TableHead>
                   <TableHead className="text-white">Player</TableHead>
-                  <TableHead className="text-right text-white">Round {totalRounds}</TableHead>
-                  <TableHead className="text-right text-white">Total</TableHead>
+                  <TableHead className="text-right text-white">Round {round}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {roundResults.players.map((playerResult, index) => {
-                  const totalDuration = playerResult.durations.reduce((sum, duration) => sum + duration, 0);
-                  const roundDuration = playerResult.durations[totalRounds - 1];
-
-                  return (
-                    <TableRow key={index} className={index % 2 === 0 ? 'bg-slate-600' : 'bg-slate-700'}>
-                      <TableCell className="font-bold text-white">{playerResult.player.name}</TableCell>
-                      <TableCell className="text-right font-mono font-bold text-white">
-                        {roundDuration.toFixed(2)}s
-                      </TableCell>
-                      <TableCell className="text-right font-mono font-bold text-white">
-                        {totalDuration.toFixed(2)}s
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                {sortedPlayers.map((player, index) => (
+                  <TableRow
+                    key={player.id}
+                    className={index % 2 === 0 ? 'bg-slate-600' : 'bg-slate-700'}
+                  >
+                    <TableCell className="font-bold text-white">#{index + 1}</TableCell>
+                    <TableCell className="font-bold text-white">{player.name}</TableCell>
+                    <TableCell className="text-right font-mono font-bold text-white">
+                      {player.score.toFixed(2)}s
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>

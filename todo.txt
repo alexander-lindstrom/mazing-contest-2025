@@ -1,4 +1,5 @@
 In lobby:
+    Change appearance in some way.
 
 In game room:
     Change appearance in some way.
@@ -13,3 +14,4 @@ In game:
 General:
     Add Mazing contest! title.
     Add ability to leave/go back without refreshing.
+    There's one round too many (works for 1 round - not if more)

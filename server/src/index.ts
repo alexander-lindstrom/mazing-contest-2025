@@ -1,26 +1,44 @@
 import express from "express";
 import cors from "cors";
 import { Server } from "socket.io";
-import { createServer } from "http";
+import { createServer as createHttpServer } from "http";
+import { createServer as createHttpsServer } from "https";
 import { setupGameServer } from "./SocketManager";
+import fs from "fs";
 
 const app = express();
 const PORT = 5000;
-const VITE_PORT = 5173;
 
 app.use(cors());
 app.use(express.json());
 
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
+const isProduction = process.env.NODE_ENV === "production";
+
+let server;
+
+if (isProduction) {
+  const options = {
+    key: fs.readFileSync(`${process.env.PRIVATE_KEY}`),
+    cert: fs.readFileSync(`${process.env.CERTIFICATE}`)
+  };
+  
+  server = createHttpsServer(options, app);
+} else {
+  server = createHttpServer(app);
+}
+
+const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: isProduction 
+      ? "https://mazing-contest.se" 
+      : "http://localhost:5173",
     methods: ["GET", "POST"]
+    //credentials: true 
   }
 });
 
 setupGameServer(io);
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} (${isProduction ? 'HTTPS' : 'HTTP'})`);
 });

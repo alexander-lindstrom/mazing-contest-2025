@@ -6,8 +6,10 @@ In game room:
 In game:
     Give the option to select which player to view (during running phase).
     Show round results before starting new round (only for a few seconds?)
+    Final results 
+        Should be sorted
+        Show #1, #2
     
 General:
     Add Mazing contest! title.
     Add ability to leave/go back without refreshing.
-    Domainname -> use https: https://support.loopia.se/wiki/vidarebefordra-doman-till-annan-url/

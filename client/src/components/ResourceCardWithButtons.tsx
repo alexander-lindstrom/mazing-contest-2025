@@ -12,7 +12,7 @@ interface ResourceCardWithButtonProps {
   handleReset: (() => void) | null;
   handleGenerateNew: (() => void) | null;
   handleShare: (() => void) | null;
-  copied: boolean; // Added copied prop for the Share button state
+  copied: boolean;
 }
 
 const ResourceCardWithButton: React.FC<ResourceCardWithButtonProps> = ({

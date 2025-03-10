@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from "express";
 import cors from "cors";
 import { Server } from "socket.io";
@@ -7,7 +8,7 @@ import { setupGameServer } from "./SocketManager";
 import fs from "fs";
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -17,9 +18,13 @@ const isProduction = process.env.NODE_ENV === "production";
 let server;
 
 if (isProduction) {
+  if (!process.env.PRIVATE_KEY || !process.env.CERTIFICATE) {
+    throw new Error("PRIVATE_KEY or CERTIFICATE environment variables are not defined.");
+  }
+
   const options = {
-    key: fs.readFileSync(`${process.env.PRIVATE_KEY}`),
-    cert: fs.readFileSync(`${process.env.CERTIFICATE}`)
+    key: fs.readFileSync(process.env.PRIVATE_KEY),
+    cert: fs.readFileSync(process.env.CERTIFICATE)
   };
   
   server = createHttpsServer(options, app);

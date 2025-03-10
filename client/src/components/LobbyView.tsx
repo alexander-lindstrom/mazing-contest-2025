@@ -32,33 +32,32 @@ export const LobbyView = ({
   return (
     <div className="max-w-md mx-auto p-4">
       {error && (
-        <Alert variant="destructive" className="bg-red-400 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <AlertDescription className="text-black font-bold">{error}</AlertDescription>
+        <Alert variant="destructive" className="bg-red-600 border-2 border-red-800 rounded-lg shadow-lg">
+          <AlertDescription className="text-white font-mono font-bold">{error}</AlertDescription>
         </Alert>
       )}
-      <Card className="bg-yellow-300 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 transition-transform">
+      <Card className="bg-slate-800 border-2 border-slate-700 rounded-lg shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-black uppercase tracking-tight">Welcome to the Game</CardTitle>
+          <CardTitle className="text-2xl font-mono font-bold tracking-tight text-white">
+            Join or host a game
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2 text-black">
-                Your Name
-              </label>
               <Input
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 placeholder="Enter your name"
-                className="w-full border-3 border-black rounded-lg p-3 font-medium bg-white"
+                className="w-full border-2 border-slate-700 rounded-lg p-3 font-mono bg-slate-700 text-white"
               />
             </div>
 
             <div className="space-y-2">
               <SoundButton
                 onClick={onHostGame}
-                className="w-full bg-green-400 text-black hover:bg-green-500 font-bold py-3 px-6 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                className="w-full bg-green-600 text-white hover:bg-green-700 font-mono font-bold py-3 px-6 border-2 border-green-800 rounded-lg shadow-lg hover:translate-y-1 transition-all"
                 disabled={!isConnected}
               >
                 Host New Game
@@ -66,13 +65,13 @@ export const LobbyView = ({
 
               {waitingGames.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-medium my-2 text-black">Available Games</h3>
+                  <h3 className="text-lg font-mono font-medium my-2 text-white">Available Games</h3>
                   <div className="space-y-2">
                     {waitingGames.map((lobbyInfo) => (
                       <SoundButton
                         key={lobbyInfo.gameId}
                         onClick={() => onJoinGame(lobbyInfo.gameId)}
-                        className="w-full bg-blue-400 text-black hover:bg-blue-500 font-bold py-3 px-6 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                        className="w-full bg-blue-600 text-white hover:bg-blue-700 font-mono font-bold py-3 px-6 border-2 border-blue-800 rounded-lg shadow-lg hover:translate-y-1 transition-all"
                         disabled={!isConnected || lobbyInfo.numPlayers > 8}
                       >
                         {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
@@ -84,13 +83,13 @@ export const LobbyView = ({
 
               {startedGames.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-medium my-2 text-black">Ongoing Games</h3>
+                  <h3 className="text-lg font-mono font-medium my-2 text-white">Ongoing Games</h3>
                   <div className="space-y-2">
                     {startedGames.map((lobbyInfo) => (
                       <Button
                         key={lobbyInfo.gameId}
                         onClick={() => onJoinGame(lobbyInfo.gameId)}
-                        className="w-full bg-orange-400 text-black hover:bg-orange-500 font-bold py-3 px-6 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                        className="w-full bg-orange-600 text-white hover:bg-orange-700 font-mono font-bold py-3 px-6 border-2 border-orange-800 rounded-lg shadow-lg hover:translate-y-1 transition-all"
                         disabled={true}
                       >
                         {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)
@@ -102,13 +101,13 @@ export const LobbyView = ({
 
               {finishedGames.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-medium my-2 text-black">Completed Games</h3>
+                  <h3 className="text-lg font-mono font-medium my-2 text-white">Completed Games</h3>
                   <div className="space-y-2">
                     {finishedGames.map((lobbyInfo) => (
                       <Button
                         key={lobbyInfo.gameId}
                         onClick={() => onJoinGame(lobbyInfo.gameId)}
-                        className="w-full bg-purple-400 text-black hover:bg-purple-500 font-bold py-3 px-6 border-3 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                        className="w-full bg-purple-600 text-white hover:bg-purple-700 font-mono font-bold py-3 px-6 border-2 border-purple-800 rounded-lg shadow-lg hover:translate-y-1 transition-all"
                         disabled={true}
                       >
                         {lobbyInfo.gameId.substring(0, 8)} ({lobbyInfo.numPlayers} players)

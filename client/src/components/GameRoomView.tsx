@@ -3,7 +3,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ChatMessage, GameSettingsData, LobbyInformation } from '@mazing/util';
 import GameSettings from './GameSettings';
-import { GameRoomChat } from './GameRoomChat';
+import { GameChat } from './GameChat';
+import PlayersList from './PlayersList';
 
 interface GameRoomViewProps {
   game: LobbyInformation;
@@ -12,8 +13,8 @@ interface GameRoomViewProps {
   onStartGame: () => void;
   onChatMessage: (message: string) => void;
   chatLog: ChatMessage[];
-  gameSettings: GameSettingsData,
-  updateGameSettings: (settings: GameSettingsData) => void; 
+  gameSettings: GameSettingsData;
+  updateGameSettings: (settings: GameSettingsData) => void;
 }
 
 export const GameRoomView = ({
@@ -23,52 +24,37 @@ export const GameRoomView = ({
   onStartGame,
   onChatMessage,
   chatLog,
-  gameSettings, 
+  gameSettings,
   updateGameSettings,
 }: GameRoomViewProps) => {
-
-
   const isHost = game.host.name === playerName;
+
   const handleSettingsChange = (newSettings: GameSettingsData) => {
     updateGameSettings(newSettings);
   };
 
+  const players = game.players.map((player) => ({
+    name: player.name,
+    isHost: player.name === game.host.name,
+  }));
+
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <Card className="bg-yellow-300 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 transition-transform">
+    <div className="max-w-5xl mx-auto p-8">
+      <Card className="w-full bg-slate-800 p-6 rounded-lg shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-black uppercase tracking-tight">
+          <CardTitle className="text-left text-white font-mono font-bold text-xl">
             Game Room: {game.gameId.substring(0, 8)}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="md:col-span-1 bg-yellow-300 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 transition-transform">
-              <CardHeader>
-                <CardTitle className="text-lg font-black uppercase tracking-tight">Players</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {game.players.map((name, index) => (
-                    <div key={index} className="flex items-center">
-                      <span className="flex-1 font-medium">{name.name}</span>
-                      {name.name === game.host.name && (
-                        <span className="text-sm text-muted-foreground font-bold">(Host)</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <PlayersList players={players} />
 
-            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-2">
-                <GameRoomChat 
-                  chatLog={chatLog}
-                  onSendMessage={onChatMessage}
-                />
+                <GameChat chatLog={chatLog} onSendMessage={onChatMessage} />
               </div>
-              
+
               <div className="md:col-span-1">
                 <GameSettings
                   settings={gameSettings}
@@ -79,21 +65,21 @@ export const GameRoomView = ({
             </div>
           </div>
 
-          <Separator className="my-4 border-2 border-black" />
+          <Separator className="my-8 bg-slate-600" />
 
           <div className="flex justify-between">
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={onLeaveGame}
-              className="bg-red-400 text-black hover:bg-red-500 font-bold py-2 px-4 border-3 border-black rounded shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+              className="bg-red-500 text-white font-mono font-bold py-3 px-5 rounded-lg hover:bg-red-600 transition-colors text-lg"
             >
               Leave Game
             </Button>
             {isHost && (
-              <Button 
+              <Button
                 disabled={game.numPlayers < 2}
                 onClick={onStartGame}
-                className="bg-green-400 text-black hover:bg-green-500 font-bold py-2 px-4 border-3 border-black rounded shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                className="bg-green-500 text-white font-mono font-bold py-3 px-5 rounded-lg hover:bg-green-600 transition-colors text-lg"
               >
                 Start Game
               </Button>

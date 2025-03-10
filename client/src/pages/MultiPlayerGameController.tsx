@@ -17,7 +17,7 @@ export const MultiPlayerGameController = () => {
   const [chatLog, setChatLog] = useState<ChatMessage[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   const [initialScore, setInitialScore] = useState<RoundResult[] | null>(null);
-  const [gameSettings, setGameSettings] = useState<GameSettingsData>( {rounds: 5, duration: 45} );
+  const [gameSettings, setGameSettings] = useState<GameSettingsData>({ rounds: 5, duration: 45, roundTransitionDelay: 5 });
   const startButtonClick = useSound(startSound, 0.5);
   const stopButtonClick = useSound(stopSound, 0.5);
 

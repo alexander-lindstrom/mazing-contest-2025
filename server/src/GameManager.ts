@@ -123,7 +123,8 @@ export class GameManager {
       return;
     }
     game.updateSettings(req.settings);
-    io.to(req.gameId).emit("update-settings", { rounds: req.settings.rounds, duration: req.settings.duration });
+    io.to(req.gameId).emit("update-settings", { rounds: req.settings.rounds, duration: req.settings.duration,
+       roundTransitionDelay: req.settings.roundTransitionDelay });
   }
 
   private cleanupFinishedGames(): void {
@@ -136,8 +137,13 @@ export class GameManager {
     }
   }
 
-  private handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction){
+delay(seconds: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, seconds * 1000);
+  });
+}
 
+  private async handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction) {
     if (game.getState().status !== GameStatusEnum.RUNNING) {
       console.error("Cannot send result for game which is not running!");
       return;
@@ -145,7 +151,7 @@ export class GameManager {
 
     const finalResult = action.payload as StartingState;
     const path = findShortestPath(finalResult.grid, defaultStart, defaultGoal);
-    
+
     if (!validateRoundResult(game.getConfig(), finalResult) || !path) {
       console.error("Invalid round result!");
       // Todo: what should happen here?
@@ -157,15 +163,19 @@ export class GameManager {
     if (!player) {
       return;
     }
+
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player });
+
     if (game.allResultsReceived()) {
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound());
+
+      await this.delay(game.getState().roundTransitionDelay);
+
       if (game.startNextRound()) {
-        io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig())
-      }
-      else{
+        io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
+      } else {
         io.to(game.id).emit(GameActionEnum.SERVER_GAME_ENDED, game.getFinalResults());
       }
     }
-  }
+  } 
 }

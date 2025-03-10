@@ -8,6 +8,7 @@ interface GameState {
   currentRound: number; // zero-indexed
   results: Map<string, Result[]>;
   startingConfigs: StartingState[];
+  roundTransitionDelay: number;
 }
 
 export interface Result {
@@ -36,6 +37,7 @@ export class Game {
       currentRound: 0,
       results: new Map(),
       startingConfigs: [],
+      roundTransitionDelay: 5,
     };
 
     this.state.results.set(host.id, []);
@@ -106,6 +108,7 @@ export class Game {
 
   updateSettings(settings: GameSettingsData) {
     this.state.rounds = settings.rounds;
+    this.state.roundTransitionDelay = settings.roundTransitionDelay;
   }
 
   canStart(playerId: string): boolean {

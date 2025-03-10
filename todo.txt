@@ -6,12 +6,8 @@ In game room:
 
 In game:
     Give the option to select which player to view (during running phase).
-    Show round results before starting new round (only for a few seconds?)
-    Final results 
-        Should be sorted
-        Show #1, #2
+    Add round result dialog duration to settings
     
 General:
     Add Mazing contest! title.
     Add ability to leave/go back without refreshing.
-    There's one round too many (works for 1 round - not if more)

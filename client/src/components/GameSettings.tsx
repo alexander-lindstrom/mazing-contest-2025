@@ -6,80 +6,103 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardHeader,  CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { GameSettingsData } from '@mazing/util';
 
 interface GameSettingsProps {
   onSettingsChange: (settings: GameSettingsData) => void;
-  settings: GameSettingsData
+  settings: GameSettingsData;
   isHost: boolean;
 }
-
 
 const GameSettings: React.FC<GameSettingsProps> = ({ 
   onSettingsChange, 
   settings,
   isHost 
 }) => {
+  const { rounds, duration, roundTransitionDelay } = settings;
 
-  const { rounds, duration } = settings;
   const handleRoundsChange = (value: string): void => {
     const newRounds = parseInt(value);
-    onSettingsChange({ rounds: newRounds, duration });
+    onSettingsChange({ rounds: newRounds, duration, roundTransitionDelay });
   };
 
   const handleDurationChange = (value: string): void => {
     const newDuration = parseInt(value);
-    onSettingsChange({ rounds, duration: newDuration });
+    onSettingsChange({ rounds, duration: newDuration, roundTransitionDelay });
+  };
+
+  const handleRoundTransitionDelayChange = (value: string): void => {
+    const newDelay = parseInt(value);
+    onSettingsChange({ rounds, duration, roundTransitionDelay: newDelay });
   };
 
   return (
-    <Card className="bg-yellow-300 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 transition-transform h-full">
-      <CardHeader className="pb-2">
-       
-      </CardHeader>
+    <Card className="w-full bg-slate-800 p-3 rounded-lg shadow-lg">
       <CardContent>
         <div className="space-y-4">
           <div className="flex flex-col space-y-2">
-            <label className="font-bold text-black">ROUNDS</label>
+            <label className="font-mono font-bold text-white">ROUNDS</label>
             {isHost ? (
               <Select value={rounds.toString()} onValueChange={handleRoundsChange}>
-                <SelectTrigger className="bg-white border-2 border-black rounded font-medium">
+                <SelectTrigger className="bg-slate-700 border-slate-600 text-white font-mono font-bold">
                   <SelectValue placeholder="Select rounds" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-2 border-black">
+                <SelectContent className="bg-slate-700 border-slate-600 text-white font-mono">
                   {[1, 2, 3, 4, 5, 7, 10].map((num) => (
-                    <SelectItem key={num} value={num.toString()}>
+                    <SelectItem key={num} value={num.toString()} className="hover:bg-slate-600">
                       {num}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             ) : (
-              <div className="bg-white border-2 border-black rounded py-2 px-3 font-medium">
+              <div className="bg-slate-700 rounded-lg p-2 font-mono font-bold text-white">
                 {rounds}
               </div>
             )}
           </div>
 
           <div className="flex flex-col space-y-2">
-            <label className="font-bold text-black">BUILD TIME</label>
+            <label className="font-mono font-bold text-white">BUILD TIME</label>
             {isHost ? (
               <Select value={duration.toString()} onValueChange={handleDurationChange}>
-                <SelectTrigger className="bg-white border-2 border-black rounded font-medium">
+                <SelectTrigger className="bg-slate-700 border-slate-600 text-white font-mono font-bold">
                   <SelectValue placeholder="Select duration" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-2 border-black">
+                <SelectContent className="bg-slate-700 border-slate-600 text-white font-mono">
                   {[30, 45, 60, 90, 120].map((num) => (
-                    <SelectItem key={num} value={num.toString()}>
-                      {num}
+                    <SelectItem key={num} value={num.toString()} className="hover:bg-slate-600">
+                      {num} sec
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             ) : (
-              <div className="bg-white border-2 border-black rounded py-2 px-3 font-medium">
+              <div className="bg-slate-700 rounded-lg p-2 font-mono font-bold text-white">
                 {duration}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col space-y-2">
+            <label className="font-mono font-bold text-white">Transition time </label>
+            {isHost ? (
+              <Select value={roundTransitionDelay.toString()} onValueChange={handleRoundTransitionDelayChange}>
+                <SelectTrigger className="bg-slate-700 border-slate-600 text-white font-mono font-bold">
+                  <SelectValue placeholder="Select delay" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-700 border-slate-600 text-white font-mono">
+                  {[0, 3, 5, 10, 15].map((num) => (
+                    <SelectItem key={num} value={num.toString()} className="hover:bg-slate-600">
+                      {num} sec
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="bg-slate-700 rounded-lg p-2 font-mono font-bold text-white">
+                {roundTransitionDelay} seconds
               </div>
             )}
           </div>

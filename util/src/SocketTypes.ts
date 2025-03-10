@@ -65,6 +65,7 @@ export interface FinalResults {
 export interface GameSettingsData {
   rounds: number;
   duration: number;
+  roundTransitionDelay: number;
 }
 
 export interface UpdateSettingsRequest {

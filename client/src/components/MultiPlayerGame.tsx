@@ -322,7 +322,7 @@ export const MultiPlayerGame = ({
         numRounds={settings.rounds}
         open={isRoundResultsDialogOpen}
         onOpenChange={setIsRoundResultsDialogOpen}
-        autoCloseDelay={5000}
+        autoCloseDelay={settings.roundTransitionDelay}
       />
 
     </div>

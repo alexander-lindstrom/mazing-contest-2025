@@ -1,13 +1,8 @@
 In lobby:
-    Change appearance in some way.
 
 In game room:
-    Change appearance in some way.
 
 In game:
     Give the option to select which player to view (during running phase).
-    Add round result dialog duration to settings
     
 General:
-    Add Mazing contest! title.
-    Add ability to leave/go back without refreshing.

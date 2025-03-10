@@ -3,11 +3,12 @@ import { SinglePlayerGame } from "./pages/SinglePlayerGame";
 import { MultiPlayerGameController } from "./pages/MultiPlayerGameController";
 import SoundButton from "./components/SoundButton";
 import { getParamFromUrl, removeParamFromUrl } from "./util/url";
+import { getSocket } from "./socket";
 
 function App() {
   const [gameMode, setGameMode] = useState<"single" | "multi" | null>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const [titleHeight, setTitleHeight] = useState(0);
+  const titleRef = useRef<HTMLHeadingElement>(null); // Ref to measure title height
+  const [titleHeight, setTitleHeight] = useState(0); // State to store title height
 
   useEffect(() => {
     const mode = getParamFromUrl("mode");
@@ -27,6 +28,12 @@ function App() {
 
   const handleTitleClick = () => {
     setGameMode(null);
+
+    const socket = getSocket();
+    if (socket.connected) {
+      socket.disconnect();
+      console.log("Socket disconnected");
+    }
   };
 
   return (

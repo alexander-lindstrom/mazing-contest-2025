@@ -1,11 +1,21 @@
-import { Stage, Layer, Rect, Group, RegularPolygon, Line } from "react-konva";
+import { Stage, Layer, Rect, Group } from "react-konva";
 import { useCallback, useState, useMemo } from "react";
 import { KonvaEventObject } from "konva/lib/Node";
 import Runner from "./Runner";
-import { canPlaceTower, ClapEvent, defaultTimeStep, getBaseCellColor, getCellColor, getCenterPoint, GridCell, GridParams, Position, Tower } from "@mazing/util";
+import { canPlaceTower, ClapEvent, defaultTimeStep, getCenterPoint, GridCell, GridParams, Position, Tower } from "@mazing/util";
 import ClapAnimation from "./ClapAnimation";
+import SlowTower from "./grid/SlowTower";
+import { RegularTower } from "./grid/RegularTower";
+import { Grass } from "./grid/Grass";
+import { WildGrass } from "./grid/WildGrass";
+import { Sand } from "./grid/Sand";
 
-const CELL_PADDING = 0;
+export interface BasePositionProps {
+  x: number;
+  y: number;
+  size: number;
+  id?: string;
+}
 
 export type GridRendererParams = GridParams & {
   handleClick: (x: number, y: number, e: KonvaEventObject<MouseEvent>) => void;
@@ -89,104 +99,105 @@ const GridRenderer: React.FC<GridRendererParams> = ({
 
     return grid.map((row, y) =>
       row.map((cell, x) => {
-        return (
-          <Rect
-            key={`${x}-${y}`}
-            x={x * CELL_SIZE + CELL_PADDING}
-            y={y * CELL_SIZE + CELL_PADDING}
-            width={CELL_SIZE - 2 * CELL_PADDING}
-            height={CELL_SIZE - 2 * CELL_PADDING}
-            fill={getBaseCellColor(cell)}
-            strokeWidth={1}
-            stroke="#000"
-            cornerRadius={2}
-            cursor="pointer"
-          />
-        );
+        const centerX = (x+0.5) * CELL_SIZE;
+        const centerY= (y+0.5) * CELL_SIZE;
+        switch (cell) {
+          case GridCell.GRASS:
+            return (
+              <Grass
+                key={`grass-${x}-${y}`}
+                x={centerX}
+                y={centerY}
+                size={CELL_SIZE}
+              />
+            );
+          case GridCell.GRASS_NOBUILD:
+            return (
+              <WildGrass
+                key={`wild-grass-${x}-${y}`}
+                x={centerX}
+                y={centerY}
+                size={CELL_SIZE}
+              />
+            );
+          case GridCell.SAND:
+            return (
+              <Sand
+                key={`sand-${x}-${y}`}
+                x={centerX}
+                y={centerY}
+                size={CELL_SIZE}
+              />
+            );
+          default:
+            return null;
+        }
       })
     );
-  };
-
-  const renderFrostSymbol = (centerX: number, centerY: number, size: number) => {
-    const snowflakeRadius = size * 0.35;
-    const lines = [];
-    
-    for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i;
-      const x1 = centerX;
-      const y1 = centerY;
-      const x2 = centerX + snowflakeRadius * Math.cos(angle);
-      const y2 = centerY + snowflakeRadius * Math.sin(angle);
-      
-      lines.push(
-        <Line
-          key={`frost-line-${i}`}
-          points={[x1, y1, x2, y2]}
-          stroke="#ffffff"
-          strokeWidth={2}
-        />
-      );
-      
-      const crossSize = snowflakeRadius * 0.3;
-      const crossAngle = Math.PI / 6;
-      
-      const cx1 = x2 + crossSize * Math.cos(angle + crossAngle);
-      const cy1 = y2 + crossSize * Math.sin(angle + crossAngle);
-      const cx2 = x2 + crossSize * Math.cos(angle - crossAngle);
-      const cy2 = y2 + crossSize * Math.sin(angle - crossAngle);
-      
-      lines.push(
-        <Line
-          key={`frost-cross-1-${i}`}
-          points={[x2, y2, cx1, cy1]}
-          stroke="#ffffff"
-          strokeWidth={1.5}
-        />
-      );
-      
-      lines.push(
-        <Line
-          key={`frost-cross-2-${i}`}
-          points={[x2, y2, cx2, cy2]}
-          stroke="#ffffff"
-          strokeWidth={1.5}
-        />
-      );
-    }
-    
-    return lines;
   };
 
   const renderTowers = () => {
     if (grid.length === 0 || grid[0].length === 0) return null;
 
     return towers.map((tower, index) => {
-      if (tower.type === GridCell.BLOCK_TOWER || tower.type === GridCell.BLOCK_TOWER_NOSELL) {
-        return;
-      }
-      const { positions, type } = tower;
+      const { positions } = tower;
       const center = getCenterPoint(positions);
       
       const centerX = (center.x + 0.5) * CELL_SIZE;
       const centerY = (center.y + 0.5) * CELL_SIZE;
       
-      const radius = CELL_SIZE * 0.85;
+      const radius = 2*CELL_SIZE;
       
-      return (
-        <Group key={`tower-${index}`}>
-          <RegularPolygon
-            x={centerX}
-            y={centerY}
-            sides={6}
-            radius={radius}
-            fill={getCellColor(type)}
-            strokeWidth={1}
-            stroke="#000"
-            rotation={0}
-          />
-          {renderFrostSymbol(centerX, centerY, CELL_SIZE * 1.7)}
-        </Group>
-      );
+      switch (tower.type) {
+        case GridCell.CLAP_TOWER:
+          return (
+            <SlowTower
+              key={`tower-${index}`}
+              id={`tower-${index}`}
+              x={centerX}
+              y={centerY}
+              towerRadius={radius}
+              showEffectBorder={false} // Todo: show on hover?
+              sellable={true}       
+            />
+          );
+        case GridCell.CLAP_TOWER_NOSELL:
+          return (
+            <SlowTower
+              key={`tower-${index}`}
+              id={`tower-${index}`}
+              x={centerX}
+              y={centerY}
+              towerRadius={radius}
+              showEffectBorder={false} // Todo: show on hover?
+              sellable={false}       
+            />
+          );
+        case GridCell.BLOCK_TOWER:
+          return (
+            <RegularTower
+              key={`tower-${index}`}
+              id={`tower-${index}`}
+              x={centerX}
+              y={centerY}
+              towerRadius={radius}
+              sellable={true}
+            />
+          );
+        case GridCell.BLOCK_TOWER_NOSELL:
+          return (
+            <RegularTower
+              key={`tower-${index}`}
+              id={`tower-${index}`}
+              x={centerX}
+              y={centerY}
+              towerRadius={radius}
+              sellable={false}
+            />
+          );
+        default:
+          return null;
+      }
     });
   };
 

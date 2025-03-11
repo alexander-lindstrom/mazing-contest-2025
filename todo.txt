@@ -4,5 +4,15 @@ In game room:
 
 In game:
     Give the option to select which player to view (during running phase).
-    
+
 General:
+    Challenge mode?
+    Option available after completed game.
+    Display two mazes side by side. 
+
+Grid appearance changes:
+    Regular tower appearance
+    Background for tower (sellable - non sellable)
+    Grass, Wild gras, Sand - different issue
+    Grid indicator missing at the center
+    Runner?

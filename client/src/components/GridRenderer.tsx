@@ -5,7 +5,7 @@ import Runner from "./Runner";
 import { canPlaceTower, ClapEvent, defaultTimeStep, getCenterPoint, GridCell, GridParams, Position, Tower } from "@mazing/util";
 import ClapAnimation from "./ClapAnimation";
 import SlowTower from "./grid/SlowTower";
-import { RegularTower } from "./grid/RegularTower";
+import { BlockingTower } from "./grid/BlockingTower";
 import { Grass } from "./grid/Grass";
 import { WildGrass } from "./grid/WildGrass";
 import { Sand } from "./grid/Sand";
@@ -100,7 +100,7 @@ const GridRenderer: React.FC<GridRendererParams> = ({
     return grid.map((row, y) =>
       row.map((cell, x) => {
         const centerX = (x+0.5) * CELL_SIZE;
-        const centerY= (y+0.5) * CELL_SIZE;
+        const centerY = (y+0.5) * CELL_SIZE;
         switch (cell) {
           case GridCell.GRASS:
             return (
@@ -175,7 +175,7 @@ const GridRenderer: React.FC<GridRendererParams> = ({
           );
         case GridCell.BLOCK_TOWER:
           return (
-            <RegularTower
+            <BlockingTower
               key={`tower-${index}`}
               id={`tower-${index}`}
               x={centerX}
@@ -186,7 +186,7 @@ const GridRenderer: React.FC<GridRendererParams> = ({
           );
         case GridCell.BLOCK_TOWER_NOSELL:
           return (
-            <RegularTower
+            <BlockingTower
               key={`tower-${index}`}
               id={`tower-${index}`}
               x={centerX}

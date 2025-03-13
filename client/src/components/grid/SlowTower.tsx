@@ -49,7 +49,6 @@ const SlowTower: React.FC<SlowTowerProps> = ({
   
   const scale = towerRadius / 42;
   
-
   const outerHexRadius = 20 * scale;
   const innerHexRadius = 15 * scale;
   const middleCircleRadius = 15 * scale;
@@ -60,19 +59,21 @@ const SlowTower: React.FC<SlowTowerProps> = ({
   
   const radarLength = 22 * scale;
 
-  const bgColor = sellable ? "#4CAF50" : "#607D8B";
-  const bgOpacity = sellable ? 0.5 : 0.4;
+  const baseColor = "#78909C";
+  const borderColor = "#455A64";
+  const sellIndicatorColor = "#4CAF50";
   
   return (
     <Group x={x} y={y} id={id}>
-
       <Rect
         width={towerRadius}
         height={towerRadius}
         offsetX={towerRadius / 2}
         offsetY={towerRadius / 2}
-        fill={bgColor}
-        opacity={bgOpacity}
+        fill={baseColor}
+        stroke={borderColor}
+        strokeWidth={2 * scale}
+        cornerRadius={3 * scale}
       />
 
       {showEffectBorder && (
@@ -164,6 +165,37 @@ const SlowTower: React.FC<SlowTowerProps> = ({
         radius={indicatorRadius}
         fill="#29b6f6"
       />
+      
+      {sellable && (
+        <>
+          <Circle
+            radius={towerRadius * 0.1}
+            x={towerRadius * 0.3}
+            y={-towerRadius * 0.3}
+            fill={sellIndicatorColor}
+            stroke={borderColor}
+            strokeWidth={1 * scale}
+          />
+          <Rect
+            width={towerRadius * 0.12}
+            height={towerRadius * 0.02}
+            x={towerRadius * 0.3}
+            y={-towerRadius * 0.3}
+            offsetX={towerRadius * 0.06}
+            offsetY={towerRadius * 0.01}
+            fill={baseColor}
+          />
+          <Rect
+            width={towerRadius * 0.02}
+            height={towerRadius * 0.12}
+            x={towerRadius * 0.3}
+            y={-towerRadius * 0.3}
+            offsetX={towerRadius * 0.01}
+            offsetY={towerRadius * 0.06}
+            fill={baseColor}
+          />
+        </>
+      )}
     </Group>
   );
 };

@@ -4,6 +4,7 @@ In game room:
 
 In game:
     Give the option to select which player to view (during running phase).
+    Hold shift to upgrade tower with left click.
 
 General:
     Challenge mode?

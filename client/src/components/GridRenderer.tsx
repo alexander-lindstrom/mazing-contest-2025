@@ -9,6 +9,7 @@ import { BlockingTower } from "./grid/BlockingTower";
 import { Grass } from "./grid/Grass";
 import { WildGrass } from "./grid/WildGrass";
 import { Sand } from "./grid/Sand";
+import { GridLines } from "./grid/GridLines";
 
 export interface BasePositionProps {
   x: number;
@@ -41,10 +42,11 @@ const GridRenderer: React.FC<GridRendererParams> = ({
 }) => {
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
 
+  if (grid.length === 0 || grid[0].length === 0) {
+    return null;
+  }
+
   const CELL_SIZE = useMemo(() => {
-    if (grid.length === 0 || grid[0].length === 0) {
-      return 0;
-    }
     const cellWidth = width / grid[0].length;
     const cellHeight = height / grid.length;
     return Math.min(cellWidth, cellHeight);
@@ -52,7 +54,6 @@ const GridRenderer: React.FC<GridRendererParams> = ({
 
   const handleMouseMove = useCallback(
     (e: KonvaEventObject<MouseEvent>) => {
-      if (grid.length === 0 || grid[0].length === 0) return;
 
       const stage = e.target.getStage();
       if (!stage) return;
@@ -78,7 +79,6 @@ const GridRenderer: React.FC<GridRendererParams> = ({
 
   const handleStageClick = useCallback(
     (e: KonvaEventObject<MouseEvent>) => {
-      if (grid.length === 0 || grid[0].length === 0) return;
 
       const stage = e.target.getStage();
       if (!stage) return;
@@ -95,12 +95,10 @@ const GridRenderer: React.FC<GridRendererParams> = ({
   );
 
   const renderBaseGrid = () => {
-    if (grid.length === 0 || grid[0].length === 0) return null;
-
-    return grid.map((row, y) =>
+    const gridElements = grid.map((row, y) =>
       row.map((cell, x) => {
-        const centerX = (x+0.5) * CELL_SIZE;
-        const centerY = (y+0.5) * CELL_SIZE;
+        const centerX = (x + 0.5) * CELL_SIZE;
+        const centerY = (y + 0.5) * CELL_SIZE;
         switch (cell) {
           case GridCell.GRASS:
             return (
@@ -134,10 +132,15 @@ const GridRenderer: React.FC<GridRendererParams> = ({
         }
       })
     );
+  
+    return [
+      <GridLines key="grid-lines" width={grid[0].length * CELL_SIZE} height={grid.length * CELL_SIZE} cellSize={CELL_SIZE} />,
+      ...gridElements.flat(),
+    ];
   };
+  
 
   const renderTowers = () => {
-    if (grid.length === 0 || grid[0].length === 0) return null;
 
     return towers.map((tower, index) => {
       const { positions } = tower;
@@ -201,10 +204,6 @@ const GridRenderer: React.FC<GridRendererParams> = ({
     });
   };
 
-  if (grid.length === 0 || grid[0].length === 0) {
-    return null;
-  }
-
   const baseGrid = useMemo(() => renderBaseGrid(), [grid, CELL_SIZE]);
   const towersGrid = useMemo(() => renderTowers(), [towers, CELL_SIZE]);
 
@@ -216,8 +215,11 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       onMouseLeave={handleMouseLeave}
       onClick={handleStageClick}
     >
-      <Layer>{baseGrid}</Layer>
+      <Layer>{baseGrid}
+      <GridLines width={width} height={height} cellSize={CELL_SIZE} />
+      </Layer>
       <Layer>{towersGrid}</Layer>
+      
       {!showRunner && hoverPosition && (
         <Layer>
           <Group>

@@ -14,9 +14,7 @@ General:
         On the starting page
 
 Grid appearance changes:
-    Fix 'grid lines' appearance in the center.
+    Fix tower size.
+    Update block tower inner shape
     Runner appearance change.
-    Performance updates:
-        - Put everything which is static in it's own layer which is cached.
-        - For moving parts (slowTower, runner, selection square, clapAnimation). Keep separate 
-            and make sure only the part re-renders
+ 

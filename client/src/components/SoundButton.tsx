@@ -9,16 +9,16 @@ interface SoundButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>
 const SoundButton: React.FC<SoundButtonProps> = ({ onClick, children, className, disabled, ...props }) => {
   const buttonClickRef = useRef<Howl | null>(null);
 
-  if (!buttonClickRef.current) {
-    buttonClickRef.current = new Howl({
-      src: [buttonClickSound],
-      volume: 1,
-    });
-  }
-
   const handleClick = () => {
     if (!disabled) {
-      buttonClickRef.current?.play();
+      if (!buttonClickRef.current) {
+        buttonClickRef.current = new Howl({
+          src: [buttonClickSound],
+          volume: 1,
+        });
+      }
+
+      buttonClickRef.current.play();
       onClick();
     }
   };

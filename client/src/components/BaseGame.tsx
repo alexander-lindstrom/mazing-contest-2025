@@ -76,7 +76,7 @@ const BaseGame: React.FC<BaseGameProps> = ({
   return (
     <div className="flex flex-col items-center w-full max-w-6xl mx-auto">
       <div style={{ width: gridDimensions.width }} className="flex flex-col">
-
+  
         <div className="w-full mb-4 flex justify-center items-center">
           {handleStartButton && handleReset && handleGenerateNew && handleShare ? (
             <ResourceCardWithButtons
@@ -100,23 +100,25 @@ const BaseGame: React.FC<BaseGameProps> = ({
           )}
         </div>
   
-        <div
-          ref={ref}
-          className="rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mx-auto"
-        >
-          <GridRenderer
-            width={gridDimensions.width}
-            height={gridDimensions.height}
-            towers={towers}
-            grid={grid}
-            handleClick={handleCellClick}
-            runnerPath={runnerPath}
-            runnerStatus={runnerStatus}
-            runnerAngle={runnerAngle}
-            showRunner={isRunning}
-            clapEvents={clapEvents}
-          />
-        </div>
+        {grid.length > 0 && grid[0].length > 0 && (
+          <div
+            ref={ref}
+            className="rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mx-auto"
+          >
+            <GridRenderer
+              width={gridDimensions.width}
+              height={gridDimensions.height}
+              towers={towers}
+              grid={grid}
+              handleClick={handleCellClick}
+              runnerPath={runnerPath}
+              runnerStatus={runnerStatus}
+              runnerAngle={runnerAngle}
+              showRunner={isRunning}
+              clapEvents={clapEvents}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

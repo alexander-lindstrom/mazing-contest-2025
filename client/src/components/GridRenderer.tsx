@@ -43,10 +43,6 @@ const GridRenderer: React.FC<GridRendererParams> = ({
 }) => {
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
 
-  if (grid.length === 0 || grid[0].length === 0) {
-    return null;
-  }
-
   const CELL_SIZE = useMemo(() => {
     const cellWidth = width / grid[0].length;
     const cellHeight = height / grid.length;

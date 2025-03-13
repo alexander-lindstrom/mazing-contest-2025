@@ -7,8 +7,8 @@ import { getSocket } from "./socket";
 
 function App() {
   const [gameMode, setGameMode] = useState<"single" | "multi" | null>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null); // Ref to measure title height
-  const [titleHeight, setTitleHeight] = useState(0); // State to store title height
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [titleHeight, setTitleHeight] = useState(0);
 
   useEffect(() => {
     const mode = getParamFromUrl("mode");

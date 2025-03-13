@@ -4,17 +4,16 @@ In game room:
 
 In game:
     Give the option to select which player to view (during running phase).
-    Hold shift to upgrade tower with left click.
+    Hold shift to upgrade tower with left click. Should be possible both for sellable, and non sellable block tower. 
+        Need to think a bit how about the non-sellable case
 
 General:
     Challenge mode?
-    Option available after completed game.
-    Display two mazes side by side.
-    Fix error: The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu
-        On the starting page
+        Option available after completed game.
+        Display two mazes side by side.
 
 Grid appearance changes:
-    Fix tower size.
-    Update block tower inner shape
-    Runner appearance change.
+    Fix tower size?
+    Update block tower inner shape?
+    Runner appearance change?
  

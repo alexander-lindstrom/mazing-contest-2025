@@ -26,7 +26,6 @@ export const Grass: React.FC<BasePositionProps> = ({ x, y, size, id }) => {
         fill={baseColor}
       />
       
-      
       {grassPattern.map((patch, i) => (
         <Rect
           key={i}

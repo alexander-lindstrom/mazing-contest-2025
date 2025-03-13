@@ -9,11 +9,14 @@ In game:
 General:
     Challenge mode?
     Option available after completed game.
-    Display two mazes side by side. 
+    Display two mazes side by side.
+    Fix error: The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu
+        On the starting page
 
 Grid appearance changes:
-    Regular tower appearance
-    Background for tower (sellable - non sellable)
-    Grass, Wild gras, Sand - different issue
-    Grid indicator missing at the center
-    Runner?
+    Fix 'grid lines' appearance in the center.
+    Runner appearance change.
+    Performance updates:
+        - Put everything which is static in it's own layer which is cached.
+        - For moving parts (slowTower, runner, selection square, clapAnimation). Keep separate 
+            and make sure only the part re-renders

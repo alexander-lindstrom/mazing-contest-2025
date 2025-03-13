@@ -205,6 +205,9 @@ const GridRenderer: React.FC<GridRendererParams> = ({
     return null;
   }
 
+  const baseGrid = useMemo(() => renderBaseGrid(), [grid, CELL_SIZE]);
+  const towersGrid = useMemo(() => renderTowers(), [towers, CELL_SIZE]);
+
   return (
     <Stage
       width={width}
@@ -213,10 +216,10 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       onMouseLeave={handleMouseLeave}
       onClick={handleStageClick}
     >
-      <Layer>
-        {renderBaseGrid()}
-        {renderTowers()}
-        {!showRunner && hoverPosition && (
+      <Layer>{baseGrid}</Layer>
+      <Layer>{towersGrid}</Layer>
+      {!showRunner && hoverPosition && (
+        <Layer>
           <Group>
             {[0, 1].map((dy) =>
               [0, 1].map((dx) => {
@@ -237,26 +240,22 @@ const GridRenderer: React.FC<GridRendererParams> = ({
               })
             )}
           </Group>
-        )}
-      </Layer>
+        </Layer>
+      )}
       {runnerPath && showRunner && (
         <Layer>
-          <Runner 
-            runnerPath={runnerPath} 
-            cellSize={CELL_SIZE} 
+          <Runner
+            runnerPath={runnerPath}
+            cellSize={CELL_SIZE}
             timestep={defaultTimeStep}
             runnerStatus={runnerStatus}
             runnerAngle={runnerAngle}
           />
-
         </Layer>
       )}
       {clapEvents.length > 0 && showRunner && (
         <Layer>
-          <ClapAnimation 
-            events={clapEvents} 
-            cellSize={CELL_SIZE}
-          />
+          <ClapAnimation events={clapEvents} cellSize={CELL_SIZE} />
         </Layer>
       )}
     </Stage>

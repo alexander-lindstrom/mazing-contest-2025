@@ -27,12 +27,7 @@ const PlayerSelector: React.FC<PlayerSelectorProps> = ({
   return (
     <Card className="w-full bg-slate-800 p-3 rounded-lg shadow-lg">
       <div className="text-left text-white font-mono font-bold text-lg mb-4">
-        {isAnimationPhase ? "Choose Player to Watch" : "Players in Game"}
-        {!isAnimationPhase && (
-          <div className="text-xs text-slate-400 mt-1">
-            Selection available during animation phase
-          </div>
-        )}
+        {isAnimationPhase ? "View player" : "Players"}
       </div>
 
       <div className="flex flex-col space-y-2">

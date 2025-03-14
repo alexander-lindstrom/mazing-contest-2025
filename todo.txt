@@ -4,6 +4,8 @@ In game room:
 
 In game:
     Give the option to select which player to view (during running phase).
+        New component?
+        Needs to be able to switch to another grid at the same time.
     Hold shift to upgrade tower with left click. Should be possible both for sellable, and non sellable block tower. 
         Need to think a bit how about the non-sellable case
     Server should be fully in control - not wait for players to return results indefinitely.
@@ -16,4 +18,7 @@ General:
 Grid appearance changes:
     Fix tower size?
     Update block tower inner shape?
+
+Sound:
+    Delay before sound is heard?
  

@@ -1,4 +1,4 @@
-import { GridCell } from "./Grid";
+import { GridCell, Tower } from "./Grid";
 
 export enum GameActionEnum {
 
@@ -40,6 +40,7 @@ export interface RoundResult {
   duration: number;
   cumulativeDuration: number
   finalMaze: GridCell[][];
+  finalTowers: Tower[];
 }
 
 export enum GameStatusEnum {

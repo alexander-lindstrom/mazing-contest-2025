@@ -1,4 +1,4 @@
-import { FinalResult, FinalResults, GameSettingsData, GameStatusEnum, generateStartingState, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState } from "@mazing/util";
+import { FinalResult, FinalResults, GameSettingsData, GameStatusEnum, generateStartingState, GridCell, LobbyInformation, PlayerData, RoundResult, StartingState, Tower } from "@mazing/util";
 
 interface GameState {
   status: GameStatusEnum;
@@ -15,6 +15,7 @@ export interface Result {
   player: PlayerData;
   duration: number;
   finalMaze: GridCell[][];
+  finalTowers: Tower[];
 }
 
 export class Game {

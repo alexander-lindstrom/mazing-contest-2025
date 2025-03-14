@@ -164,7 +164,7 @@ delay(seconds: number): Promise<void> {
       return;
     }
 
-    game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player });
+    game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player, finalTowers: finalResult.towers });
 
     if (game.allResultsReceived()) {
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound());

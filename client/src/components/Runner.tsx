@@ -1,6 +1,6 @@
 import { Position } from '@mazing/util';
 import { useEffect, useRef, useState } from 'react';
-import { Circle, Line } from 'react-konva';
+import { Group, Circle, Rect } from 'react-konva';
 
 type RunnerProps = {
   runnerPath: Position[];
@@ -12,6 +12,7 @@ type RunnerProps = {
 
 const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep, runnerStatus, runnerAngle }) => {
   const [currentPosition, setCurrentPosition] = useState<Position | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const startTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const [isSlowed, setIsSlowed] = useState(false);
@@ -29,8 +30,9 @@ const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep, runnerS
       const elapsed = (timestamp - startTimeRef.current) / 1000;
       const progress = elapsed / totalDuration;
       const index = Math.min(Math.floor(progress * runnerPath.length), runnerPath.length - 1);
+      
       setCurrentPosition(runnerPath[index]);
-
+      setCurrentIndex(index);
       setIsSlowed(runnerStatus[index]);
 
       if (index < runnerPath.length - 1) {
@@ -49,33 +51,72 @@ const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep, runnerS
 
   if (!currentPosition) return null;
 
-  const angle = runnerAngle[runnerPath.indexOf(currentPosition)];
-
-  const lineLength = cellSize / 3;
-
-  return (
-    <>
+  const angle = runnerAngle[currentIndex];
+  
+  const renderCharacter = () => {
+    const centerX = currentPosition.x * cellSize + cellSize / 2;
+    const centerY = currentPosition.y * cellSize + cellSize / 2;
+    const size = cellSize * 0.6;
+    
+    return (
+      <Group
+        x={centerX}
+        y={centerY}
+        rotation={angle * (180 / Math.PI)}
+      >
+        <Rect
+          x={-size/2}
+          y={-size/3}
+          width={size}
+          height={size/1.5}
+          cornerRadius={5}
+          fill={isSlowed ? "#4169E1" : "#FF4500"}
+          shadowColor="black"
+          shadowBlur={3}
+          shadowOffset={{ x: 1, y: 1 }}
+          shadowOpacity={0.3}
+        />
+        
+        <Rect
+          x={-size/4}
+          y={-size/3}
+          width={size/2}
+          height={size/4}
+          cornerRadius={3}
+          fill={isSlowed ? "#87CEFA" : "#FFD700"}
+        />
+        
+        <Circle x={-size/3} y={-size/5} radius={size/10} fill="#333" />
+        <Circle x={size/3} y={-size/5} radius={size/10} fill="#333" />
+        <Circle x={-size/3} y={size/5} radius={size/10} fill="#333" />
+        <Circle x={size/3} y={size/5} radius={size/10} fill="#333" />
+        
+        <Circle x={size/2 - 2} y={-size/6} radius={size/12} fill="yellow" />
+        <Circle x={size/2 - 2} y={size/6} radius={size/12} fill="yellow" />
+      </Group>
+    );
+  };
+  
+  const renderGlow = () => {
+    if (!isSlowed) return null;
+    
+    return (
       <Circle
         x={currentPosition.x * cellSize + cellSize / 2}
         y={currentPosition.y * cellSize + cellSize / 2}
-        radius={cellSize / 3}
-        fill={isSlowed ? "blue" : "red"}
-        stroke="black"
-        strokeWidth={2}
-        rotation={angle * (180 / Math.PI)}
+        radius={cellSize * 0.5}
+        fill="rgba(0, 100, 255, 0.2)"
+        shadowColor="blue"
+        shadowBlur={10}
+        shadowOpacity={0.6}
       />
-      <Line
-        points={[
-          currentPosition.x * cellSize + cellSize / 2,
-          currentPosition.y * cellSize + cellSize / 2,
-          currentPosition.x * cellSize + cellSize / 2 + lineLength * Math.cos(angle),
-          currentPosition.y * cellSize + cellSize / 2 + lineLength * Math.sin(angle),
-        ]}
-        stroke="black"
-        strokeWidth={3}
-        lineCap="round"
-        lineJoin="round"
-      />
+    );
+  };
+
+  return (
+    <>
+      {renderGlow()}
+      {renderCharacter()}
     </>
   );
 };

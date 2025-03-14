@@ -15,6 +15,7 @@ import Scoreboard, { PlayerScore } from './ScoreBoard';
 import { GameChat } from './GameChat';
 import RoundResultsDialog from './RoundResultsDialog';
 import FinalResultsDisplay from './FinalResultsDisplay';
+import PlayerSelector from './PlayerSelector';
 
 
 interface MultiPlayerGameProps {
@@ -23,6 +24,7 @@ interface MultiPlayerGameProps {
   onChatMessage: (message: string) => void;
   initialScore: RoundResult[] | null;
   players: PlayerData[];
+  player: { id: string, name: string };
 }
 
 const extractPlayerScores = (
@@ -57,7 +59,8 @@ export const MultiPlayerGame = ({
   chatLog,
   onChatMessage,
   initialScore,
-  players
+  players,
+  player
 }: MultiPlayerGameProps) => {
   const [grid, setGrid] = useState<GridCell[][]>([])
   const [towers, setTowers] = useState<Tower[]>([])
@@ -75,6 +78,7 @@ export const MultiPlayerGame = ({
   const [gameEnded, setGameEnded] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResults | null >(null);
   const [isRoundResultsDialogOpen, setIsRoundResultsDialogOpen] = useState(false);
+  const [selectedPlayerId, setSelectedPlayerId] = useState(player.id);
   const playStartSound = useSound(startSound, 0.5);
   const playInvalidSound = useSound(invalidSound, 0.5);
   const playBuildSound = useSound(buildSound, 0.5);
@@ -254,6 +258,10 @@ export const MultiPlayerGame = ({
     const totalSimTime = timeSteps.length * defaultTimeStep;
     setTotalSimulationTime(totalSimTime);
   };
+
+  const updateSelectedPlayer = (id: string) => {
+    setSelectedPlayerId(id);
+  }
   
   return (
     <div className="flex flex-col lg:flex-row gap-2 items-start w-full">
@@ -272,6 +280,15 @@ export const MultiPlayerGame = ({
                 chatLog={chatLog}
                 onSendMessage={onChatMessage}
               />
+            </div>
+            <div>
+            <PlayerSelector
+              players={playerScores}
+              isAnimationPhase={isRunning}
+              onSelectPlayer={updateSelectedPlayer}
+              currentUserId={player.id}
+              selectedPlayerId={selectedPlayerId}
+            />
             </div>
           </div>
           <div className="max-w-[1200px]">
@@ -322,7 +339,7 @@ export const MultiPlayerGame = ({
         numRounds={settings.rounds}
         open={isRoundResultsDialogOpen}
         onOpenChange={setIsRoundResultsDialogOpen}
-        autoCloseDelay={settings.roundTransitionDelay}
+        autoCloseDelay={settings.roundTransitionDelay*1000}
       />
 
     </div>

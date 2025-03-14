@@ -168,6 +168,7 @@ export const MultiPlayerGameController = () => {
         onChatMessage={handleChatMessage}
         initialScore={initialScore}
         players={currentGame.players}
+        player={player}
       />
     );
   } else if (currentGame) {

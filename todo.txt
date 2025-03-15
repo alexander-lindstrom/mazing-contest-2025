@@ -1,6 +1,7 @@
 In lobby:
 
 In game room:
+    shorter sticky time on tooltip
 
 In game:
     Give the option to select which player to view (during running phase).
@@ -21,4 +22,7 @@ Grid appearance changes:
 
 Sound:
     Delay before sound is heard?
+
+Share:
+    Not working
  

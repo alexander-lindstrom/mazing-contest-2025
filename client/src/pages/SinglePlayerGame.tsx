@@ -159,7 +159,7 @@ export function SinglePlayerGame() {
   const handleShare = () => {
     const baseUrl = import.meta.env.MODE === 'development'
       ? 'http://localhost:5173'
-      : import.meta.env.VITE_URL;
+      : import.meta.env.VITE_FRONTEND_URL;
   
     const seed = startingState.seed;
     const fullUrl = `${baseUrl}?mode=single&seed=${encodeURIComponent(seed)}`;

@@ -42,15 +42,15 @@ const GameSettings: React.FC<GameSettingsProps> = ({
     <Card className="w-full bg-slate-700 p-3 rounded-lg shadow-lg">
       <CardContent>
         <div className="space-y-4">
-          {/* Rounds */}
+
           <div className="flex flex-col space-y-2">
-            <Tooltip>
+            <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <label className="font-mono font-bold text-white cursor-help">
                   Rounds
                 </label>
               </TooltipTrigger>
-              <TooltipContent className="bg-slate-800 text-white border-slate-700">
+              <TooltipContent side="right" className="bg-slate-800 text-white border-slate-700">
                 <p>Number of rounds in the game</p>
               </TooltipContent>
             </Tooltip>
@@ -74,15 +74,14 @@ const GameSettings: React.FC<GameSettingsProps> = ({
             )}
           </div>
 
-          {/* Duration */}
           <div className="flex flex-col space-y-2">
-            <Tooltip>
+            <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <label className="font-mono font-bold text-white cursor-help">
                   Duration
                 </label>
               </TooltipTrigger>
-              <TooltipContent className="bg-slate-800 text-white border-slate-700">
+              <TooltipContent side="right" className="bg-slate-800 text-white border-slate-700">
                 <p>Duration of each round in seconds</p>
               </TooltipContent>
             </Tooltip>
@@ -106,15 +105,14 @@ const GameSettings: React.FC<GameSettingsProps> = ({
             )}
           </div>
 
-          {/* Transition */}
           <div className="flex flex-col space-y-2">
-            <Tooltip>
+            <Tooltip delayDuration={100}>
               <TooltipTrigger asChild>
                 <label className="font-mono font-bold text-white cursor-help">
                   Transition
                 </label>
               </TooltipTrigger>
-              <TooltipContent className="bg-slate-800 text-white border-slate-700">
+              <TooltipContent side = "right" className="bg-slate-800 text-white border-slate-700">
                 <p>Delay between rounds in seconds</p>
               </TooltipContent>
             </Tooltip>

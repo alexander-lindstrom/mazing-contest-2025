@@ -5,8 +5,9 @@ In game room:
 
 In game:
     Give the option to select which player to view (during running phase).
-        New component?
-        Needs to be able to switch to another grid at the same time.
+        Update GridRender, Runner, ClapAnimation to accept a startIndex prop which will be the starting point. Make sure this works properly.
+        Figure out how to clean up animations/sounds if needed.
+        When a new player is selected, pass the corresponding grid, path, etc.
     Hold shift to upgrade tower with left click. Should be possible both for sellable, and non sellable block tower. 
         Need to think a bit how about the non-sellable case
     Server should be fully in control - not wait for players to return results indefinitely.
@@ -22,7 +23,3 @@ Grid appearance changes:
 
 Sound:
     Delay before sound is heard?
-
-Share:
-    Not working
- 

@@ -6,15 +6,18 @@ import invalidSound from "../sounds/invalid_action.mp3";
 import buildSound from "../sounds/building_tower.wav";
 import sellSound from "../sounds/selling_tower.wav";
 import useSound from '@/hooks/useSound';
-import { getParamFromUrl, removeParamFromUrl } from '@/util/url';
 
+interface SinglePlayerGameProps {
+  seed: string | undefined;
+  duration: number;
+}
 
-const seed = getParamFromUrl("seed");
-removeParamFromUrl("seed");
-let startingState = generateStartingState(seed || undefined);
-const INITIAL_COUNTDOWN = 60;
+export function SinglePlayerGame({
+  seed,
+  duration,
+} : SinglePlayerGameProps) {
 
-export function SinglePlayerGame() {
+  const [startingState, setStartingState] = useState(generateStartingState(seed));
   const [grid, setGrid] = useState(startingState.grid);
   const [towers, setTowers] = useState(startingState.towers);
   const [resources, setResources] = useState({ gold: startingState.gold, lumber: startingState.lumber });
@@ -23,7 +26,7 @@ export function SinglePlayerGame() {
   const [runnerAngle, setRunnerAngle] = useState<number[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [clapEvents, setClapEvents] = useState<ClapEvent[]>([]);
-  const [countdown, setCountdown] = useState(INITIAL_COUNTDOWN);
+  const [countdown, setCountdown] = useState(duration);
   const [stopwatch, setStopwatch] = useState(0);
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
@@ -31,6 +34,12 @@ export function SinglePlayerGame() {
   const buildTowerSound = useSound(buildSound, 0.5);
   const invalidActionSound = useSound(invalidSound, 0.5);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const newStartingState = generateStartingState(seed || undefined);
+    setStartingState(newStartingState);
+    restart(newStartingState);
+  }, [seed]);
 
   useEffect(() => {
     if (countdown <= 0) {
@@ -115,7 +124,7 @@ export function SinglePlayerGame() {
     setRunnerStatus([]);
     setRunnerAngle([]);
     setIsRunning(false);
-    setCountdown(INITIAL_COUNTDOWN);
+    setCountdown(duration);
     setStopwatch(0);
     setIsStopwatchRunning(false);
     setTotalSimulationTime(null);
@@ -148,7 +157,7 @@ export function SinglePlayerGame() {
 
   const handleRegenerate = () => {
     const newState = generateStartingState();
-    startingState = newState;
+    setStartingState(newState);
     restart(newState);
   };
 

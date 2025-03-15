@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { SinglePlayerGame } from "./pages/SinglePlayerGame";
 import { MultiPlayerGameController } from "./pages/MultiPlayerGameController";
 import SoundButton from "./components/SoundButton";
@@ -7,19 +7,24 @@ import { getSocket } from "./socket";
 
 function App() {
   const [gameMode, setGameMode] = useState<"single" | "multi" | null>(null);
+  const [seed, setSeed] = useState<string | undefined>("");
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [titleHeight, setTitleHeight] = useState(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mode = getParamFromUrl("mode");
-    if (mode === "single") {
-      setGameMode("single");
-    } else if (mode === "multi") {
-      setGameMode("multi");
+    if (mode === "single" || mode === "multi") {
+      setGameMode(mode);
     }
     removeParamFromUrl("mode");
+  
+    const seed = getParamFromUrl("seed");
+    if (seed) {
+      setSeed(seed);
+    }
+    removeParamFromUrl("seed");
   }, []);
-
+  
   useEffect(() => {
     if (titleRef.current) {
       setTitleHeight(titleRef.current.offsetHeight);
@@ -78,7 +83,7 @@ function App() {
           </div>
         )}
 
-        {gameMode === "single" && <SinglePlayerGame />}
+        {gameMode === "single" && <SinglePlayerGame seed={seed} duration={60} />}
         {gameMode === "multi" && <MultiPlayerGameController />}
       </div>
     </div>

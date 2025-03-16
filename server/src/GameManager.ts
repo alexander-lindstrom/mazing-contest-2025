@@ -167,10 +167,18 @@ delay(seconds: number): Promise<void> {
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player, finalTowers: finalResult.towers });
 
     if (game.allResultsReceived()) {
+
+      const results = game.getResultsForCurrentRound();
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, game.getResultsForCurrentRound());
 
+      const longestDuration = results.reduce((maxDuration, roundResult) => {
+        return roundResult.duration > maxDuration ? roundResult.duration : maxDuration;
+      }, 0);
+      await this.delay(longestDuration);
+      
+      io.to(game.id).emit(GameActionEnum.SERVER_ROUND_ENDED);
       await this.delay(game.getState().roundTransitionDelay);
-
+      
       if (game.startNextRound()) {
         io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
       } else {

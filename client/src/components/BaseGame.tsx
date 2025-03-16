@@ -102,7 +102,6 @@ const BaseGame: React.FC<BaseGameProps> = ({
           )}
         </div>
   
-        { /* regular grid */}
         {grid.length > 0 && grid[0].length > 0 && (
           <div
             ref={ref}
@@ -119,7 +118,7 @@ const BaseGame: React.FC<BaseGameProps> = ({
               runnerAngle={runnerAngle}
               showRunner={isRunning}
               clapEvents={clapEvents}
-              startTime={startTime}
+              startTime={5}
             />
           </div>
         )}

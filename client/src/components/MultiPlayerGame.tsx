@@ -100,6 +100,7 @@ export const MultiPlayerGame = ({
   const { rounds, duration: buildingTime } = settings;
   const playerScores = extractPlayerScores(players, currentScore);
   const round = extractRound(currentScore);
+  const resultSentRef = useRef(false);
 
   useEffect(() => {
     const socket = getSocket();
@@ -129,8 +130,11 @@ export const MultiPlayerGame = ({
       setSelectedPlayerClapEvents([]);
     }
 
-    const onRoundEnd = (result: RoundResult[]) => {
+    const onRoundResult = (result: RoundResult[]) => {
       setCurrentScore(result);
+    };
+
+    const onRoundEnd = () => {
       setIsRoundResultsDialogOpen(true);
     };
 
@@ -140,12 +144,14 @@ export const MultiPlayerGame = ({
     }
 
     socket.on(GameActionEnum.SERVER_ROUND_CONFIG, onRoundStart);
-    socket.on(GameActionEnum.SERVER_ROUND_RESULT, onRoundEnd);
+    socket.on(GameActionEnum.SERVER_ROUND_RESULT, onRoundResult);
+    socket.on(GameActionEnum.SERVER_ROUND_ENDED, onRoundEnd);
     socket.on(GameActionEnum.SERVER_GAME_ENDED, onGameEnd);
 
     return () => {
       socket.off(GameActionEnum.SERVER_ROUND_CONFIG);
       socket.off(GameActionEnum.SERVER_ROUND_RESULT);
+      socket.off(GameActionEnum.SERVER_ROUND_ENDED);
       socket.off(GameActionEnum.SERVER_GAME_ENDED);
     };
   }, [buildingTime, playStartSound]);
@@ -158,7 +164,20 @@ export const MultiPlayerGame = ({
         setCountdown((prevCountdown) => {
           const newCountdown = prevCountdown - 1;
           if (newCountdown <= 0) {
-            handleRunnerStart();
+            if (!resultSentRef.current) {
+              resultSentRef.current = true;
+              const socket = getSocket();
+              const finalState: StartingState = {
+                height: grid.length > 0 ? grid.length : defaultHeight,
+                width: grid.length > 0 ? grid[0].length : defaultWidth,
+                grid: grid,
+                towers: towers,
+                gold: resources.gold,
+                lumber: resources.lumber
+              };
+              socket.emit('game-action', { type: GameActionEnum.CLIENT_ROUND_RESULT, payload: finalState });
+            }
+            handleRunnerStart()
           }
           return newCountdown;
         });
@@ -166,12 +185,13 @@ export const MultiPlayerGame = ({
     }
     
     return () => {
-      if (timer) clearInterval(timer);
+      if (timer) {
+        clearInterval(timer);
+      }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown]);
 
-  const resultSentRef = useRef(false);
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
     
@@ -182,19 +202,6 @@ export const MultiPlayerGame = ({
         setStopwatch(prevTime => {
           if (totalSimulationTime !== null && prevTime >= totalSimulationTime && !resultSentRef.current) {
             setIsStopwatchRunning(false);
-            resultSentRef.current = true;
-            
-            const socket = getSocket();
-            const finalState: StartingState = {
-              height: grid.length > 0 ? grid.length : defaultHeight,
-              width: grid.length > 0 ? grid[0].length : defaultWidth,
-              grid: grid,
-              towers: towers,
-              gold: resources.gold,
-              lumber: resources.lumber
-            };
-            
-            socket.emit('game-action', { type: GameActionEnum.CLIENT_ROUND_RESULT, payload: finalState });
           }
           
           return totalSimulationTime !== null && prevTime >= totalSimulationTime
@@ -210,7 +217,9 @@ export const MultiPlayerGame = ({
 }, [isStopwatchRunning, totalSimulationTime, grid, towers, resources]);
 
   const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
-    if (isRunning) return;
+    if (isRunning) {
+      return;
+    }
     const newGrid = grid.map(row => [...row]);
     const shiftPress = e.evt.shiftKey;
 

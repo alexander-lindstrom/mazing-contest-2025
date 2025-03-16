@@ -6,6 +6,7 @@ export enum GameActionEnum {
 
   SERVER_ROUND_CONFIG = 'server-round-config',
   SERVER_ROUND_RESULT = 'server-round-result',
+  SERVER_ROUND_ENDED = 'server-round-ended',
   SERVER_GAME_ENDED = 'server-game-ended'
 }
 

@@ -293,6 +293,8 @@ export const MultiPlayerGame = ({
     setIsStopwatchRunning(true);
     
     const totalSimTime = timeSteps.length * defaultTimeStep;
+    console.log(totalSimTime)
+    console.log(towers)
     setTotalSimulationTime(totalSimTime);
   };
 

@@ -19,7 +19,7 @@ const Scoreboard: React.FC<ScoreboardProps> = ({ players, round, numRounds }) =>
   return (
     <Card className="w-full bg-slate-800 p-3 rounded-lg shadow-lg">
       <div className="text-left text-white font-mono font-bold text-lg mb-4">
-        Round {round + 1} of {numRounds}
+        Score after round {round + 1} of {numRounds}
       </div>
 
       <div className="flex flex-col space-y-2">

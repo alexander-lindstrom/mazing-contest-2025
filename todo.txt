@@ -1,4 +1,3 @@
-
 In game:
     Hold shift to upgrade tower with left click. Should be possible both for sellable, and non sellable block tower. 
         Need to think a bit how about the non-sellable case
@@ -13,8 +12,11 @@ Give the option to select which player to view (during running phase).
     Various issues with how this works.
     Need to handle the case where the player to spectate is already finished (right now returns - should show runner at last position)
     Figure out how to clean up animations/sounds if needed.
-    Choppy animation when viewing another player.
+    Runner "jumps" once after switch.
     Will show the last round for other players sometimes (if not the first round?)
+    Stopwatch does not match result. Even the player view is never changed.
+        Difference between client and server side calculation?
+        Only happens when slowtowers are involed?
 
 Server:
     Improve handling of:
@@ -22,3 +24,9 @@ Server:
         Players not sending results in time
             Have all users ack that simulation has ended? Only then send round end event. Max time ofc.
 
+ScoreBoard:
+    Updates result as soon as building phase has ended.
+    Sometimes only shows the latest round.
+
+
+Slight delay before sounds are played.

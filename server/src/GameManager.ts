@@ -159,6 +159,8 @@ delay(seconds: number): Promise<void> {
     }
 
     const duration = simulateRunnerMovement([], path).length * defaultTimeStep;
+    console.log(duration)
+    console.log(finalResult.towers)
     const player = game.getPlayerData(socket.id);
     if (!player) {
       return;

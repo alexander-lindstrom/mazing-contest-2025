@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface PlayerScore {
   id: string;
@@ -51,7 +51,9 @@ const RoundResultsDialog: React.FC<RoundResultsDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Round {round} Results</DialogTitle>
+          <DialogTitle>Round {round} results</DialogTitle>
+          <DialogDescription>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">

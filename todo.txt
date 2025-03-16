@@ -2,7 +2,6 @@
 In game:
     Hold shift to upgrade tower with left click. Should be possible both for sellable, and non sellable block tower. 
         Need to think a bit how about the non-sellable case
-    Runner spins in a werid way when turning west -> north.
 
 General:
     Challenge mode?
@@ -11,25 +10,15 @@ General:
 
 
 Give the option to select which player to view (during running phase).
+    Various issues with how this works.
     Need to handle the case where the player to spectate is already finished (right now returns - should show runner at last position)
     Figure out how to clean up animations/sounds if needed.
     Choppy animation when viewing another player.
     Will show the last round for other players sometimes (if not the first round?)
 
-
-Errors:
-    4react-konva.js?v=204bf2c6:709 Konva warning: NaN is a not valid value for "rotation" attribute. The value should be a number.
-warn @ react-konva.js?v=204bf2c6:709Understand this warningAI
-    2@radix-ui_react-dialog.js?v=204bf2c6:334 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-
-
 Server:
     Improve handling of:
         Players leaving
         Players not sending results in time
-
-
-
-
-
+            Have all users ack that simulation has ended? Only then send round end event. Max time ofc.
 

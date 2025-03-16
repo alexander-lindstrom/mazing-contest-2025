@@ -174,11 +174,12 @@ delay(seconds: number): Promise<void> {
       const longestDuration = results.reduce((maxDuration, roundResult) => {
         return roundResult.duration > maxDuration ? roundResult.duration : maxDuration;
       }, 0);
-      await this.delay(longestDuration);
+      const grace = 2;
+      await this.delay(longestDuration + 2);
       
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_ENDED);
       await this.delay(game.getState().roundTransitionDelay);
-      
+
       if (game.startNextRound()) {
         io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
       } else {

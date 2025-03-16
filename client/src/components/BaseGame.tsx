@@ -118,7 +118,7 @@ const BaseGame: React.FC<BaseGameProps> = ({
               runnerAngle={runnerAngle}
               showRunner={isRunning}
               clapEvents={clapEvents}
-              startTime={5}
+              startTime={startTime}
             />
           </div>
         )}

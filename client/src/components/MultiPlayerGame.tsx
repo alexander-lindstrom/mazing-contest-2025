@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
   defaultTimeStep, defaultWidth, FinalResults, findShortestPath, GameActionEnum, GameSettingsData, get2x2Positions, GridCell,
+  pathExists,
   PlayerData,
   Position, RoundResult, simulateRunnerMovement, StartingState, Tower } from '@mazing/util';
 import BaseGame from '@/components/BaseGame';
@@ -220,6 +221,10 @@ export const MultiPlayerGame = ({
     if (isRunning) {
       return;
     }
+    if (!pathExists(grid, defaultStart, defaultGoal, { x, y })) {
+      playInvalidSound();
+      return;
+    }
     const newGrid = grid.map(row => [...row]);
     const shiftPress = e.evt.shiftKey;
 
@@ -372,6 +377,7 @@ export const MultiPlayerGame = ({
                 handleGenerateNew={null}
                 handleShare={null}
                 copied={false}
+                startTime={stopwatch}
               />
             ) : (
               <BaseGame

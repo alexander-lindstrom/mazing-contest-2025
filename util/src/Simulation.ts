@@ -65,7 +65,9 @@ export function simulateRunnerMovement(
     const targetAngle = Math.atan2(dy, dx);
     let angleDiff = targetAngle - runnerAngle;
 
-    angleDiff = ((angleDiff + Math.PI) % (2 * Math.PI)) - Math.PI;
+    // Normalize to [-π, π] for shortest path rotation
+    while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+    while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
 
     if (Math.abs(angleDiff) > 0.001) {
       const maxTurnStep = turnRate * dt;

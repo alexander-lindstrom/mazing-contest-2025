@@ -24,19 +24,20 @@ const Runner: React.FC<RunnerProps> = ({
   const startTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const [isSlowed, setIsSlowed] = useState(false);
-  const totalDuration = runnerPath.length * timestep;
 
   useEffect(() => {
-    if (runnerPath.length < 2 || runnerPath.length <= startIndex)  {
+    if (runnerPath.length < 2 || runnerPath.length <= startIndex) {
       return;
     }
+  
+    startTimeRef.current = null; // Reset start time when switching players
   
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
       }
       const elapsed = (timestamp - startTimeRef.current) / 1000;
-      const progress = (elapsed / totalDuration) + (startIndex / runnerPath.length);
+      const progress = (elapsed / (runnerPath.length * timestep)) + (startIndex / runnerPath.length);
       const index = Math.min(Math.floor(progress * runnerPath.length), runnerPath.length - 1);
       
       setCurrentPosition(runnerPath[index]);
@@ -55,7 +56,8 @@ const Runner: React.FC<RunnerProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [runnerPath, timestep, totalDuration, runnerStatus, startIndex]);
+  }, [runnerPath, timestep, runnerStatus, startIndex]);
+  
 
   if (!currentPosition) {
     return null;

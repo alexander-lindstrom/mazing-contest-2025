@@ -27,6 +27,7 @@ export type GridRendererParams = GridParams & {
   showRunner: boolean;
   clapEvents: ClapEvent[];
   towers: Tower[];
+  startTime: number;
 };
 
 const GridRenderer: React.FC<GridRendererParams> = ({
@@ -40,6 +41,7 @@ const GridRenderer: React.FC<GridRendererParams> = ({
   showRunner,
   clapEvents,
   towers,
+  startTime = 0,
 }) => {
   const [hoverPosition, setHoverPosition] = useState<Position | null>(null);
 
@@ -236,6 +238,10 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       );
     }, [hoverPosition, showRunner, CELL_SIZE, grid]);
 
+    const startIndex = useMemo(() => {
+      return Math.floor(startTime / defaultTimeStep);
+    }, [startTime]);
+
   return (
     <Stage
       width={width}
@@ -250,22 +256,31 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       </Layer>
 
       {!showRunner && hoverPosition && (
-        <Layer>{hoverEffect}</Layer>
+        <Layer>
+          {hoverEffect}
+        </Layer>
       )}
+
       {runnerPath && showRunner && (
         <Layer>
           <Runner
             runnerPath={runnerPath}
             cellSize={CELL_SIZE}
-            timestep={defaultTimeStep}
             runnerStatus={runnerStatus}
             runnerAngle={runnerAngle}
+            startIndex={startIndex}
+            timestep={defaultTimeStep}
           />
         </Layer>
       )}
+
       {clapEvents.length > 0 && showRunner && (
         <Layer>
-          <ClapAnimation events={clapEvents} cellSize={CELL_SIZE} />
+          <ClapAnimation 
+            events={clapEvents} 
+            cellSize={CELL_SIZE}
+            startTime={startTime}
+          />
         </Layer>
       )}
     </Stage>

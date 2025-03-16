@@ -8,9 +8,17 @@ type RunnerProps = {
   runnerAngle: number[];
   cellSize: number;
   timestep: number;
+  startIndex?: number;
 };
 
-const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep, runnerStatus, runnerAngle }) => {
+const Runner: React.FC<RunnerProps> = ({ 
+  runnerPath,
+  cellSize,
+  timestep, 
+  runnerStatus, 
+  runnerAngle,
+  startIndex = 0,
+ }) => {
   const [currentPosition, setCurrentPosition] = useState<Position | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const startTimeRef = useRef<number | null>(null);
@@ -19,37 +27,39 @@ const Runner: React.FC<RunnerProps> = ({ runnerPath, cellSize, timestep, runnerS
   const totalDuration = runnerPath.length * timestep;
 
   useEffect(() => {
-    if (runnerPath.length < 2) {
+    if (runnerPath.length < 2 || runnerPath.length <= startIndex)  {
       return;
     }
-
+  
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
       }
       const elapsed = (timestamp - startTimeRef.current) / 1000;
-      const progress = elapsed / totalDuration;
+      const progress = (elapsed / totalDuration) + (startIndex / runnerPath.length);
       const index = Math.min(Math.floor(progress * runnerPath.length), runnerPath.length - 1);
       
       setCurrentPosition(runnerPath[index]);
       setCurrentIndex(index);
       setIsSlowed(runnerStatus[index]);
-
+  
       if (index < runnerPath.length - 1) {
         animationFrameRef.current = requestAnimationFrame(animate);
       }
     };
-
+  
     animationFrameRef.current = requestAnimationFrame(animate);
-
+  
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [runnerPath, timestep, totalDuration, runnerStatus]);
+  }, [runnerPath, timestep, totalDuration, runnerStatus, startIndex]);
 
-  if (!currentPosition) return null;
+  if (!currentPosition) {
+    return null;
+  }
 
   const angle = runnerAngle[currentIndex];
   

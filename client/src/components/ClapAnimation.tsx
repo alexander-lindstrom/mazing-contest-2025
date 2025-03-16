@@ -7,6 +7,7 @@ import clapTowerSound from "../sounds/clap_tower_effect.wav";
 interface ClapAnimationProps {
   events: ClapEvent[];
   cellSize: number;
+  startTime: number;
 }
 
 const duration = 0.5;
@@ -16,6 +17,7 @@ const radius = defaultClapRange;
 const ClapAnimation: React.FC<ClapAnimationProps> = ({
   events,
   cellSize,
+  startTime = 0,
 }) => {
   const [activeClaps, setActiveClaps] = useState<{ id: string; x: number; y: number; progress: number; opacity: number }[]>([]);
   const playedEventIds = useRef<Set<string>>(new Set());
@@ -23,29 +25,30 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
 
   useEffect(() => {
     let animationFrame: number;
-    const startTime = performance.now();
-
+    const animationStartTime = performance.now();
+  
     const update = () => {
-      const currentTime = (performance.now() - startTime) / 1000;
+      const currentTime = (performance.now() - animationStartTime) / 1000 + startTime;
+  
       const newClaps = events
         .filter((event) => currentTime >= event.time && currentTime <= event.time + duration + persistenceDuration)
         .map((event) => {
           const timeInEvent = currentTime - event.time;
           let progress = 0;
           let opacity = 1;
-
+  
           if (timeInEvent <= duration) {
             progress = timeInEvent / duration;
           } else if (timeInEvent <= duration + persistenceDuration) {
             progress = 1;
             opacity = 1 - (timeInEvent - duration) / persistenceDuration;
           }
-
+  
           if (timeInEvent >= 0 && timeInEvent <= 0.05 && !playedEventIds.current.has(event.id)) {
             playClapTowerSound();
             playedEventIds.current.add(event.id);
           }
-
+  
           return {
             id: event.id,
             x: event.x * cellSize + cellSize / 2,
@@ -54,15 +57,14 @@ const ClapAnimation: React.FC<ClapAnimationProps> = ({
             opacity,
           };
         });
-
+  
       setActiveClaps(newClaps);
       animationFrame = requestAnimationFrame(update);
     };
-
+  
     animationFrame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(animationFrame);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cellSize, events]);
+  }, [cellSize, events, startTime]);
 
   return (
     <Group>

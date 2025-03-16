@@ -11,6 +11,7 @@ In game:
     Hold shift to upgrade tower with left click. Should be possible both for sellable, and non sellable block tower. 
         Need to think a bit how about the non-sellable case
     Server should be fully in control - not wait for players to return results indefinitely.
+    Runner spins in a werid way when turning west -> north.
 
 General:
     Challenge mode?

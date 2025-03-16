@@ -27,7 +27,7 @@ export type GridRendererParams = GridParams & {
   showRunner: boolean;
   clapEvents: ClapEvent[];
   towers: Tower[];
-  startTime: number;
+  startTime?: number;
 };
 
 const GridRenderer: React.FC<GridRendererParams> = ({

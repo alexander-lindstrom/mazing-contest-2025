@@ -24,6 +24,7 @@ interface BaseGameProps {
   handleGenerateNew: (() => void) | null;
   handleShare: (() => void) | null;
   copied: boolean;
+  startTime?: number;
 }
 
 const BaseGame: React.FC<BaseGameProps> = ({
@@ -44,6 +45,7 @@ const BaseGame: React.FC<BaseGameProps> = ({
   handleGenerateNew,
   handleShare,
   copied,
+  startTime = 0,
 }) => {
   const [ref, bounds] = useMeasure();
   const [gridDimensions, setGridDimensions] = useState({ width: 0, height: 0 });
@@ -100,6 +102,7 @@ const BaseGame: React.FC<BaseGameProps> = ({
           )}
         </div>
   
+        { /* regular grid */}
         {grid.length > 0 && grid[0].length > 0 && (
           <div
             ref={ref}
@@ -116,6 +119,7 @@ const BaseGame: React.FC<BaseGameProps> = ({
               runnerAngle={runnerAngle}
               showRunner={isRunning}
               clapEvents={clapEvents}
+              startTime={startTime}
             />
           </div>
         )}

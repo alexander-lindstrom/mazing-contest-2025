@@ -54,6 +54,10 @@ const extractRound = (roundResults: RoundResult[] | null) => {
   return 0;
 }
 
+const resultById = (roundResults: RoundResult[], playerId: string): RoundResult | undefined => {
+  return roundResults.find(result => result.player.id === playerId);
+};
+
 export const MultiPlayerGame = ({
   settings, 
   chatLog,
@@ -62,8 +66,8 @@ export const MultiPlayerGame = ({
   players,
   player
 }: MultiPlayerGameProps) => {
-  const [grid, setGrid] = useState<GridCell[][]>([])
-  const [towers, setTowers] = useState<Tower[]>([])
+  const [grid, setGrid] = useState<GridCell[][]>([]);
+  const [towers, setTowers] = useState<Tower[]>([]);
   const [resources, setResources] = useState({ gold: 0, lumber: 0 });
   const [runnerPath, setRunnerPath] = useState<Position[]>([]);
   const [runnerStatus, setRunnerStatus] = useState<boolean[]>([]);
@@ -78,7 +82,16 @@ export const MultiPlayerGame = ({
   const [gameEnded, setGameEnded] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResults | null >(null);
   const [isRoundResultsDialogOpen, setIsRoundResultsDialogOpen] = useState(false);
+
   const [selectedPlayerId, setSelectedPlayerId] = useState(player.id);
+  const [selectedPlayerGrid, setSelectedPlayerGrid] = useState<GridCell[][]>([]);
+  const [selectedPlayerTowers, setSelectedPlayerTowers] = useState<Tower[]>([]);
+  const [selectedPlayerRunnerPath, setSelectedPlayerRunnerPath] = useState<Position[]>([]);
+  const [selectedPlayerRunnerStatus, setSelectedPlayerRunnerStatus] = useState<boolean[]>([]);
+  const [selectedPlayerRunnerAngle, setSelectedPlayerRunnerAngle] = useState<number[]>([]);
+  const [selectedPlayerClapEvents, setSelectedPlayerClapEvents] = useState<ClapEvent[]>([]);
+
+
   const playStartSound = useSound(startSound, 0.5);
   const playInvalidSound = useSound(invalidSound, 0.5);
   const playBuildSound = useSound(buildSound, 0.5);
@@ -106,6 +119,14 @@ export const MultiPlayerGame = ({
       
       setCountdown(buildingTime);
       setIsStopwatchRunning(false);
+
+      setSelectedPlayerId(player.id);
+      setSelectedPlayerGrid([]);
+      setSelectedPlayerTowers([]);
+      setSelectedPlayerRunnerPath([]);
+      setSelectedPlayerRunnerStatus([]);
+      setSelectedPlayerRunnerAngle([]);
+      setSelectedPlayerClapEvents([]);
     }
 
     const onRoundEnd = (result: RoundResult[]) => {
@@ -237,7 +258,9 @@ export const MultiPlayerGame = ({
     }
     
     const path = findShortestPath(grid, defaultStart, defaultGoal);
-    if (!path) return;
+    if (!path) {
+      return;
+    }
     
     const timeSteps = simulateRunnerMovement(towers, path);
     const positions = timeSteps.map(step => step.position);
@@ -260,7 +283,36 @@ export const MultiPlayerGame = ({
   };
 
   const updateSelectedPlayer = (id: string) => {
+
+    if (!currentScore || currentScore.length === 0) {
+      return;
+    }
+    const results = resultById(currentScore, id);
+    if (!results) {
+      return;
+    }
+
     setSelectedPlayerId(id);
+    
+    const playerGrid = results.finalMaze;
+    const playerTowers = results.finalTowers;
+    const playerPath = findShortestPath(playerGrid, defaultStart, defaultGoal);
+    if (!playerPath) {
+      return;
+    }
+    
+    const timeSteps = simulateRunnerMovement(playerTowers, playerPath);
+    const positions = timeSteps.map(step => step.position);
+    const runnerStatus = timeSteps.map(step => step.isSlowed);
+    const runnerAngle = timeSteps.map(step => step.angle);
+    const claps = timeSteps.flatMap(step => step.claps || []);
+
+    setSelectedPlayerGrid(playerGrid);
+    setSelectedPlayerTowers(playerTowers);
+    setSelectedPlayerRunnerPath(positions);
+    setSelectedPlayerRunnerAngle(runnerAngle);
+    setSelectedPlayerRunnerStatus(runnerStatus);
+    setSelectedPlayerClapEvents(claps);
   }
   
   return (
@@ -292,25 +344,48 @@ export const MultiPlayerGame = ({
             </div>
           </div>
           <div className="max-w-[1200px]">
-            <BaseGame
-              startingState={{ width: defaultWidth, height: defaultHeight }}
-              towers={towers}
-              grid={grid}
-              handleCellClick={handleCellClick}
-              runnerPath={runnerPath}
-              runnerStatus={runnerStatus}
-              runnerAngle={runnerAngle}
-              isRunning={isRunning}
-              clapEvents={clapEvents}
-              resources={resources}
-              stopwatch={stopwatch}
-              countdown={countdown}
-              handleStartButton={null}
-              handleReset={null}
-              handleGenerateNew={null}
-              handleShare={null}
-              copied={false}
-            />
+            {selectedPlayerId === player.id ? (
+              <BaseGame
+                startingState={{ width: defaultWidth, height: defaultHeight }}
+                towers={towers}
+                grid={grid}
+                handleCellClick={handleCellClick}
+                runnerPath={runnerPath}
+                runnerStatus={runnerStatus}
+                runnerAngle={runnerAngle}
+                isRunning={isRunning}
+                clapEvents={clapEvents}
+                resources={resources}
+                stopwatch={stopwatch}
+                countdown={countdown}
+                handleStartButton={null}
+                handleReset={null}
+                handleGenerateNew={null}
+                handleShare={null}
+                copied={false}
+              />
+            ) : (
+              <BaseGame
+                startingState={{ width: defaultWidth, height: defaultHeight }}
+                towers={selectedPlayerTowers}
+                grid={selectedPlayerGrid}
+                handleCellClick={handleCellClick}
+                runnerPath={selectedPlayerRunnerPath}
+                runnerStatus={selectedPlayerRunnerStatus}
+                runnerAngle={selectedPlayerRunnerAngle}
+                isRunning={isRunning}
+                clapEvents={selectedPlayerClapEvents}
+                resources={resources}
+                stopwatch={stopwatch}
+                countdown={countdown}
+                handleStartButton={null}
+                handleReset={null}
+                handleGenerateNew={null}
+                handleShare={null}
+                copied={false}
+                startTime={stopwatch}
+              />
+            )}
           </div>
         </>
       )}

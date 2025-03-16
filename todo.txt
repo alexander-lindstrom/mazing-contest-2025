@@ -4,13 +4,9 @@ In game room:
     shorter sticky time on tooltip
 
 In game:
-    Give the option to select which player to view (during running phase).
-        Update GridRender, Runner, ClapAnimation to accept a startIndex prop which will be the starting point. Make sure this works properly.
-        Figure out how to clean up animations/sounds if needed.
-        When a new player is selected, pass the corresponding grid, path, etc.
     Hold shift to upgrade tower with left click. Should be possible both for sellable, and non sellable block tower. 
         Need to think a bit how about the non-sellable case
-    Server should be fully in control - not wait for players to return results indefinitely.
+    
     Runner spins in a werid way when turning west -> north.
 
 General:
@@ -22,5 +18,19 @@ Grid appearance changes:
     Fix tower size?
     Update block tower inner shape?
 
-Sound:
-    Delay before sound is heard?
+
+Give the option to select which player to view (during running phase).
+    Need to handle the case where the player to spectate is already finished (right now returns - should show runner at last position)
+    Figure out how to clean up animations/sounds if needed.
+    Need clients to send result at the end of building phase instead of end running phase.
+
+Server should be fully in control - not wait for players to return results indefinitely.
+    Client send results at the end of building phase.
+    Add event indicating start of running phase -> broadcast results
+    After waiting max duration (depending on results) -> round end.
+
+
+
+
+
+

@@ -17,6 +17,7 @@ Give the option to select which player to view (during running phase).
     Stopwatch does not match result. Even the player view is never changed.
         Difference between client and server side calculation?
         Only happens when slowtowers are involed?
+        Old issue - not connected to this here.
 
 Server:
     Improve handling of:

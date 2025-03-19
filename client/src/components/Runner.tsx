@@ -110,7 +110,9 @@ const Runner: React.FC<RunnerProps> = ({
   };
   
   const renderGlow = () => {
-    if (!isSlowed) return null;
+    if (!isSlowed) {
+      return null;
+    }
     
     return (
       <Circle

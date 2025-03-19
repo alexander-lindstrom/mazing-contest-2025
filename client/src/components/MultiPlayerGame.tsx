@@ -44,7 +44,7 @@ const extractPlayerScores = (
   return roundResults.map((result) => ({
     id: result.player.id,
     name: result.player.name,
-    score: result.duration,
+    score: result.cumulativeDuration,
   }));
 };
 

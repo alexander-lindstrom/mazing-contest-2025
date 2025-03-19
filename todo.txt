@@ -9,21 +9,14 @@ General:
 
 
 Give the option to select which player to view (during running phase).
-    Various issues with how this works.
-    Need to handle the case where the player to spectate is already finished (right now returns - should show runner at last position)
+    Need the timer to be independent for each player in some way. Without causing issues.
     Figure out how to clean up animations/sounds if needed.
-    Runner "jumps" once after switch.
-    Will show the last round for other players sometimes (if not the first round?)
+  
 
 Server:
     Improve handling of:
         Players leaving
         Players not sending results in time
             Have all users ack that simulation has ended? Only then send round end event. Max time ofc.
-
-ScoreBoard:
-    Updates result as soon as building phase has ended.
-    Sometimes only shows the latest round.
-
 
 Slight delay before sounds are played.

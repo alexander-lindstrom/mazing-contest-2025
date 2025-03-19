@@ -35,6 +35,7 @@ export interface ChatRequest {
   sender: string;
 }
 
+// Rename to something more reasonable
 export interface RoundResult {
   round: number;
   player: PlayerData;

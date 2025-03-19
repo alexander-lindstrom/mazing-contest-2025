@@ -14,10 +14,6 @@ Give the option to select which player to view (during running phase).
     Figure out how to clean up animations/sounds if needed.
     Runner "jumps" once after switch.
     Will show the last round for other players sometimes (if not the first round?)
-    Stopwatch does not match result. Even the player view is never changed.
-        Difference between client and server side calculation?
-        Only happens when slowtowers are involed?
-        Old issue - not connected to this here.
 
 Server:
     Improve handling of:

@@ -30,7 +30,7 @@ const Runner: React.FC<RunnerProps> = ({
       return;
     }
   
-    startTimeRef.current = null; // Reset start time when switching players
+    startTimeRef.current = null;
   
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) {

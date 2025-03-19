@@ -79,7 +79,8 @@ export const MultiPlayerGame = ({
   const [stopwatch, setStopwatch] = useState(0);
   const [isStopwatchRunning, setIsStopwatchRunning] = useState(false);
   const [totalSimulationTime, setTotalSimulationTime] = useState<number | null>(null);
-  const [currentScore, setCurrentScore] = useState<RoundResult[] | null>(initialScore);
+  const [score, setscore] = useState<RoundResult[] | null>(initialScore);
+  const [roundResult, setRoundResult] = useState<RoundResult[] | null>(null);
   const [gameEnded, setGameEnded] = useState(false);
   const [finalResult, setFinalResult] = useState<FinalResults | null >(null);
   const [isRoundResultsDialogOpen, setIsRoundResultsDialogOpen] = useState(false);
@@ -99,8 +100,8 @@ export const MultiPlayerGame = ({
   const playSellSound = useSound(sellSound, 0.5);
   
   const { rounds, duration: buildingTime } = settings;
-  const playerScores = extractPlayerScores(players, currentScore);
-  const round = extractRound(currentScore);
+  const playerScores = extractPlayerScores(players, score);
+  const round = extractRound(score);
   const resultSentRef = useRef(false);
 
   useEffect(() => {
@@ -132,10 +133,11 @@ export const MultiPlayerGame = ({
     }
 
     const onRoundResult = (result: RoundResult[]) => {
-      setCurrentScore(result);
+      setRoundResult(result);
     };
 
-    const onRoundEnd = () => {
+    const onRoundEnd = (result : RoundResult[]) => {
+      setscore(result);
       setIsRoundResultsDialogOpen(true);
     };
 
@@ -298,10 +300,10 @@ export const MultiPlayerGame = ({
 
   const updateSelectedPlayer = (id: string) => {
 
-    if (!currentScore || currentScore.length === 0) {
+    if (!roundResult || roundResult.length === 0) {
       return;
     }
-    const results = resultById(currentScore, id);
+    const results = resultById(roundResult, id);
     if (!results) {
       return;
     }

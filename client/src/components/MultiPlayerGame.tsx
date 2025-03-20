@@ -209,13 +209,15 @@ export const MultiPlayerGame = ({
           
           return totalSimulationTime !== null && prevTime >= totalSimulationTime
             ? totalSimulationTime
-            : prevTime + 1;
+            : prevTime + 0.1;
         });
-    }, 1000);
+    }, 100);
   }
   
   return () => {
-    if (timer) clearInterval(timer);
+    if (timer) {
+      clearInterval(timer);
+    }
   };
 }, [isStopwatchRunning, totalSimulationTime, grid, towers, resources]);
 

@@ -10,7 +10,8 @@ General:
 
 Give the option to select which player to view (during running phase).
     Need the timer to be independent for each player in some way. Without causing issues.
-    Figure out how to clean up animations/sounds if needed.
+    If two many switches the next round never starts.
+    Figure out how to clean up animations/sounds as needed.
   
 
 Server:

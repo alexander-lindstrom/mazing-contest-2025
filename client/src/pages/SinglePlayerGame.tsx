@@ -55,17 +55,32 @@ export function SinglePlayerGame({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown]);
 
-  useEffect(() => {
-    if (!isStopwatchRunning || (totalSimulationTime !== null && stopwatch >= totalSimulationTime)) {
-      return;
-    }
-    
-    const interval = setInterval(() => {
-      setStopwatch(prev => prev + 1);
-    }, 1000);
+  console.log(totalSimulationTime)
 
-    return () => clearInterval(interval);
-  }, [isStopwatchRunning, stopwatch, totalSimulationTime]);
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    
+    
+    if (isStopwatchRunning) {
+      timer = setInterval(() => {
+        setStopwatch(prevTime => {
+          if (totalSimulationTime !== null && prevTime >= totalSimulationTime) {
+            setIsStopwatchRunning(false);
+          }
+          
+          return totalSimulationTime !== null && prevTime >= totalSimulationTime
+            ? totalSimulationTime
+            : prevTime + 0.1;
+        });
+    }, 100);
+  }
+  
+  return () => {
+    if (timer) {
+      clearInterval(timer);
+    }
+  };
+}, [isStopwatchRunning, totalSimulationTime, grid, towers, resources]);
 
   const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
     if (isRunning) {

@@ -26,7 +26,15 @@ const Runner: React.FC<RunnerProps> = ({
   const [isSlowed, setIsSlowed] = useState(false);
 
   useEffect(() => {
-    if (runnerPath.length < 2 || runnerPath.length <= startIndex) {
+    if (runnerPath.length < 2) {
+      return;
+    }
+    
+    if (runnerPath.length <= startIndex) {
+      const lastIndex = runnerPath.length - 1;
+      setCurrentPosition(runnerPath[lastIndex]);
+      setCurrentIndex(lastIndex);
+      setIsSlowed(false);
       return;
     }
   

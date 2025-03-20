@@ -30,7 +30,8 @@ interface MultiPlayerGameProps {
 
 const extractPlayerScores = (
   players: PlayerData[],
-  roundResults: RoundResult[] | null
+  roundResults: RoundResult[] | null,
+  total: boolean
 ): PlayerScore[] => {
 
   if (!roundResults || roundResults.length === 0) {
@@ -44,7 +45,7 @@ const extractPlayerScores = (
   return roundResults.map((result) => ({
     id: result.player.id,
     name: result.player.name,
-    score: result.cumulativeDuration,
+    score: total ? result.cumulativeDuration : result.duration,
   }));
 };
 
@@ -58,6 +59,13 @@ const extractRound = (roundResults: RoundResult[] | null) => {
 const resultById = (roundResults: RoundResult[], playerId: string): RoundResult | undefined => {
   return roundResults.find(result => result.player.id === playerId);
 };
+
+const displayStopwatch = (stopwatch: number, totalSimulationTime: number | null) => {
+  if (! totalSimulationTime) {
+    return stopwatch;
+  }
+  return stopwatch > totalSimulationTime ? totalSimulationTime : stopwatch;
+}
 
 export const MultiPlayerGame = ({
   settings, 
@@ -92,6 +100,7 @@ export const MultiPlayerGame = ({
   const [selectedPlayerRunnerStatus, setSelectedPlayerRunnerStatus] = useState<boolean[]>([]);
   const [selectedPlayerRunnerAngle, setSelectedPlayerRunnerAngle] = useState<number[]>([]);
   const [selectedPlayerClapEvents, setSelectedPlayerClapEvents] = useState<ClapEvent[]>([]);
+  const [selectedPlayerTotalSimulationTime, setSelectedPlayerTotalSimulationTime] = useState<number | null>(null);
 
 
   const playStartSound = useSound(startSound, 0.5);
@@ -100,7 +109,8 @@ export const MultiPlayerGame = ({
   const playSellSound = useSound(sellSound, 0.5);
   
   const { rounds, duration: buildingTime } = settings;
-  const playerScores = extractPlayerScores(players, score);
+  const playerScores = extractPlayerScores(players, score, true);
+  const roundPlayerScores = extractPlayerScores(players, score, false)
   const round = extractRound(score);
   const resultSentRef = useRef(false);
 
@@ -130,6 +140,7 @@ export const MultiPlayerGame = ({
       setSelectedPlayerRunnerStatus([]);
       setSelectedPlayerRunnerAngle([]);
       setSelectedPlayerClapEvents([]);
+      setSelectedPlayerTotalSimulationTime(null);
     }
 
     const onRoundResult = (result: RoundResult[]) => {
@@ -139,6 +150,7 @@ export const MultiPlayerGame = ({
     const onRoundEnd = (result : RoundResult[]) => {
       setscore(result);
       setIsRoundResultsDialogOpen(true);
+      setIsStopwatchRunning(false);
     };
 
     function onGameEnd(finalResult: FinalResults) {
@@ -195,6 +207,7 @@ export const MultiPlayerGame = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown]);
 
+  // Global stopwatch - not stopped until round end event received.
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
     
@@ -202,15 +215,7 @@ export const MultiPlayerGame = ({
     
     if (isStopwatchRunning) {
       timer = setInterval(() => {
-        setStopwatch(prevTime => {
-          if (totalSimulationTime !== null && prevTime >= totalSimulationTime && !resultSentRef.current) {
-            setIsStopwatchRunning(false);
-          }
-          
-          return totalSimulationTime !== null && prevTime >= totalSimulationTime
-            ? totalSimulationTime
-            : prevTime + 0.1;
-        });
+        setStopwatch(prevTime => prevTime + 0.1);
     }, 100);
   }
   
@@ -219,7 +224,7 @@ export const MultiPlayerGame = ({
       clearInterval(timer);
     }
   };
-}, [isStopwatchRunning, totalSimulationTime, grid, towers, resources]);
+}, [isStopwatchRunning]);
 
   const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
     if (isRunning) {
@@ -285,6 +290,7 @@ export const MultiPlayerGame = ({
     const runnerStatus = timeSteps.map(step => step.isSlowed);
     const runnerAngle = timeSteps.map(step => step.angle);
     const claps = timeSteps.flatMap(step => step.claps || []);
+    const totalSimTime = timeSteps.length * defaultTimeStep;
     
     setRunnerPath(positions);
     setRunnerStatus(runnerStatus);
@@ -296,7 +302,7 @@ export const MultiPlayerGame = ({
     setStopwatch(0);
     setIsStopwatchRunning(true);
     
-    const totalSimTime = timeSteps.length * defaultTimeStep;
+    
     setTotalSimulationTime(totalSimTime);
   };
 
@@ -324,6 +330,7 @@ export const MultiPlayerGame = ({
     const runnerStatus = timeSteps.map(step => step.isSlowed);
     const runnerAngle = timeSteps.map(step => step.angle);
     const claps = timeSteps.flatMap(step => step.claps || []);
+    const totalSimTime = timeSteps.length * defaultTimeStep;
 
     setSelectedPlayerGrid(playerGrid);
     setSelectedPlayerTowers(playerTowers);
@@ -331,6 +338,7 @@ export const MultiPlayerGame = ({
     setSelectedPlayerRunnerAngle(runnerAngle);
     setSelectedPlayerRunnerStatus(runnerStatus);
     setSelectedPlayerClapEvents(claps);
+    setSelectedPlayerTotalSimulationTime(totalSimTime);
   }
   
   return (
@@ -374,7 +382,7 @@ export const MultiPlayerGame = ({
                 isRunning={isRunning}
                 clapEvents={clapEvents}
                 resources={resources}
-                stopwatch={stopwatch}
+                stopwatch={displayStopwatch(stopwatch, totalSimulationTime)}
                 countdown={countdown}
                 handleStartButton={null}
                 handleReset={null}
@@ -395,7 +403,7 @@ export const MultiPlayerGame = ({
                 isRunning={isRunning}
                 clapEvents={selectedPlayerClapEvents}
                 resources={resources}
-                stopwatch={stopwatch}
+                stopwatch={displayStopwatch(stopwatch, selectedPlayerTotalSimulationTime)}
                 countdown={countdown}
                 handleStartButton={null}
                 handleReset={null}
@@ -428,7 +436,7 @@ export const MultiPlayerGame = ({
       )}
 
       <RoundResultsDialog
-        players={playerScores}
+        players={roundPlayerScores}
         round={round}
         numRounds={settings.rounds}
         open={isRoundResultsDialogOpen}

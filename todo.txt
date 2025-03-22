@@ -1,6 +1,9 @@
 In game:
-    Hold shift to upgrade tower with left click. Should be possible both for sellable, and non sellable block tower. 
-        Need to think a bit how about the non-sellable case
+    Indicate which users have finished (green border or whatever)
+    Round result dialog is not sorted correctly.
+
+Performance? 
+    Most likely there's bunch of easy improvements that can be made.
 
 General:
     Challenge mode?
@@ -11,6 +14,5 @@ Server:
     Improve handling of:
         Players leaving
         Players not sending results in time
-            Have all users ack that simulation has ended? Only then send round end event. Max time ofc.
 
 

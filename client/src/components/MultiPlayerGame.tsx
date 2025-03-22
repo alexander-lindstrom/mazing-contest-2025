@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
-import { canPlaceTower, canSellTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
+import { canDowngradeTower, canPlaceTower, canSellTower, canUpgradeTower, ChatMessage, ClapEvent, defaultGoal, defaultHeight, defaultStart,
   defaultTimeStep, defaultWidth, FinalResults, findShortestPath, GameActionEnum, GameSettingsData, get2x2Positions, GridCell,
   pathExists,
   PlayerData,
@@ -104,9 +104,9 @@ export const MultiPlayerGame = ({
 
 
   const playStartSound = useSound(startSound, 0.5);
-  const playInvalidSound = useSound(invalidSound, 0.5);
-  const playBuildSound = useSound(buildSound, 0.5);
-  const playSellSound = useSound(sellSound, 0.5);
+  const invalidActionSound = useSound(invalidSound, 0.5);
+  const buildTowerSound = useSound(buildSound, 0.5);
+  const sellTowerSound = useSound(sellSound, 0.5);
   
   const { rounds, duration: buildingTime } = settings;
   const playerScores = extractPlayerScores(players, score, true);
@@ -227,53 +227,101 @@ export const MultiPlayerGame = ({
 }, [isStopwatchRunning]);
 
   const handleCellClick = (x: number, y: number, e: KonvaEventObject<MouseEvent>) => {
-    if (isRunning) {
-      return;
-    }
-    if (!pathExists(grid, defaultStart, defaultGoal, { x, y })) {
-      playInvalidSound();
-      return;
-    }
-    const newGrid = grid.map(row => [...row]);
-    const shiftPress = e.evt.shiftKey;
-
-    if (canSellTower(grid, x, y)) {
-      const towerIndex = towers.findIndex(tower =>
-        tower.positions.some(pos => pos.x === x && pos.y === y)
-      );
-      if (towerIndex !== -1) {
-        playSellSound();
-        const tower = towers[towerIndex];
-        const goldDiff = 1;
-        const lumberDiff = tower.type === GridCell.CLAP_TOWER ? 1 : 0;
-        tower.positions.forEach(pos => {
-          newGrid[pos.y][pos.x] = GridCell.GRASS;
-        });
-        const newTowers = [...towers];
-        newTowers.splice(towerIndex, 1);
-        setGrid(newGrid);
-        setTowers(newTowers);
-        setResources({ gold: resources.gold + goldDiff, lumber: resources.lumber + lumberDiff });
+      if (isRunning) {
         return;
       }
-    } else if (canPlaceTower(grid, x, y)) {
-      const positions = get2x2Positions({ x, y });
-      const lumberCost = shiftPress ? 1 : 0;
-      if (resources.gold < 1 || resources.lumber < lumberCost) {
+      if (!pathExists(grid, defaultStart, defaultGoal, { x, y })) {
+        invalidActionSound();
         return;
+      }
+      const newGrid = grid.map(row => [...row]);
+      const shiftPress = e.evt.shiftKey;
+  
+      if (!shiftPress && canSellTower(grid, x, y)) {
+        const towerIndex = towers.findIndex(tower =>
+          tower.positions.some(pos => pos.x === x && pos.y === y)
+        );
+        if (towerIndex !== -1) {
+          sellTowerSound();
+          const tower = towers[towerIndex];
+          const goldDiff = 1;
+          const lumberDiff = tower.type === GridCell.CLAP_TOWER ? 1 : 0;
+          tower.positions.forEach(pos => {
+            newGrid[pos.y][pos.x] = GridCell.GRASS;
+          });
+          const newTowers = [...towers];
+          newTowers.splice(towerIndex, 1);
+          setGrid(newGrid);
+          setTowers(newTowers);
+          setResources({ gold: resources.gold + goldDiff, lumber: resources.lumber + lumberDiff });
+          return;
+        }
       } 
-      playBuildSound();
-      positions.forEach(pos => {
-        newGrid[pos.y][pos.x] = shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER;
-      });
-      setGrid(newGrid);
-      setTowers([...towers, { type: shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER, positions }]);
-      setResources({ gold: resources.gold - 1, lumber: resources.lumber - lumberCost });
-    }
-    else{
-      playInvalidSound();
-    }
-  };
+      else if (!shiftPress && canDowngradeTower(grid, x, y)) {
+        const towerIndex = towers.findIndex(tower =>
+          tower.positions.some(pos => pos.x === x && pos.y === y)
+        );
+        if (towerIndex !== -1) {
+          sellTowerSound();
+          const tower = towers[towerIndex];
+          const lumberDiff = 1;
+  
+          tower.positions.forEach(pos => {
+            newGrid[pos.y][pos.x] = GridCell.BLOCK_TOWER_NOSELL;
+          });
+          const newTowers = [...towers];
+          newTowers[towerIndex].type = GridCell.BLOCK_TOWER_NOSELL;
+          setGrid(newGrid);
+          setTowers(newTowers);
+          setResources({ gold: resources.gold, lumber: resources.lumber + lumberDiff });
+          return;
+        }
+      }
+      else if (shiftPress && canUpgradeTower(grid, x, y)) {
+        const towerIndex = towers.findIndex(tower =>
+          tower.positions.some(pos => pos.x === x && pos.y === y)
+        );
+        if (towerIndex !== -1) {
+          const lumberCost = 1;
+          if (resources.lumber < lumberCost) {
+            invalidActionSound();
+            return;
+          }
+  
+          buildTowerSound();
+          
+          const tower = towers[towerIndex];
+          const newTowerType = tower.type === GridCell.BLOCK_TOWER_NOSELL ? GridCell.BLOCK_TOWER_NOSELL_UPGRADED : GridCell.CLAP_TOWER;
+          tower.positions.forEach(pos => {
+            newGrid[pos.y][pos.x] = newTowerType;
+          });
+          const newTowers = [...towers];
+          newTowers[towerIndex].type = newTowerType;
+          setGrid(newGrid);
+          setTowers(newTowers);
+          setResources({ gold: resources.gold, lumber: resources.lumber - lumberCost });
+          return;
+        }
+      }
+      else if (canPlaceTower(grid, x, y)) {
+        const positions = get2x2Positions({ x, y });
+        const lumberCost = shiftPress ? 1 : 0;
+        if (resources.gold < 1 || resources.lumber < lumberCost) {
+          invalidActionSound()
+          return;
+        }
+        buildTowerSound();
+        positions.forEach(pos => {
+          newGrid[pos.y][pos.x] = shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER;
+        });
+        setGrid(newGrid);
+        setTowers([...towers, { type: shiftPress ? GridCell.CLAP_TOWER : GridCell.BLOCK_TOWER, positions }]);
+        setResources({ gold: resources.gold - 1, lumber: resources.lumber - lumberCost });
+      }
+      else{
+        invalidActionSound();
+      }
+    };
 
   const handleRunnerStart = () => {
     if (isRunning) {

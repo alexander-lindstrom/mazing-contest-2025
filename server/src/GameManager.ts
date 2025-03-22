@@ -165,8 +165,6 @@ delay(seconds: number): Promise<void> {
       return;
     }
 
-    console.log("Client submit result");
-
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player, finalTowers: finalResult.towers });
 
     if (game.allResultsReceived()) {

@@ -18,6 +18,7 @@ export enum GridCell {
   CLAP_TOWER,
   BLOCK_TOWER_NOSELL,
   CLAP_TOWER_NOSELL,
+  BLOCK_TOWER_NOSELL_UPGRADED,
 }
 
 export const defaultHeight = 20;
@@ -85,6 +86,8 @@ export const getCellColor = (cell: GridCell): string => {
       return '#3498DB'; // Bright blue
     case GridCell.CLAP_TOWER_NOSELL:
       return '#3498DB'; // Bright blue
+    case GridCell.BLOCK_TOWER_NOSELL_UPGRADED:
+      return '#3498DB'; // Bright blue
     default:
       return '#FFFFFF';
   }
@@ -101,6 +104,8 @@ export const getBaseCellColor = (cell: GridCell): string => {
     case GridCell.BLOCK_TOWER_NOSELL:
       return '#5C4033';
     case GridCell.CLAP_TOWER_NOSELL:
+      return '#5C4033';
+    case GridCell.BLOCK_TOWER_NOSELL_UPGRADED:
       return '#5C4033';
     case GridCell.BLOCK_TOWER:
       return '#8B5A2B';
@@ -140,6 +145,16 @@ export const canSellTower = (grid: GridCell[][], x: number, y: number): boolean 
   return cell === GridCell.BLOCK_TOWER || cell === GridCell.CLAP_TOWER;
 };
 
+export const canDowngradeTower = (grid: GridCell[][], x: number, y: number): boolean => {
+  const cell = grid[y][x];
+  return cell === GridCell.BLOCK_TOWER_NOSELL_UPGRADED;
+};
+
+export const canUpgradeTower = (grid: GridCell[][], x: number, y: number): boolean => {
+  const cell = grid[y][x];
+  return cell === GridCell.BLOCK_TOWER_NOSELL || cell == GridCell.BLOCK_TOWER;
+};
+
 export function distance2D(pos1: Position, pos2: Position): number {
   const dx = pos2.x - pos1.x;
   const dy = pos2.y - pos1.y;
@@ -148,7 +163,7 @@ export function distance2D(pos1: Position, pos2: Position): number {
 
 export function isTower(g: GridCell){
   return g === GridCell.BLOCK_TOWER || g === GridCell.BLOCK_TOWER_NOSELL ||
-    g === GridCell.CLAP_TOWER || g === GridCell.CLAP_TOWER_NOSELL;
+    g === GridCell.CLAP_TOWER || g === GridCell.CLAP_TOWER_NOSELL || g === GridCell.BLOCK_TOWER_NOSELL_UPGRADED;
 }
 
 function getTotalTowerValue(grid: GridCell[][]): { gold: number; lumber: number } {
@@ -159,7 +174,7 @@ function getTotalTowerValue(grid: GridCell[][]): { gold: number; lumber: number 
     for (const cell of row) {
       if (cell === GridCell.BLOCK_TOWER || cell === GridCell.BLOCK_TOWER_NOSELL) {
         gold += 1;
-      } else if (cell === GridCell.CLAP_TOWER || cell === GridCell.CLAP_TOWER_NOSELL) {
+      } else if (cell === GridCell.CLAP_TOWER || cell === GridCell.CLAP_TOWER_NOSELL || cell === GridCell.BLOCK_TOWER_NOSELL_UPGRADED) {
         gold += 1;
         lumber += 1;
       }
@@ -171,9 +186,20 @@ function getTotalTowerValue(grid: GridCell[][]): { gold: number; lumber: number 
 function checkNonSellableTowers(initialGrid: GridCell[][], finalGrid: GridCell[][]): boolean {
   for (let i = 0; i < initialGrid.length; i++) {
     for (let j = 0; j < initialGrid[i].length; j++) {
+      const initialCell = initialGrid[i][j];
+      const finalCell = finalGrid[i][j];
+
       if (
-        (initialGrid[i][j] === GridCell.BLOCK_TOWER_NOSELL || initialGrid[i][j] === GridCell.CLAP_TOWER_NOSELL) &&
-        initialGrid[i][j] !== finalGrid[i][j]
+        initialCell === GridCell.BLOCK_TOWER_NOSELL &&
+        finalCell !== GridCell.BLOCK_TOWER_NOSELL &&
+        finalCell !== GridCell.BLOCK_TOWER_NOSELL_UPGRADED
+      ) {
+        return false;
+      }
+
+      if (
+        initialCell === GridCell.CLAP_TOWER_NOSELL &&
+        initialCell !== finalCell
       ) {
         return false;
       }

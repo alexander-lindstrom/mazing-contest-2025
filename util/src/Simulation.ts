@@ -92,7 +92,7 @@ export function simulateRunnerMovement(
     let isSlowed = slowTimeRemaining > 0;
 
     for (const tower of towers) {
-      if (tower.type === GridCell.CLAP_TOWER || tower.type === GridCell.CLAP_TOWER_NOSELL) {
+      if (tower.type === GridCell.CLAP_TOWER || tower.type === GridCell.CLAP_TOWER_NOSELL || tower.type === GridCell.BLOCK_TOWER_NOSELL_UPGRADED) {
         const centerPoint = getCenterPoint(tower.positions);
         const towerDistance = Math.sqrt(
           (centerPoint.x - runnerX) ** 2 + (centerPoint.y - runnerY) ** 2

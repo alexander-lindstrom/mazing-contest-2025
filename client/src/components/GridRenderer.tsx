@@ -136,30 +136,9 @@ const GridRenderer: React.FC<GridRendererParams> = ({
         })
       );
   
-      const unsellableTowers = towers
-        .filter((tower) => tower.type === GridCell.BLOCK_TOWER_NOSELL)
-        .map((tower, index) => {
-          const { positions } = tower;
-          const center = getCenterPoint(positions);
-          const centerX = (center.x + 0.5) * CELL_SIZE;
-          const centerY = (center.y + 0.5) * CELL_SIZE;
-          const radius = 2 * CELL_SIZE;
-  
-          return (
-            <BlockingTower
-              key={`unsellable-tower-${index}`}
-              x={centerX}
-              y={centerY}
-              towerRadius={radius}
-              sellable={false}
-            />
-          );
-        });
-  
       return (
         <Layer cache>
           {gridElements.flat()}
-          {unsellableTowers}
           <GridLines
             key="grid-lines"
             width={grid[0].length * CELL_SIZE}
@@ -181,7 +160,7 @@ const GridRenderer: React.FC<GridRendererParams> = ({
       const radius = 2 * CELL_SIZE;
       const key = `tower-${index}`;
   
-      if (type === GridCell.CLAP_TOWER || type === GridCell.CLAP_TOWER_NOSELL) {
+      if (type === GridCell.CLAP_TOWER || type === GridCell.CLAP_TOWER_NOSELL || type == GridCell.BLOCK_TOWER_NOSELL_UPGRADED) {
         return (
           <SlowTower
             key={key}
@@ -190,12 +169,12 @@ const GridRenderer: React.FC<GridRendererParams> = ({
             y={centerY}
             towerRadius={radius}
             showEffectBorder={false} // Todo: show on hover?
-            sellable={type === GridCell.CLAP_TOWER}       
+            sellable={type === GridCell.CLAP_TOWER || type === GridCell.BLOCK_TOWER_NOSELL_UPGRADED}       
           />
         );
       }
   
-      if (type === GridCell.BLOCK_TOWER) {
+      if (type === GridCell.BLOCK_TOWER || type == GridCell.BLOCK_TOWER_NOSELL) {
         return (
           <BlockingTower
             key={key}
@@ -203,7 +182,7 @@ const GridRenderer: React.FC<GridRendererParams> = ({
             x={centerX}
             y={centerY}
             towerRadius={radius}
-            sellable={true}
+            sellable={type === GridCell.BLOCK_TOWER}
           />
         );
       }

@@ -27,7 +27,7 @@ const RoundResultsDialog: React.FC<RoundResultsDialogProps> = ({
 }) => {
   const [progress, setProgress] = useState(100);
 
-  const sortedPlayers = [...players].sort((a, b) => a.score - b.score);
+  const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
 
   useEffect(() => {
     if (!open) return;

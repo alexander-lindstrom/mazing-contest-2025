@@ -172,25 +172,24 @@ delay(seconds: number): Promise<void> {
     if (game.allResultsReceived()) {
 
       const results = game.getResultsForCurrentRound();
+      console.log("Emitting event:", GameActionEnum.SERVER_ROUND_RESULT, results);
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_RESULT, results);
-      console.log("Server round result");
 
       const longestDuration = results.reduce((maxDuration, roundResult) => {
         return roundResult.duration > maxDuration ? roundResult.duration : maxDuration;
       }, 0);
-      console.log("Longest duration:" + longestDuration)
       const grace = 2;
       await this.delay(longestDuration + 2);
       
-      console.log("Server round ended");
+      console.log("Emitting event:", GameActionEnum.SERVER_ROUND_ENDED, results);
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_ENDED, results);
       await this.delay(game.getState().roundTransitionDelay);
 
       if (game.startNextRound()) {
-        console.log("Server start new round");
-        console.log(game.getConfig())
+        console.log("Emitting event:", GameActionEnum.SERVER_ROUND_CONFIG, results);
         io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
       } else {
+        console.log("Emitting event:", GameActionEnum.SERVER_GAME_ENDED, results);
         io.to(game.id).emit(GameActionEnum.SERVER_GAME_ENDED, game.getFinalResults());
       }
     }

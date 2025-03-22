@@ -9,9 +9,8 @@ General:
 
 
 Give the option to select which player to view (during running phase).
-    Need the timer to be independent for each player in some way. Without causing issues.
-    If two many switches the next round never starts.
     Figure out how to clean up animations/sounds as needed.
+    Sometimes gets stuck. In particular when watching a losing player until the end and then switching to winningplayer.
   
 Server:
     Improve handling of:
@@ -20,4 +19,3 @@ Server:
             Have all users ack that simulation has ended? Only then send round end event. Max time ofc.
 
 Slight delay before sounds are played.
-Round result show cumulative time?

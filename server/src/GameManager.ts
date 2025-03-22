@@ -161,8 +161,11 @@ delay(seconds: number): Promise<void> {
     const duration = simulateRunnerMovement(finalResult.towers, path).length * defaultTimeStep;
     const player = game.getPlayerData(socket.id);
     if (!player) {
+      console.error("Player not found!");
       return;
     }
+
+    console.log("Client submid result");
 
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player, finalTowers: finalResult.towers });
 
@@ -177,10 +180,12 @@ delay(seconds: number): Promise<void> {
       const grace = 2;
       await this.delay(longestDuration + 2);
       
+      console.log("Server start new game");
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_ENDED, results);
       await this.delay(game.getState().roundTransitionDelay);
 
       if (game.startNextRound()) {
+        console.log("Server start new round");
         io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
       } else {
         io.to(game.id).emit(GameActionEnum.SERVER_GAME_ENDED, game.getFinalResults());

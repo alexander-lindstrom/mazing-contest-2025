@@ -55,8 +55,6 @@ export function SinglePlayerGame({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown]);
 
-  console.log(totalSimulationTime)
-
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
     

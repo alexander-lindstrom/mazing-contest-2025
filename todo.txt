@@ -1,18 +1,16 @@
-In game:
-    Indicate which users have finished (green border or whatever)
-    Round result dialog is not sorted correctly.
-
 Performance? 
     Most likely there's bunch of easy improvements that can be made.
-
-General:
-    Challenge mode?
-        Option available after completed game.
-        Display two mazes side by side.
   
 Server:
     Improve handling of:
         Players leaving
         Players not sending results in time
 
-
+General:
+    Challenge mode?
+        Option available after completed game.
+        Display two mazes side by side.
+    Maze of the day
+        Single player, get maze from backend with http req
+        Postgres db
+        Leaderboard for the day

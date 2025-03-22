@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 export interface Player {
   id: string;
   name: string;
+  finished: boolean;
 }
 
 interface PlayerSelectorProps {
@@ -40,6 +41,7 @@ const PlayerSelector: React.FC<PlayerSelectorProps> = ({
               ${effectiveSelectedId === player.id ? 'bg-slate-600 border border-slate-400' : 'bg-slate-700'}
               ${isAnimationPhase ? 'cursor-pointer hover:bg-slate-600' : 'opacity-80'}
               transition-all duration-200
+              ${player.finished ? 'border-l-4 border-l-green-500' : ''}
             `}
           >
             <div className="flex-1 mx-2 font-mono text-white truncate">

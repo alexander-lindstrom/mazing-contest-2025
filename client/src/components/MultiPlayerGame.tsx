@@ -16,7 +16,7 @@ import Scoreboard, { PlayerScore } from './ScoreBoard';
 import { GameChat } from './GameChat';
 import RoundResultsDialog from './RoundResultsDialog';
 import FinalResultsDisplay from './FinalResultsDisplay';
-import PlayerSelector from './PlayerSelector';
+import PlayerSelector, { Player } from './PlayerSelector';
 
 
 interface MultiPlayerGameProps {
@@ -67,6 +67,27 @@ const displayStopwatch = (stopwatch: number, totalSimulationTime: number | null)
   return stopwatch > totalSimulationTime ? totalSimulationTime : stopwatch;
 }
 
+function getPlayerStatus(
+  players: PlayerData[], 
+  roundResults: RoundResult[] | null, 
+  stopwatch: number
+): Player[] {
+  return players.map(player => {
+    let finished = false;
+    
+    if (roundResults) {
+      const playerResult = roundResults.find(result => result.player.id === player.id);
+      finished = !!playerResult && playerResult.duration < stopwatch;
+    }
+    
+    return {
+      id: player.id,
+      name: player.name,
+      finished
+    };
+  });
+}
+
 export const MultiPlayerGame = ({
   settings, 
   chatLog,
@@ -113,6 +134,8 @@ export const MultiPlayerGame = ({
   const roundPlayerScores = extractPlayerScores(players, score, false)
   const round = extractRound(score);
   const resultSentRef = useRef(false);
+
+  const playerStatus = getPlayerStatus(players, roundResult, stopwatch);
 
   useEffect(() => {
     const socket = getSocket();
@@ -409,7 +432,7 @@ export const MultiPlayerGame = ({
             </div>
             <div>
             <PlayerSelector
-              players={playerScores}
+              players={playerStatus}
               isAnimationPhase={isRunning}
               onSelectPlayer={updateSelectedPlayer}
               currentUserId={player.id}

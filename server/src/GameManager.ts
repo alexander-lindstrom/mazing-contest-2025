@@ -165,7 +165,7 @@ delay(seconds: number): Promise<void> {
       return;
     }
 
-    console.log("Client submid result");
+    console.log("Client submit result");
 
     game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player, finalTowers: finalResult.towers });
 
@@ -180,12 +180,13 @@ delay(seconds: number): Promise<void> {
       const grace = 2;
       await this.delay(longestDuration + 2);
       
-      console.log("Server start new game");
+      console.log("Server round ended");
       io.to(game.id).emit(GameActionEnum.SERVER_ROUND_ENDED, results);
       await this.delay(game.getState().roundTransitionDelay);
 
       if (game.startNextRound()) {
         console.log("Server start new round");
+        console.log(game.getConfig())
         io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
       } else {
         io.to(game.id).emit(GameActionEnum.SERVER_GAME_ENDED, game.getFinalResults());

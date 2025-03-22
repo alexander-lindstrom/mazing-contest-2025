@@ -10,7 +10,7 @@ General:
 
 Give the option to select which player to view (during running phase).
     Figure out how to clean up animations/sounds as needed.
-    Sometimes gets stuck. In particular when watching a losing player until the end and then switching to winningplayer.
+    Running in 'prod' always get stuck. Round 2 never starts - regardless of view.
   
 Server:
     Improve handling of:

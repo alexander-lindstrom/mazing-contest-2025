@@ -118,8 +118,6 @@ export const MultiPlayerGame = ({
     const socket = getSocket();
 
     function onRoundStart(config: StartingState) {
-      console.log("Client round start")
-      console.log(config)
       playStartSound();
       setGrid(config.grid);
       setTowers(config.towers);
@@ -146,12 +144,10 @@ export const MultiPlayerGame = ({
     }
 
     const onRoundResult = (result: RoundResult[]) => {
-      ("Client round result")
       setRoundResult(result);
     };
 
     const onRoundEnd = (result : RoundResult[]) => {
-      console.log("Client round end");
       setscore(result);
       setIsRoundResultsDialogOpen(true);
       setIsStopwatchRunning(false);

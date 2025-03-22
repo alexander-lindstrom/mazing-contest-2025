@@ -6,11 +6,6 @@ General:
     Challenge mode?
         Option available after completed game.
         Display two mazes side by side.
-
-
-Give the option to select which player to view (during running phase).
-    Figure out how to clean up animations/sounds as needed.
-    Running in 'prod' always get stuck. Round 2 never starts - regardless of view.
   
 Server:
     Improve handling of:
@@ -18,4 +13,4 @@ Server:
         Players not sending results in time
             Have all users ack that simulation has ended? Only then send round end event. Max time ofc.
 
-Slight delay before sounds are played.
+

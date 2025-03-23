@@ -91,7 +91,6 @@ export function setupGameServer(io: Server): void {
       message: message, 
       timestamp: Date.now() 
     };
-    console.log(chatMessage)
     io.to(gameId).emit("chat-broadcast", chatMessage);
   }
 
@@ -119,5 +118,7 @@ export function setupGameServer(io: Server): void {
     }
     game.updatePlayer(userId, false);
     gameManager.leaveGame(socket, userId)
+    socket.leave(game.id);
+    io.to(game.id).emit("player-update", game.getLobbyInformation());
   }
 }

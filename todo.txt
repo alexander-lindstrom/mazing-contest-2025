@@ -2,9 +2,8 @@
   
 Server:
     Improve handling of:
-        Players disconnected.
-        Players not sending results in time - give starting config score.
-        Reconnecting. local storage UUID to be used as identifier (replace socket.id).
+        Players not sending results in time - give starting config score. Little bit tricky - think about how.
+        Reconnecting - later.
 
 Performance? 
     Most likely there's bunch of easy improvements that can be made.

@@ -4,6 +4,7 @@ import { MultiPlayerGameController } from "./pages/MultiPlayerGameController";
 import SoundButton from "./components/SoundButton";
 import { getParamFromUrl, removeParamFromUrl } from "./util/url";
 import { getSocket } from "./socket";
+import { getUserId } from "./user";
 
 function App() {
   const [gameMode, setGameMode] = useState<"single" | "multi" | null>(null);
@@ -34,10 +35,9 @@ function App() {
   const handleTitleClick = () => {
     setGameMode(null);
 
-    const socket = getSocket();
+    const socket = getSocket(getUserId());
     if (socket.connected) {
       socket.disconnect();
-      console.log("Socket disconnected");
     }
   };
 

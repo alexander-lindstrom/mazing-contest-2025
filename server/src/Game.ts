@@ -129,10 +129,13 @@ export class Game {
     player.push(result);
   }
 
-  allResultsReceived(){
-    return Array.from(this.state.results.values()).every(resultsArray => 
-      resultsArray[this.state.currentRound] !== undefined
-    );
+  allResultsReceived(): boolean {
+    const playerIds = Array.from(this.players.keys());
+  
+    return playerIds.every(playerId => {
+      const resultsArray = this.state.results.get(playerId);
+      return resultsArray && resultsArray[this.state.currentRound] !== undefined;
+    });
   }
 
   getResultsForCurrentRound(): RoundResult[] {

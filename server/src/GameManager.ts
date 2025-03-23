@@ -1,8 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { randomUUID } from 'crypto';
 import { Game } from './Game';
-import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, GameAction, GameActionEnum, GameStatusEnum, generateStartingState,
-   LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, UpdateSettingsRequest, validateRoundResult } from '@mazing/util';
+import { defaultGoal, defaultStart, defaultTimeStep, findShortestPath, GameAction, GameActionEnum, GameSettingsData, GameStatusEnum, generateStartingState,
+   LobbyInformation, PlayerData, simulateRunnerMovement, StartingState, validateRoundResult } from '@mazing/util';
 
 export class GameManager {
   private games: Map<string, Game>;
@@ -18,9 +18,6 @@ export class GameManager {
   createGame(host: PlayerData): Game {
 
     const gameId = randomUUID();
-    if (this.games.has(gameId)) {
-      console.error('Game ID already exists');
-    }
     const game = new Game(gameId, host);
     this.games.set(gameId, game);
 
@@ -28,7 +25,7 @@ export class GameManager {
     return game;
   }
 
-  joinGame(gameId: string, socket: Socket, playerData: PlayerData): Game | undefined{
+  joinGame(gameId: string, socket: Socket, player: PlayerData): Game | undefined{
     const game = this.games.get(gameId);
     if (!game) {
       console.error('Game not found');
@@ -39,15 +36,15 @@ export class GameManager {
       console.error("Cannot join started game!");
     }
     
-    game.addPlayer(socket.id, playerData);
-    this.playerToGame.set(socket.id, gameId);
+    game.addPlayer(player);
+    this.playerToGame.set(player.id, gameId);
     
     socket.join(gameId);
     return game;
   }
 
-  leaveGame(socket: Socket): Game | null {
-    const gameId = this.playerToGame.get(socket.id);
+  leaveGame(socket: Socket, playerId: string): Game | null {
+    const gameId = this.playerToGame.get(playerId);
 
     if (!gameId) {
       return null;
@@ -58,8 +55,8 @@ export class GameManager {
       return null;
     }
 
-    const remainingPlayers = game.removePlayer(socket.id);
-    this.playerToGame.delete(socket.id);
+    const remainingPlayers = game.removePlayer(playerId);
+    this.playerToGame.delete(playerId);
 
     if (remainingPlayers === 0) {
       this.games.delete(gameId);
@@ -68,8 +65,8 @@ export class GameManager {
     return game;
   }
 
-  getGameByPlayer(socketId: string): Game | null {
-    const gameId = this.playerToGame.get(socketId);
+  getGameByPlayer(playerId: string): Game | null {
+    const gameId = this.playerToGame.get(playerId);
     return gameId ? this.games.get(gameId) || null : null;
   }
 
@@ -81,9 +78,9 @@ export class GameManager {
     return Array.from(this.games.values()).map(game => game.getLobbyInformation());
   }      
 
-  handleGameAction(io: Server, socket: Socket, action: GameAction) {
+  handleGameAction(io: Server, socket: Socket, action: GameAction, player: PlayerData) {
 
-    const game = this.getGameByPlayer(socket.id);
+    const game = this.getGameByPlayer(player.id);
     if (!game){
       console.error("Player not part of a game!")
       return;
@@ -91,7 +88,7 @@ export class GameManager {
 
     switch(action.type) {
         case GameActionEnum.CLIENT_ROUND_RESULT:
-            this.handleClientSubmitResult(io, socket, game, action);
+            this.handleClientSubmitResult(io, socket, game, action, player);
             break;
 
         default:
@@ -99,10 +96,10 @@ export class GameManager {
     }
   }
 
-   startGame(io: Server, socket: Socket, gameId: string) {
+   startGame(io: Server, socket: Socket, gameId: string, player: PlayerData) {
 
     const game = this.getGame(gameId);
-    if (!game || !game.canStart(socket.id)) {
+    if (!game || !game.canStart(player.id)) {
       console.error ("Game cannot start!");
       return;
     }
@@ -112,19 +109,18 @@ export class GameManager {
     io.to(game.id).emit(GameActionEnum.SERVER_ROUND_CONFIG, game.getConfig());
   }
 
-  updateSettings(io: Server, socket: Socket, req: UpdateSettingsRequest) {
-    const game = this.getGame(req.gameId);
+  updateSettings(io: Server, socket: Socket, gameId: string, settings: GameSettingsData, player: PlayerData) {
+    const game = this.getGame(gameId);
     if (!game) {
       console.error("Game not found!");
       return;
     }
-    if (!game.isHost(socket.id)) {
+    if (!game.isHost(player.id)) {
       console.error("Only host can change settings!");
       return;
     }
-    game.updateSettings(req.settings);
-    io.to(req.gameId).emit("update-settings", { rounds: req.settings.rounds, duration: req.settings.duration,
-       roundTransitionDelay: req.settings.roundTransitionDelay });
+    game.updateSettings(settings);
+    io.to(gameId).emit("update-settings", settings);
   }
 
   private cleanupFinishedGames(): void {
@@ -143,7 +139,7 @@ delay(seconds: number): Promise<void> {
   });
 }
 
-  private async handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction) {
+  private async handleClientSubmitResult(io: Server, socket: Socket, game: Game, action: GameAction, player: PlayerData) {
     if (game.getState().status !== GameStatusEnum.RUNNING) {
       console.error("Cannot send result for game which is not running!");
       return;
@@ -159,13 +155,13 @@ delay(seconds: number): Promise<void> {
     }
 
     const duration = simulateRunnerMovement(finalResult.towers, path).length * defaultTimeStep;
-    const player = game.getPlayerData(socket.id);
-    if (!player) {
+    const storedPlayer = game.getPlayerData(player.id);
+    if (!storedPlayer) {
       console.error("Player not found!");
       return;
     }
 
-    game.setResult(socket.id, { duration, finalMaze: finalResult.grid, player, finalTowers: finalResult.towers });
+    game.setResult(storedPlayer.id, { duration, finalMaze: finalResult.grid, player, finalTowers: finalResult.towers });
 
     if (game.allResultsReceived()) {
 

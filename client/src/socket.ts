@@ -7,11 +7,14 @@ const URL =
 
 let socket: Socket | null = null;
 
-export const getSocket = (): Socket => {
+export const getSocket = (userId: string): Socket => {
   if (!socket) {
     socket = io(URL, {
       autoConnect: false,
       transports: ['websocket'],
+      query: {
+        userId: userId
+      }
     });
   }
   return socket;

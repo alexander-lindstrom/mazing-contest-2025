@@ -44,8 +44,8 @@ export class Game {
     this.state.results.set(host.id, []);
   }
 
-  addPlayer(socketId: string, playerData: PlayerData): number | undefined  {
-    if (this.players.has(socketId)) {
+  addPlayer(player: PlayerData): number | undefined  {
+    if (this.players.has(player.id)) {
         console.error('Player already added');
         return;
     }
@@ -55,8 +55,8 @@ export class Game {
         return;
     }
 
-    this.players.set(socketId, playerData);
-    this.state.results.set(socketId, []);
+    this.players.set(player.id, player);
+    this.state.results.set(player.id, []);
 
     return this.players.size;
 }
@@ -150,7 +150,7 @@ export class Game {
       .filter((result): result is RoundResult => result !== undefined);
   }
 
-  public getFinalResults(): FinalResults {
+  getFinalResults(): FinalResults {
     const finalResults: FinalResult[] = [];
 
     this.state.results.forEach((results, playerId) => {
@@ -171,6 +171,19 @@ export class Game {
       players: finalResults,
     };
   }
+
+  updatePlayer(playerId: string, connectionStatus: boolean) {
+    const player = this.players.get(playerId);
+    if (!player) {
+      console.error("Cannot update player!");
+      return;
+    }
+    if (player) {
+        player.connected = connectionStatus;
+    }
+}
+
+
   
   getLobbyInformation(): LobbyInformation {
     return {
@@ -181,6 +194,7 @@ export class Game {
       players: Array.from(this.players.entries()).map(([id, player]) => ({
         id,
         name: player.name,
+        connected: player.connected,
       })),
     };
   }  

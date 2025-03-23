@@ -13,6 +13,7 @@ export enum GameActionEnum {
 export interface PlayerData {
   name: string;
   id: string;
+  connected: boolean;
 }
 
 export interface LobbyInformation {
@@ -27,12 +28,6 @@ export interface ChatMessage {
   sender: string;
   message: string;
   timestamp: number;
-}
-
-export interface ChatRequest {
-  gameId: string;
-  message: string;
-  sender: string;
 }
 
 // Rename to something more reasonable
@@ -71,7 +66,3 @@ export interface GameSettingsData {
   roundTransitionDelay: number;
 }
 
-export interface UpdateSettingsRequest {
-  gameId: string;
-  settings: GameSettingsData;
-}

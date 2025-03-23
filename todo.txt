@@ -1,10 +1,13 @@
-Performance? 
-    Most likely there's bunch of easy improvements that can be made.
+
   
 Server:
     Improve handling of:
-        Players leaving
-        Players not sending results in time
+        Players disconnected.
+        Players not sending results in time - give starting config score.
+        Reconnecting. local storage UUID to be used as identifier (replace socket.id).
+
+Performance? 
+    Most likely there's bunch of easy improvements that can be made.
 
 General:
     Challenge mode?

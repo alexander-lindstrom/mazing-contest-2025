@@ -18,16 +18,6 @@ import RoundResultsDialog from './RoundResultsDialog';
 import FinalResultsDisplay from './FinalResultsDisplay';
 import PlayerSelector, { Player } from './PlayerSelector';
 
-
-interface MultiPlayerGameProps {
-  settings: GameSettingsData,
-  chatLog: ChatMessage[];
-  onChatMessage: (message: string) => void;
-  initialScore: RoundResult[] | null;
-  players: PlayerData[];
-  player: { id: string, name: string };
-}
-
 const extractPlayerScores = (
   players: PlayerData[],
   roundResults: RoundResult[] | null,
@@ -88,6 +78,15 @@ function getPlayerStatus(
   });
 }
 
+interface MultiPlayerGameProps {
+  settings: GameSettingsData,
+  chatLog: ChatMessage[];
+  onChatMessage: (message: string) => void;
+  initialScore: RoundResult[] | null;
+  players: PlayerData[];
+  player: { id: string, name: string };
+}
+
 export const MultiPlayerGame = ({
   settings, 
   chatLog,
@@ -138,7 +137,7 @@ export const MultiPlayerGame = ({
   const playerStatus = getPlayerStatus(players, roundResult, stopwatch);
 
   useEffect(() => {
-    const socket = getSocket();
+    const socket = getSocket(player.id);
 
     function onRoundStart(config: StartingState) {
       playStartSound();
@@ -204,7 +203,7 @@ export const MultiPlayerGame = ({
           if (newCountdown <= 0) {
             if (!resultSentRef.current) {
               resultSentRef.current = true;
-              const socket = getSocket();
+              const socket = getSocket(player.id);
               const finalState: StartingState = {
                 height: grid.length > 0 ? grid.length : defaultHeight,
                 width: grid.length > 0 ? grid[0].length : defaultWidth,
@@ -213,7 +212,7 @@ export const MultiPlayerGame = ({
                 gold: resources.gold,
                 lumber: resources.lumber
               };
-              socket.emit('game-action', { type: GameActionEnum.CLIENT_ROUND_RESULT, payload: finalState });
+              socket.emit('game-action', { type: GameActionEnum.CLIENT_ROUND_RESULT, payload: finalState }, player);
             }
             handleRunnerStart()
           }

@@ -7,10 +7,11 @@ import { MultiPlayerGame } from '../components/MultiPlayerGame';
 import startSound from "../sounds/button_start.wav";
 import stopSound from "../sounds/button_stop.wav";
 import useSound from '@/hooks/useSound';
+import { getUserId, getUserName } from '@/user';
 
 export const MultiPlayerGameController = () => {
   const [isConnected, setIsConnected] = useState(false);
-  const [player, setPlayer] = useState<PlayerData>({ name: "", id: "" });
+  const [player, setPlayer] = useState<PlayerData>({ name: getUserName(), id: getUserId(), connected: false });
   const [availableGames, setAvailableGames] = useState<LobbyInformation[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [currentGame, setCurrentGame] = useState<LobbyInformation | null>(null);
@@ -22,19 +23,15 @@ export const MultiPlayerGameController = () => {
   const stopButtonClick = useSound(stopSound, 0.5);
 
   useEffect(() => {
-    const socket = getSocket();
+    const socket = getSocket(player.id);
     socket.connect();
 
-    function onConnect(socketId: string | undefined) {
+    function onConnect() {
       setIsConnected(true);
-      if (socketId) {
-        setPlayer((prevPlayer) => ({
-          ...prevPlayer,
-          id: socketId,
-        }));
-      } else {
-        console.warn("Socket ID is not available after connection.");
-      }
+      setPlayer(prevPlayer => ({
+        ...prevPlayer,
+        connected: true,
+      }));
     }    
 
     function onDisconnect() {
@@ -73,7 +70,7 @@ export const MultiPlayerGameController = () => {
     }
 
     socket.on("connect", () => {
-      onConnect(socket.id);
+      onConnect();
     });    
     socket.on('disconnect', onDisconnect);
     socket.on('list-games', onGamesList);
@@ -85,7 +82,7 @@ export const MultiPlayerGameController = () => {
     socket.on('update-settings', onSettingsUpdate);
 
     return () => {
-      socket.off("connect", () => onConnect(socket.id));
+      socket.off("connect", () => onConnect());
       socket.off('disconnect', onDisconnect);
       socket.off('list-games', onGamesList);
       socket.off('game-joined', onGameJoined);
@@ -102,8 +99,8 @@ export const MultiPlayerGameController = () => {
       setError('Please enter your name before hosting a game');
       return;
     }
-    const socket = getSocket();
-    socket?.emit('req-create-game', player.name);
+    const socket = getSocket(player.id);
+    socket?.emit('req-create-game', player);
   };
 
   const setPlayerNameAndClearError = (name: string) => {
@@ -111,9 +108,9 @@ export const MultiPlayerGameController = () => {
       ...prevPlayer,
       name: name,
     }));
-    if (error) {
-      setError(null);
-    }
+    setError(null);
+    localStorage.setItem("userName", name);
+ 
   };
 
   const handleRequestJoinGame = (gameId: string) => {
@@ -122,42 +119,30 @@ export const MultiPlayerGameController = () => {
       return;
     }
 
-    const socket = getSocket();
-    socket?.emit('req-join-game', {
-      gameId: gameId,
-      playerData: {
-        name: player.name,
-        id: socket.id
-      }
-    });    
+    const socket = getSocket(player.id);
+    socket?.emit('req-join-game', gameId, player);    
   };
 
   const handleLeaveGame = () => {
     stopButtonClick();
-    const socket = getSocket();
-    socket?.emit('req-leave-game', {
-      gameId: currentGame?.gameId
-    });
+    const socket = getSocket(player.id);
+    socket?.emit('req-leave-game', currentGame?.gameId, player);
   };
 
   const handleStartGame = () => {
     startButtonClick();
-    const socket = getSocket();
-    socket?.emit('req-start-game', currentGame?.gameId)
+    const socket = getSocket(player.id);
+    socket?.emit('req-start-game', currentGame?.gameId, player)
   };
 
   const handleChatMessage = (message: string) => {
-    const socket = getSocket();
-    socket?.emit('req-chat-message', {
-      message: message,
-      sender: player.name,
-      gameId: currentGame?.gameId,
-    });
+    const socket = getSocket(player.id);
+    socket?.emit('req-chat-message',currentGame?.gameId, message, player, );
   }
 
   const clientSettingsUpdate = (settings: GameSettingsData) => {
-    const socket = getSocket();
-    socket?.emit('req-update-settings', { gameId: currentGame?.gameId, settings: settings })
+    const socket = getSocket(player.id);
+    socket?.emit('req-update-settings', currentGame?.gameId, settings, player)
   }
 
   if (gameStarted && currentGame) {

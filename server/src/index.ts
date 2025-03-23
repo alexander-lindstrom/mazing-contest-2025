@@ -6,6 +6,7 @@ import { createServer as createHttpServer } from "http";
 import { createServer as createHttpsServer } from "https";
 import { setupGameServer } from "./SocketManager";
 import fs from "fs";
+import { getMaze } from './service';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -40,6 +41,19 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
     //credentials: true 
   }
+});
+
+app.get('/api/maze', (req, res) => {
+  const maze = getMaze();
+  res.json({ maze });
+});
+
+app.put('/api/result', (req, res) => {
+  const result = req.body; 
+  //validateResult(result);
+  //persistResult(result);
+
+  res.status(200).json({ message: 'Success', result });
 });
 
 setupGameServer(io);

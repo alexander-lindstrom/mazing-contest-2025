@@ -51,7 +51,7 @@ function App() {
       >
         <h1
           ref={titleRef}
-          className="text-6xl sm:text-7xl font-press-start text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400 retro-text-shadow pb-3"
+          className="text-6xl sm:text-7xl font-bold font-warcraft text-yellow-300 tower-defense-glow pb-3"
         >
           Mazing Contest!
         </h1>

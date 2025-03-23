@@ -15,4 +15,9 @@ General:
     Challenge mode?
         Option available after completed game.
         Display two mazes side by side.
+
+Appearance:
+    Some text/number can be made larger.
+    Try to handle different screen sizes.
+    Change title in some way.
     
